@@ -14,7 +14,7 @@ process.on('unhandledRejection', (reason, promise) => {
 
 // 1. Configuración inicial
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8000;
 console.log('3. Configuración inicial de Express y puertos.');
 
 // 2. Conexión a la base de datos
