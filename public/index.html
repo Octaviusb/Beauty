@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Tienda de productos de belleza y cuidado personal - BeautyGlow">
+  <title>BeautyGlow - Tienda de Belleza y Cuidado Personal</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="icon" href="./assets/favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <script>
+    if(window.location.hostname === "localhost") {
+      window.OtAutoBlock = false; // Desactiva el bloqueo en desarrollo local
+    }
+  </script>
+</head>
+<body>
+  <header class="main-header">
+    <div class="header-container">
+      <h1 class="logo">Beauty<span>Glow</span></h1>
+
+      <div class="cart-icon" id="cartButton">
+        <span class="cart-count">0</span>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/>
+        </svg>
+      </div>
+    </div>
+  </header>
+
+   <!-- Hero Section mejorada -->
+  <section id="inicio" class="hero" aria-labelledby="hero-heading">
+      <div class="hero-container">
+          <div class="hero-content">
+              <h1 id="hero-heading">Descubre tu Belleza Natural</h1>
+              <p>Los mejores cosméticos naturales para realzar tu belleza. Productos de alta calidad que cuidan tu piel.</p>
+              <!--<div class="hero-buttons">
+                  <a href="#productos" class="cta-button">Ver Productos</a>
+                  <a href="#categorias" class="cta-button secondary">Explorar Categorías</a>
+              </div>-->
+          </div>
+          <div class="hero-image">
+              <img src="https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" 
+                  alt="Variedad de cosméticos naturales" 
+                  loading="eager"
+                  width="600"
+                  height="400">
+          </div>
+      </div>
+  </section>
+
+  <!-- Categorías mejoradas -->
+  <section id="categorias" class="categories" aria-labelledby="categories-heading">
+    <div class="container">
+      <!--<h2 id="categories-heading" class="section-title">Nuestras Categorías</h2>
+      <p class="section-subtitle">Explora nuestros productos por categoría</p>-->
+      <div class="categories-grid" role="list">
+    <div class="category-card" role="listitem">
+      <div class="category-icon">
+        <i class="fas fa-palette" aria-hidden="true"></i>
+      </div>
+      <h3>Maquillaje</h3>
+      <p>Productos para realzar tu belleza natural</p>
+      <a href="#productos?filter=maquillaje" class="category-link filter-btn" data-filter="maquillaje">Ver productos</a>
+    </div>
+    <div class="category-card" role="listitem">
+      <div class="category-icon">
+        <i class="fas fa-spa" aria-hidden="true"></i>
+      </div>
+      <h3>Skincare</h3>
+      <p>Cuidado facial y corporal</p>
+      <a href="#productos?filter=skincare" class="category-link filter-btn" data-filter="skincare">Ver productos</a>
+    </div>
+    <div class="category-card" role="listitem">
+      <div class="category-icon">
+        <i class="fas fa-pump-soap" aria-hidden="true"></i>
+      </div>
+      <h3>Higiene</h3>
+      <p>Productos de limpieza y cuidado</p>
+      <a href="#productos?filter=higiene" class="category-link filter-btn" data-filter="higiene">Ver productos</a>
+    </div>
+    <div class="category-card" role="listitem">
+      <div class="category-icon">
+        <i class="fas fa-gem" aria-hidden="true"></i>
+      </div>
+      <h3>Accesorios</h3>
+      <p>Herramientas y accesorios de belleza</p>
+      <a href="#productos?filter=accesorios" class="category-link filter-btn" data-filter="accesorios">Ver productos</a>
+    </div>
+    <div class="category-card" role="listitem">
+      <div class="category-icon">
+        <i class="fas fa-hand-sparkles" aria-hidden="true"></i>
+      </div>
+      <h3>Uñas</h3>
+      <p>Esmaltes y cuidado de uñas</p>
+      <a href="#productos?filter=uñas" class="category-link filter-btn" data-filter="uñas">Ver productos</a>
+    </div>
+  </div>
+      </div>
+  </section>
+
+  <!-- Catálogo de productos -->
+  <section id="productos">
+    <h2>Productos</h2>
+    <div id="productsGrid" class="products-grid"></div>
+  </section>
+
+    <!-- Footer mejorado -->
+  <footer class="footer" aria-label="Pie de página">
+    <div class="container">
+      <div class="footer-content">
+    <div class="footer-col">
+      <h3>BeautyGlow</h3>
+      <p>Tu tienda de confianza para productos de belleza de alta calidad.</p>
+      <div class="newsletter">
+        <h4>Suscríbete a nuestro boletín</h4>
+        <form>
+          <input type="email" placeholder="Tu correo electrónico" required>
+          <button type="submit">Suscribirse</button>
+        </form>
+      </div>
+    </div>
+
+    <div class="footer-col">
+      <h4>Enlaces Rápidos</h4>
+      <ul>
+        <li><a href="#inicio">Inicio</a></li>
+        <li><a href="#productos">Productos</a></li>
+        <li><a href="#categorias">Categorías</a></li>
+        <li><a href="#contacto">Contacto</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-col">
+      <h4>Contacto</h4>
+      <address>
+        <p><i class="fas fa-phone"></i> <a href="tel:+1234567890">+1 234 567 890</a></p>
+        <p><i class="fas fa-envelope"></i> <a href="mailto:info@beauty-glow.com">info@beauty-glow.com</a></p>
+        <p><i class="fas fa-map-marker-alt"></i> Calle Principal 123, Ciudad</p>
+      </address>
+    </div>
+
+    <div class="footer-col">
+      <h4>Horario</h4>
+      <p>Lunes a Viernes: 9:00 - 18:00</p>
+      <p>Sábados: 10:00 - 14:00</p>
+      <p>Domingos: Cerrado</p>
+      <div class="social-links">
+        <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+        <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+        <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+        <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    <div class="legal-links">
+      <a href="#">Términos y condiciones</a>
+      <a href="#">Política de privacidad</a>
+      <a href="#">Aviso legal</a>
+    </div>
+    <p class="footer-legal">&copy; <span id="current-year"></span> BeautyGlow. Todos los derechos reservados.</p>
+  </div>
+  </footer>
+
+  <!-- Modal Carrito -->
+  <div id="carrito" class="modal hidden">
+    <div class="modal-content">
+      <button class="close-cart">&times;</button>
+      <h2>Tu Carrito</h2>
+      <div class="cart-items"></div>
+      <div class="cart-empty-message hidden">
+        <p>Tu carrito está vacío</p>
+        <button class="btn-continue-shopping">Seguir comprando</button>
+      </div>
+      <div class="cart-total">
+        <strong>Total:</strong> <span class="total-amount">$0.00</span>
+      </div>
+      <button id="btn-finalizar" class="checkout-btn">Finalizar Compra</button>
+    </div>
+  </div>
+
+  <!-- Modal de Compra -->
+  <div id="checkoutForm" class="modal hidden">
+    <div class="modal-content">
+      <button class="close-form">&times;</button>
+      <h2>Formulario de Compra</h2>
+      <form id="formularioCompra">
+        <div class="form-group">
+          <label>Nombre</label>
+          <input type="text" name="nombre" required />
+        </div>
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" name="email" required />
+        </div>
+        <div class="form-group">
+          <label>Dirección</label>
+          <input type="text" name="direccion" required />
+        </div>
+        <div class="form-group">
+          <label>Teléfono</label>
+          <input type="tel" name="telefono" required />
+        </div>
+        <div class="form-group">
+          <label>Método de pago</label>
+          <select name="medioPago" required>
+            <option value="">Selecciona</option>
+            <option value="transferencia">Transferencia</option>
+            <option value="nequi">Nequi</option>
+            <option value="daviplata">Daviplata</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Comprobante de pago (opcional, imagen o PDF)</label>
+          <input type="file" name="comprobante" accept="image/*,application/pdf" />
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn-back-to-cart">Volver</button>
+          <button type="submit" class="btn-submit">Confirmar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal de Confirmación de Pedido -->
+    <div id="confirmationModal" class="modal hidden">
+      <div class="modal-content">
+        <button class="btn-close-confirmation">&times;</button>
+        <h2>¡Pedido recibido!</h2>
+
+        <div class="confirmation-message">
+          <p><strong>Gracias por tu compra.</strong></p>
+          <p>Tu pedido será preparado y enviado a la dirección registrada.</p>
+
+          <p><strong>Confirma tu pago por:</strong></p>
+          <ul>
+            <li>📱 <strong>Nequi:</strong> 3001234567</li>
+            <li>💳 <strong>Daviplata:</strong> 3009876543</li>
+            <li>🏦 <strong>Transferencia Bancaria:</strong> Cuenta Ahorros Bancolombia 12345678901</li>
+          </ul>
+
+          <p>Después de realizar el pago, por favor envía el comprobante al WhatsApp 📲 3010001122.</p>
+<p class="confirmation-note"><strong>Nota:</strong> Cuando verifiquemos tu pago, tu pedido será despachado automáticamente.</p>
+        </div>
+
+        <button class="btn-back-to-shop">Volver a la tienda</button>
+      </div>
+    </div>
+  <!-- Modal de Producto Agregado al Carrito -->
+        <div id="addToCartModal" class="modal small hidden">
+      <div class="modal-content">
+        <p>Producto agregado al carrito ✅</p>
+      </div>
+    </div>
+
+
+  <script src="script.js" defer></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+  <script>
+    // Minimal test handler (keep for now)
+    document.addEventListener('click', function(e) {
+      console.log('[HTML TEST] Document click', e.target);
+    });
+
+    // Año dinámico en el footer - mover a script.js si es posible
+    document.getElementById('current-year').textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>

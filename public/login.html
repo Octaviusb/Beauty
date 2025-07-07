@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Iniciar sesión - Admin</title>
+</head>
+<body>
+  <h2>Ingreso al Panel</h2>
+  <form onsubmit="login(event)">
+    <input type="text" id="user" placeholder="Usuario"><br>
+    <input type="password" id="pass" placeholder="Contraseña"><br>
+    <button type="submit">Ingresar</button>
+  </form>
+
+  <script>
+    function login(e) {
+      e.preventDefault();
+      const user = document.getElementById("user").value;
+      const pass = document.getElementById("pass").value;
+
+      fetch('/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ user, pass })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          sessionStorage.setItem("adminAuth", "true");
+          window.location.href = "/admin/admin.html";
+        } else {
+          alert("Credenciales incorrectas");
+        }
+      });
+    }
+  </script>
+</body>
+</html>

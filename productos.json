@@ -1,0 +1,542 @@
+[
+  {
+    "id": 10,
+    "name": "Gel de Baño",
+    "category": "higiene",
+    "price": 21000,
+    "description": "Gel suave para piel sensible",
+    "image": "images/higiene/img64.jpg",
+    "badge": ""
+  },
+  {
+    "id": 11,
+    "name": "Jabón Antibacterial",
+    "category": "higiene",
+    "price": 15000,
+    "description": "Elimina el 99.9% de bacterias",
+    "image": "images/higiene/img247.jpg",
+    "badge": ""
+  },
+  {
+    "id": 12,
+    "name": "Serum Hidratante",
+    "category": "skincare",
+    "price": 42000,
+    "description": "Con ácido hialurónico y vitamina C",
+    "image": "images/skincare/img211.jpg",
+    "badge": "Oferta"
+  },
+  {
+    "id": 13,
+    "name": "Crema Antiarrugas",
+    "category": "skincare",
+    "price": 39000,
+    "description": "Reduce líneas de expresión",
+    "image": "images/skincare/img212.jpg",
+    "badge": ""
+  },
+  {
+    "id": 14,
+    "name": "Tónico Facial",
+    "category": "skincare",
+    "price": 25000,
+    "description": "Equilibra el pH de la piel",
+    "image": "images/skincare/img213.jpg",
+    "badge": ""
+  },
+  {
+    "id": 15,
+    "name": "Mascarilla Purificante",
+    "category": "skincare",
+    "price": 27000,
+    "description": "Elimina impurezas",
+    "image": "images/skincare/img227.jpg",
+    "badge": ""
+  },
+  {
+    "id": 16,
+    "name": "Contorno de Ojos",
+    "category": "skincare",
+    "price": 36000,
+    "description": "Reduce ojeras y bolsas",
+    "image": "images/skincare/img233.jpg",
+    "badge": ""
+  },
+  {
+    "id": 17,
+    "name": "Crema de Día",
+    "category": "skincare",
+    "price": 31000,
+    "description": "Protección e hidratación",
+    "image": "images/skincare/img234.jpg",
+    "badge": ""
+  },
+  {
+    "id": 18,
+    "name": "Agua Micelar",
+    "category": "skincare",
+    "price": 28000,
+    "description": "Limpieza sin enjuague",
+    "image": "images/skincare/img240.jpg",
+    "badge": ""
+  },
+  {
+    "id": 19,
+    "name": "Crema de Noche",
+    "category": "skincare",
+    "price": 34000,
+    "description": "Regenera mientras duermes",
+    "image": "images/skincare/img241.jpg",
+    "badge": ""
+  },
+  {
+    "id": 20,
+    "name": "Exfoliante Facial",
+    "category": "skincare",
+    "price": 26000,
+    "description": "Suaviza y limpia profundamente",
+    "image": "images/skincare/img248.jpg",
+    "badge": ""
+  },
+  {
+    "id": 21,
+    "name": "Ampollas Reafirmantes",
+    "category": "skincare",
+    "price": 44000,
+    "description": "Tratamiento intensivo",
+    "image": "images/skincare/img254.jpg",
+    "badge": ""
+  },
+  {
+    "id": 22,
+    "name": "Protector Solar",
+    "category": "skincare",
+    "price": 30000,
+    "description": "FPS 50 para uso diario",
+    "image": "images/skincare/img255.jpg",
+    "badge": ""
+  },
+  {
+    "id": 23,
+    "name": "Crema Nutritiva",
+    "category": "skincare",
+    "price": 38000,
+    "description": "Ideal para piel madura",
+    "image": "images/skincare/img610.jpg",
+    "badge": ""
+  },
+  {
+    "id": 24,
+    "name": "Serum Antioxidante",
+    "category": "skincare",
+    "price": 41000,
+    "description": "Combate el envejecimiento",
+    "image": "images/skincare/img619.jpg",
+    "badge": ""
+  },
+  {
+    "id": 25,
+    "name": "Set de Brochas 10 piezas",
+    "category": "accesorios",
+    "price": 54000,
+    "description": "Brochas suaves y profesionales",
+    "image": "images/accesorios/img58.jpg",
+    "badge": "Nuevo"
+  },
+  {
+    "id": 26,
+    "name": "Organizador de Maquillaje",
+    "category": "accesorios",
+    "price": 35000,
+    "description": "Acrílico transparente",
+    "image": "images/accesorios/img59.jpg",
+    "badge": ""
+  },
+  {
+    "id": 27,
+    "name": "Espejo con Luz LED",
+    "category": "accesorios",
+    "price": 42000,
+    "description": "Ideal para maquillaje",
+    "image": "images/accesorios/img60.jpg",
+    "badge": "Popular"
+  },
+  {
+    "id": 28,
+    "name": "Pinzas de Precisión",
+    "category": "accesorios",
+    "price": 15000,
+    "description": "Para cejas y pestañas",
+    "image": "images/accesorios/img61.jpg",
+    "badge": ""
+  },
+  {
+    "id": 29,
+    "name": "Cortaúñas Profesional",
+    "category": "accesorios",
+    "price": 12000,
+    "description": "Acero inoxidable",
+    "image": "images/accesorios/img62.jpg",
+    "badge": ""
+  },
+  {
+    "id": 30,
+    "name": "Cepillo Facial Eléctrico",
+    "category": "accesorios",
+    "price": 46000,
+    "description": "Limpieza profunda",
+    "image": "images/accesorios/img63.jpg",
+    "badge": ""
+  },
+  {
+    "id": 31,
+    "name": "Esponjas de Maquillaje x3",
+    "category": "accesorios",
+    "price": 20000,
+    "description": "Aplicación uniforme",
+    "image": "images/accesorios/img64.jpg",
+    "badge": ""
+  },
+  {
+    "id": 32,
+    "name": "Toalla Desmaquillante",
+    "category": "accesorios",
+    "price": 14000,
+    "description": "Reutilizable y suave",
+    "image": "images/accesorios/img65.jpg",
+    "badge": ""
+  },
+  {
+    "id": 33,
+    "name": "Caja de Almacenamiento",
+    "category": "accesorios",
+    "price": 32000,
+    "description": "Para cosméticos y accesorios",
+    "image": "images/accesorios/img66.jpg",
+    "badge": ""
+  },
+  {
+    "id": 34,
+    "name": "Guantes de Spa",
+    "category": "accesorios",
+    "price": 10000,
+    "description": "Para manos y pies",
+    "image": "images/accesorios/img67.jpg",
+    "badge": ""
+  },
+  {
+    "id": 35,
+    "name": "Lima de Uñas Eléctrica",
+    "category": "accesorios",
+    "price": 28000,
+    "description": "Multivelocidad",
+    "image": "images/accesorios/img68.jpg",
+    "badge": ""
+  },
+  {
+    "id": 36,
+    "name": "Brocha Kabuki",
+    "category": "accesorios",
+    "price": 17000,
+    "description": "Ideal para polvos sueltos",
+    "image": "images/accesorios/img219.jpg",
+    "badge": ""
+  },
+  {
+    "id": 37,
+    "name": "Cinta para Peinar",
+    "category": "accesorios",
+    "price": 9000,
+    "description": "Para rutina facial",
+    "image": "images/accesorios/img220.jpg",
+    "badge": ""
+  },
+  {
+    "id": 38,
+    "name": "Esmalte #1",
+    "category": "uñas",
+    "price": 5000,
+    "description": "Color duradero tono #1",
+    "image": "images/esmaltes/img52.jpg",
+    "badge": "Nuevo"
+  },
+  {
+    "id": 39,
+    "name": "Esmalte #2",
+    "category": "uñas",
+    "price": 5000,
+    "description": "Color duradero tono #2",
+    "image": "images/esmaltes/img53.jpg",
+    "badge": ""
+  },
+  {
+    "id": 49,
+    "name": "Gel de Baño",
+    "category": "higiene",
+    "price": 21000,
+    "description": "Gel suave para piel sensible",
+    "image": "images/higiene/img64.jpg",
+    "badge": ""
+  },
+  {
+    "id": 50,
+    "name": "Jabón Antibacterial",
+    "category": "higiene",
+    "price": 15000,
+    "description": "Elimina el 99.9% de bacterias",
+    "image": "images/higiene/img247.jpg",
+    "badge": ""
+  },
+  {
+    "id": 51,
+    "name": "Serum Hidratante",
+    "category": "skincare",
+    "price": 42000,
+    "description": "Con ácido hialurónico y vitamina C",
+    "image": "images/skincare/img211.jpg",
+    "badge": "Oferta"
+  },
+  {
+    "id": 52,
+    "name": "Crema Antiarrugas",
+    "category": "skincare",
+    "price": 39000,
+    "description": "Reduce líneas de expresión",
+    "image": "images/skincare/img212.jpg",
+    "badge": ""
+  },
+  {
+    "id": 53,
+    "name": "Tónico Facial",
+    "category": "skincare",
+    "price": 25000,
+    "description": "Equilibra el pH de la piel",
+    "image": "images/skincare/img213.jpg",
+    "badge": ""
+  },
+  {
+    "id": 54,
+    "name": "Mascarilla Purificante",
+    "category": "skincare",
+    "price": 27000,
+    "description": "Elimina impurezas",
+    "image": "images/skincare/img227.jpg",
+    "badge": ""
+  },
+  {
+    "id": 55,
+    "name": "Contorno de Ojos",
+    "category": "skincare",
+    "price": 36000,
+    "description": "Reduce ojeras y bolsas",
+    "image": "images/skincare/img233.jpg",
+    "badge": ""
+  },
+  {
+    "id": 56,
+    "name": "Crema de Día",
+    "category": "skincare",
+    "price": 31000,
+    "description": "Protección e hidratación",
+    "image": "images/skincare/img234.jpg",
+    "badge": ""
+  },
+  {
+    "id": 57,
+    "name": "Agua Micelar",
+    "category": "skincare",
+    "price": 28000,
+    "description": "Limpieza sin enjuague",
+    "image": "images/skincare/img240.jpg",
+    "badge": ""
+  },
+  {
+    "id": 58,
+    "name": "Crema de Noche",
+    "category": "skincare",
+    "price": 34000,
+    "description": "Regenera mientras duermes",
+    "image": "images/skincare/img241.jpg",
+    "badge": ""
+  },
+  {
+    "id": 59,
+    "name": "Exfoliante Facial",
+    "category": "skincare",
+    "price": 26000,
+    "description": "Suaviza y limpia profundamente",
+    "image": "images/skincare/img248.jpg",
+    "badge": ""
+  },
+  {
+    "id": 60,
+    "name": "Ampollas Reafirmantes",
+    "category": "skincare",
+    "price": 44000,
+    "description": "Tratamiento intensivo",
+    "image": "images/skincare/img254.jpg",
+    "badge": ""
+  },
+  {
+    "id": 61,
+    "name": "Protector Solar",
+    "category": "skincare",
+    "price": 30000,
+    "description": "FPS 50 para uso diario",
+    "image": "images/skincare/img255.jpg",
+    "badge": ""
+  },
+  {
+    "id": 62,
+    "name": "Crema Nutritiva",
+    "category": "skincare",
+    "price": 38000,
+    "description": "Ideal para piel madura",
+    "image": "images/skincare/img610.jpg",
+    "badge": ""
+  },
+  {
+    "id": 63,
+    "name": "Serum Antioxidante",
+    "category": "skincare",
+    "price": 41000,
+    "description": "Combate el envejecimiento",
+    "image": "images/skincare/img619.jpg",
+    "badge": ""
+  },
+  {
+    "id": 64,
+    "name": "Set de Brochas 10 piezas",
+    "category": "accesorios",
+    "price": 54000,
+    "description": "Brochas suaves y profesionales",
+    "image": "images/accesorios/img58.jpg",
+    "badge": "Nuevo"
+  },
+  {
+    "id": 65,
+    "name": "Organizador de Maquillaje",
+    "category": "accesorios",
+    "price": 35000,
+    "description": "Acrílico transparente",
+    "image": "images/accesorios/img59.jpg",
+    "badge": ""
+  },
+  {
+    "id": 66,
+    "name": "Espejo con Luz LED",
+    "category": "accesorios",
+    "price": 42000,
+    "description": "Ideal para maquillaje",
+    "image": "images/accesorios/img60.jpg",
+    "badge": "Popular"
+  },
+  {
+    "id": 67,
+    "name": "Pinzas de Precisión",
+    "category": "accesorios",
+    "price": 15000,
+    "description": "Para cejas y pestañas",
+    "image": "images/accesorios/img61.jpg",
+    "badge": ""
+  },
+  {
+    "id": 68,
+    "name": "Cortaúñas Profesional",
+    "category": "accesorios",
+    "price": 12000,
+    "description": "Acero inoxidable",
+    "image": "images/accesorios/img62.jpg",
+    "badge": ""
+  },
+  {
+    "id": 69,
+    "name": "Cepillo Facial Eléctrico",
+    "category": "accesorios",
+    "price": 46000,
+    "description": "Limpieza profunda",
+    "image": "images/accesorios/img63.jpg",
+    "badge": ""
+  },
+  {
+    "id": 70,
+    "name": "Esponjas de Maquillaje x3",
+    "category": "accesorios",
+    "price": 20000,
+    "description": "Aplicación uniforme",
+    "image": "images/accesorios/img64.jpg",
+    "badge": ""
+  },
+  {
+    "id": 71,
+    "name": "Toalla Desmaquillante",
+    "category": "accesorios",
+    "price": 14000,
+    "description": "Reutilizable y suave",
+    "image": "images/accesorios/img65.jpg",
+    "badge": ""
+  },
+  {
+    "id": 72,
+    "name": "Caja de Almacenamiento",
+    "category": "accesorios",
+    "price": 32000,
+    "description": "Para cosméticos y accesorios",
+    "image": "images/accesorios/img66.jpg",
+    "badge": ""
+  },
+  {
+    "id": 73,
+    "name": "Guantes de Spa",
+    "category": "accesorios",
+    "price": 10000,
+    "description": "Para manos y pies",
+    "image": "images/accesorios/img67.jpg",
+    "badge": ""
+  },
+  {
+    "id": 74,
+    "name": "Lima de Uñas Eléctrica",
+    "category": "accesorios",
+    "price": 28000,
+    "description": "Multivelocidad",
+    "image": "images/accesorios/img68.jpg",
+    "badge": ""
+  },
+  {
+    "id": 75,
+    "name": "Brocha Kabuki",
+    "category": "accesorios",
+    "price": 17000,
+    "description": "Ideal para polvos sueltos",
+    "image": "images/accesorios/img219.jpg",
+    "badge": ""
+  },
+  {
+    "id": 76,
+    "name": "Cinta para Peinar",
+    "category": "accesorios",
+    "price": 9000,
+    "description": "Para rutina facial",
+    "image": "images/accesorios/img220.jpg",
+    "badge": ""
+  },
+  {
+    "id": 77,
+    "name": "Esmalte #1",
+    "category": "uñas",
+    "price": 5000,
+    "description": "Color duradero tono #1",
+    "image": "images/esmaltes/img52.jpg",
+    "badge": "Nuevo"
+  },
+  {
+    "id": 78,
+    "name": "Esmalte #2",
+    "category": "uñas",
+    "price": 5000,
+    "description": "Color duradero tono #2",
+    "image": "images/esmaltes/img53.jpg",
+    "badge": ""
+  }
+]
