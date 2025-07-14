@@ -2,22 +2,12 @@
   "name": "beautyline-api",
   "version": "1.0.0",
   "description": "API serverless para productos desde Supabase",
-<<<<<<< HEAD
-  "main": "server.js",
-  "scripts": {
-    "start": "node server.js"
-=======
   "main": "server/server.js",
   "scripts": {
     "start": "node server/server.js"
->>>>>>> da2e45b (Guardando cambios antes de pull)
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.39.3"
   },
   "license": "MIT"
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> da2e45b (Guardando cambios antes de pull)
