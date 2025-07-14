@@ -2,22 +2,64 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Admin | BeautyLine</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/dist/umd/supabase.min.js"></script>
   <script src="admin.js" defer></script>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
   <style>
-    body { font-family: sans-serif; padding: 2rem; background: #fffafc; }
-    h1 { color: #d63384; }
-    table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
-    td, th { border: 1px solid #ccc; padding: 0.5rem; text-align: left; }
-    button { padding: 4px 8px; margin: 2px; }
-    input, select { width: 100%; padding: 4px; }
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background: #fff6f9;
+      padding: 2rem;
+    }
+    h1 {
+      color: #d63384;
+      margin-bottom: 1rem;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 2rem;
+      background: white;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    th, td {
+      border: 1px solid #e2e2e2;
+      padding: 0.6rem;
+    }
+    th {
+      background: #f5d0e1;
+    }
+    input {
+      width: 100%;
+      border: 1px solid #ccc;
+      padding: 4px;
+    }
+    button {
+      background: #d63384;
+      color: white;
+      border: none;
+      padding: 6px 10px;
+      cursor: pointer;
+      border-radius: 4px;
+      margin-right: 4px;
+    }
+    .delete {
+      background: #dc3545;
+    }
+    form {
+      background: white;
+      padding: 1rem;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    form input {
+      margin-bottom: 0.5rem;
+    }
   </style>
 </head>
 <body>
   <h1>Panel Admin - BeautyLine</h1>
-  <table id="productsTable">
+  <table>
     <thead>
       <tr>
         <th>Nombre</th>
@@ -28,7 +70,7 @@
         <th>Acciones</th>
       </tr>
     </thead>
-    <tbody></tbody>
+    <tbody id="productsTable"></tbody>
   </table>
 
   <h2>Agregar Nuevo Producto</h2>
@@ -37,7 +79,7 @@
     <input name="category" placeholder="Categoría" required />
     <input name="price" type="number" placeholder="Precio" required />
     <input name="description" placeholder="Descripción" />
-    <input name="image" placeholder="URL Imagen" />
+    <input name="image" placeholder="URL de Imagen" />
     <button type="submit">Agregar</button>
   </form>
 </body>
