@@ -7,6 +7,40 @@ const router = express.Router();
 // const db = require('../db/db'); // SI ESTÁ AQUÍ, ¡ELIMÍNALA O COMENTALA!
 // **********************************************************
 
+// Middleware de autenticación específico para este router
+const API_SECRET = 'super-secret-key'; // ¡Debe coincidir con el de admin.js!
+const authMiddleware = (req, res, next) => {
+  // Se aplica solo a POST, PUT, DELETE
+  if (req.method === 'POST' || req.method === 'PUT' || req.method === 'DELETE') {
+    const secret = req.get('X-Admin-Secret');
+    if (secret === API_SECRET) {
+      return next();
+    }
+    return res.status(403).json({ error: 'No autorizado' });
+  }
+  // Para otros métodos (GET), no se requiere autenticación
+  next();
+};
+
+// Aplicar el middleware de autenticación a todas las rutas de este archivo
+router.use(authMiddleware);
+
+// --- Lógica de conversión de precios ---
+const EXCHANGE_RATE_USD_TO_COP = 4000;
+const USD_PRICE_THRESHOLD = 1000;
+
+const convertPriceIfNeeded = (price) => {
+  const numericPrice = parseFloat(price);
+  if (isNaN(numericPrice)) {
+    return price; // Devolver el valor original si no es un número
+  }
+  if (numericPrice < USD_PRICE_THRESHOLD) {
+    return Math.round(numericPrice * EXCHANGE_RATE_USD_TO_COP);
+  }
+  return numericPrice;
+};
+
+
 // Validar campos del producto
 const validateProduct = (product) => {
   if (!product.name || !product.category || !product.price) {
@@ -15,42 +49,28 @@ const validateProduct = (product) => {
 };
 
 // Obtener todos los products
-router.get('/', async (req, res) => {
-  console.log('¡/api/products fue llamada y el handler se está ejecutando!');
+router.get('/', (req, res) => {
   try {
-    const db = req.db; // Obtener la instancia de la base de datos inyectada
-    if (!db) {
-      console.error('La instancia de la base de datos no está disponible en req.db');
-      return res.status(500).json({ error: 'Error interno del servidor: DB no disponible' });
-    }
-
-    console.log('DEBUG products.js: typeof db:', typeof db);
-    console.log('DEBUG products.js: db object (partial):', Object.keys(db).slice(0, 50));
-
-    const stmt = db.prepare('SELECT * FROM products');
+    const stmt = req.db.prepare('SELECT * FROM products');
     const productos = stmt.all();
-
-    console.log('--- Contenido de productos desde la DB (en servidor) ---');
-    console.log(productos);
-    console.log('-------------------------------------------------------');
     res.json(productos);
   } catch (err) {
-    console.error('Error al obtener productos en el servidor:', err);
+    console.error('Error al obtener productos:', err);
     res.status(500).json({ error: 'Error al obtener productos', detalle: err.message });
   }
 });
 
 // Crear producto
-router.post('/', async (req, res) => {
+router.post('/', (req, res) => {
   try {
     validateProduct(req.body);
-    
-    const { name, category, price, description, image, badge } = req.body;
+    const { name, category, description, image, badge } = req.body;
+    const price = convertPriceIfNeeded(req.body.price); // Convertir precio
+
     const stmt = req.db.prepare(
-        'INSERT INTO products (name, category, price, description, image, badge) VALUES (?, ?, ?, ?, ?, ?)'
-      );
+      'INSERT INTO products (name, category, price, description, image, badge) VALUES (?, ?, ?, ?, ?, ?)'
+    );
     const result = stmt.run(name, category, price, description, image, badge);
-    
     res.status(201).json({ id: result.lastInsertRowid });
   } catch (err) {
     console.error("Error al crear producto:", err);
@@ -63,19 +83,17 @@ router.put('/:id', (req, res) => {
   try {
     validateProduct(req.body);
     const { id } = req.params;
+    const { name, category, description, image, badge } = req.body;
+    const price = convertPriceIfNeeded(req.body.price); // Convertir precio
 
-    // Verificar si el producto existe
-    const productStmt = req.db.prepare('SELECT id FROM products WHERE id = ?');
-    const product = productStmt.get(id);
-    if (!product) {
-      return res.status(404).json({ error: 'Producto no encontrado' });
-    }
-
-    const { name, category, price, description, image, badge } = req.body;
-    const updateStmt = req.db.prepare(
+    const stmt = req.db.prepare(
       'UPDATE products SET name = ?, category = ?, price = ?, description = ?, image = ?, badge = ? WHERE id = ?'
     );
-    const result = updateStmt.run(name, category, price, description, image, badge, id);
+    const result = stmt.run(name, category, price, description, image, badge, id);
+
+    if (result.changes === 0) {
+      return res.status(404).json({ error: 'Producto no encontrado' });
+    }
 
     res.json({ updated: result.changes });
   } catch (err) {

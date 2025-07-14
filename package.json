@@ -1,21 +1,13 @@
 {
-  "name": "beautyglow-ecommerce",
+  "name": "beautyline-api",
   "version": "1.0.0",
-  "description": "E-commerce application for beauty products with an admin panel.",
+  "description": "API serverless para productos desde Supabase",
   "main": "server/server.js",
   "scripts": {
-    "start": "node server/server.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node server/server.js"
   },
-  "author": "",
-  "license": "ISC",
   "dependencies": {
-    "better-sqlite3": "^11.10.0",
-    "cors": "^2.8.5",
-    "express": "^5.1.0",
-    "multer": "^2.0.1",
-    "nodemailer": "^7.0.4",
-    "sqlite": "^5.1.1",
-    "sqlite3": "^5.1.7"
-  }
+    "@supabase/supabase-js": "^2.39.3"
+  },
+  "license": "MIT"
 }

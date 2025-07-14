@@ -24,6 +24,7 @@ router.post('/', async (req, res) => {
   console.log('[POST /api/cart] Body recibido:', req.body);
   try {
     const { producto_id, nombre, precio, cantidad } = req.body;
+    console.log('[POST /api/cart] producto_id:', producto_id, 'nombre:', nombre, 'precio:', precio, 'cantidad:', cantidad);
 
     validateCartItem({ producto_id, nombre, precio, cantidad });
 
@@ -66,6 +67,17 @@ router.delete('/:id', async (req, res) => {
 
 // Vaciar todo el carrito
 router.delete('/', async (req, res) => {
+  try {
+    const result = req.db.prepare('DELETE FROM carrito').run();
+    res.json({ cleared: result.changes });
+  } catch (err) {
+    console.error('Error al vaciar carrito:', err);
+    res.status(500).json({ error: 'Error al vaciar carrito' });
+  }
+});
+
+// Eliminar todos los productos del carrito (DEBUG)
+router.delete('/debug/clear', async (req, res) => {
   try {
     const result = req.db.prepare('DELETE FROM carrito').run();
     res.json({ cleared: result.changes });

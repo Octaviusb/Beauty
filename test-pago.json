@@ -1,0 +1,7 @@
+{
+  "public_key": "pub_test_Q5kS4d6p3l1wE7tY0c5qBwG2jZ3xR1oP",
+  "currency": "COP",
+  "amount_in_cents": 10000,
+  "reference": "TEST_ORDER_001",
+  "redirect_url": "http://localhost:3000/confirmation.html"
+}

@@ -3,14 +3,16 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Tienda de productos de belleza y cuidado personal - BeautyGlow">
-  <title>BeautyGlow - Tienda de Belleza y Cuidado Personal</title>
+  <meta name="description" content="Tienda de productos de belleza y cuidado personal - Beauty Line">
+  <title>Beauty Line - Tienda de Belleza y Cuidado Personal</title>
   <link rel="stylesheet" href="styles.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="icon" href="./assets/favicon.ico" type="image/x-icon">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <script src="https://checkout.wompi.co/widget.js" defer></script>
+  <script src="script.js" defer></script>
   <script>
     if(window.location.hostname === "localhost") {
       window.OtAutoBlock = false; // Desactiva el bloqueo en desarrollo local
@@ -20,10 +22,10 @@
 <body>
   <header class="main-header">
     <div class="header-container">
-      <h1 class="logo">Beauty<span>Glow</span></h1>
+      <h1 class="logo">Beauty<span>Line</span></h1>
 
       <div class="cart-icon" id="cartButton">
-        <span class="cart-count">0</span>
+        <span id="cart-count">0</span>
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
           <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/>
         </svg>
@@ -103,9 +105,9 @@
   </section>
 
   <!-- Catálogo de productos -->
-  <section id="productos">
+  <section id="product">
     <h2>Productos</h2>
-    <div id="productsGrid" class="products-grid"></div>
+    <div id="product-list" class="products-grid"></div>
   </section>
 
     <!-- Footer mejorado -->
@@ -113,7 +115,7 @@
     <div class="container">
       <div class="footer-content">
     <div class="footer-col">
-      <h3>BeautyGlow</h3>
+      <h3>Beauty Line</h3>
       <p>Tu tienda de confianza para productos de belleza de alta calidad.</p>
       <div class="newsletter">
         <h4>Suscríbete a nuestro boletín</h4>
@@ -137,9 +139,9 @@
     <div class="footer-col">
       <h4>Contacto</h4>
       <address>
-        <p><i class="fas fa-phone"></i> <a href="tel:+1234567890">+1 234 567 890</a></p>
-        <p><i class="fas fa-envelope"></i> <a href="mailto:info@beauty-glow.com">info@beauty-glow.com</a></p>
-        <p><i class="fas fa-map-marker-alt"></i> Calle Principal 123, Ciudad</p>
+        <p><i class="fas fa-phone"></i> <a href="tel:+3204929202">+573204929202</a></p>
+        <p><i class="fas fa-envelope"></i> <a href="mailto: faddielbc@gmail.com"> faddielbc@gmail.com</a></p>
+        <p><i class="fas fa-map-marker-alt"></i> Bogotá, Colombia</p>
       </address>
     </div>
 
@@ -163,7 +165,7 @@
       <a href="#">Política de privacidad</a>
       <a href="#">Aviso legal</a>
     </div>
-    <p class="footer-legal">&copy; <span id="current-year"></span> BeautyGlow. Todos los derechos reservados.</p>
+    <p class="footer-legal">&copy; <span id="current-year"></span> Beauty Line. Todos los derechos reservados.</p>
   </div>
   </footer>
 
@@ -180,7 +182,9 @@
       <div class="cart-total">
         <strong>Total:</strong> <span class="total-amount">$0.00</span>
       </div>
-      <button id="btn-finalizar" class="checkout-btn">Finalizar Compra</button>
+      <button class="checkout-btn">Finalizar Compra</button>
+      <button id="limpiarCarrito" class="clear-cart-btn">Limpiar Carrito</button>
+
     </div>
   </div>
 
@@ -210,14 +214,10 @@
           <label>Método de pago</label>
           <select name="medioPago" required>
             <option value="">Selecciona</option>
-            <option value="transferencia">Transferencia</option>
+            <option value="pse">PSE</option>
             <option value="nequi">Nequi</option>
             <option value="daviplata">Daviplata</option>
           </select>
-        </div>
-        <div class="form-group">
-          <label>Comprobante de pago (opcional, imagen o PDF)</label>
-          <input type="file" name="comprobante" accept="image/*,application/pdf" />
         </div>
         <div class="form-actions">
           <button type="button" class="btn-back-to-cart">Volver</button>
@@ -239,9 +239,9 @@
 
           <p><strong>Confirma tu pago por:</strong></p>
           <ul>
-            <li>📱 <strong>Nequi:</strong> 3001234567</li>
-            <li>💳 <strong>Daviplata:</strong> 3009876543</li>
-            <li>🏦 <strong>Transferencia Bancaria:</strong> Cuenta Ahorros Bancolombia 12345678901</li>
+            <li>📱 <strong>Nequi:</strong> 3204929202</li>
+            <li>💳 <strong>Daviplata:</strong> 3204929202</li>
+            <li><img src="./assets/pse.png" alt="PSE" style="height: 24px; vertical-align: middle;"> <strong>PSE:</strong> Pagos seguros en línea</li>
           </ul>
 
           <p>Después de realizar el pago, por favor envía el comprobante al WhatsApp 📲 3010001122.</p>
@@ -259,7 +259,7 @@
     </div>
 
 
-  <script src="script.js" defer></script>
+  
   <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
   <script>
     // Minimal test handler (keep for now)
