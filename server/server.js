@@ -1,114 +1,94 @@
-//console.log('1. Iniciando script server.js');
+// server/server.js
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, '../.env') });
 const Database = require('better-sqlite3');
 
-// Handlers globales de error
-process.on('uncaughtException', (err) => {
-  console.error('Uncaught Exception:', err);
-});
-process.on('unhandledRejection', (reason, promise) => {
-  console.error('Unhandled Rejection:', reason);
-});
-
-// 1. Configuración inicial
 const app = express();
-const PORT = process.env.PORT || 3000;
-console.log('3. Configuración inicial de Express y puertos.');
+const PORT = process.env.PORT || 8000;
 
-// 2. Conexión a la base de datos
+// === Conexión a base de datos SQLite ===
 let db;
 try {
   db = new Database(path.join(__dirname, 'db.sqlite'), { verbose: console.log });
   db.pragma('journal_mode = WAL');
 } catch (err) {
-  console.error('¡ERROR CRÍTICO: No se pudo conectar a la base de datos!');
-  console.error(err);
-  // process.exit(1);
+  console.error('❌ Error al conectar con la base de datos:', err);
 }
-console.log('5. Base de datos conectada. Iniciando Middlewares.');
 
-// 3. Middlewares
-app.use(cors({
-  origin: process.env.NODE_ENV === 'production' ? 'https://tudominio.com' : '*'
-}));
-
+// === Middlewares globales ===
+app.use(cors({ origin: '*' }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Headers de seguridad básicos
 app.use((req, res, next) => {
   res.setHeader('X-Content-Type-Options', 'nosniff');
   res.setHeader('X-Frame-Options', 'DENY');
   next();
 });
 
-// Inyectar DB en las rutas
+// Inyecta la base de datos a cada solicitud
 app.use((req, res, next) => {
   req.db = db;
   next();
 });
-console.log('6. Middlewares configurados.');
 
-console.log('7. Configurando rutas estáticas.');
-// 4. Rutas estáticas (¡ORDEN IMPORTANTE!)
+// === Archivos estáticos ===
 app.use(express.static(path.join(__dirname, '../public')));
-
-// Configura el favicon si aún no lo has hecho
+app.use('/images', express.static(path.join(__dirname, '../public/images')));
 app.use('/favicon.ico', express.static(path.join(__dirname, '../public/assets/favicon.ico')));
-console.log('8. Rutas estáticas configuradas.');
 
-console.log('9. Configurando rutas de API.');
-// 5. Rutas de API
-const productsRouter = require('./routes/products');
+// === Rutas API (comenta si no tienes aún esos archivos en /routes) ===
+app.use('/api/products', require('./routes/products'));
+app.use('/api/orders', require('./routes/orders'));
+app.use('/api/cart', require('./routes/cart'));
+app.use('/api', require('./routes/auth'));
+app.use('/api/payments', require('./routes/payments'));
 
-// Middleware de autenticación para rutas de admin
-const API_SECRET = 'super-secret-key'; // ¡Debe coincidir con el de admin.js!
 
-const authMiddleware = (req, res, next) => {
-  if (req.method === 'POST' || req.method === 'PUT' || req.method === 'DELETE') {
-    const secret = req.get('X-Admin-Secret');
-    if (secret === API_SECRET) {
-      return next();
-    }
-    return res.status(403).json({ error: 'No autorizado' });
-  }
-  // Para peticiones GET, no se requiere autenticación
-  next();
-};
+// === Ruta para generar checkout con Wompi (usando link fijo) ===
+app.post('/api/checkout', async (req, res) => {
+  const { amountInCents, reference } = req.body;
 
-app.use('/api/products', authMiddleware, productsRouter);
+  // Puedes guardar aquí el pedido en tu base de datos si quieres
 
-const ordersRouter = require('./routes/orders');
-app.use('/api/orders', ordersRouter);
+  // Link fijo generado desde el panel de Wompi
+  const paymentLink = 'https://checkout.wompi.co/l/VPOS_nJo3xk';
 
-const cartRouter = require('./routes/cart');
-app.use('/api/cart', cartRouter);
-
-const authRouter = require('./routes/auth');
-app.use('/api', authRouter);
-console.log('4. Todas las rutas de API configuradas.');
-
-console.log('11. Configurando manejo de errores.');
-// 6. Manejo de errores
-app.use((err, req, res, next) => {
-  console.error('Error en middleware de manejo de errores:', err.stack);
-  res.status(500).json({ error: 'Algo salió mal!' });
+  return res.json({ url: paymentLink });
 });
-console.log('12. Manejo de errores configurado.');
 
-console.log('13. Intentando iniciar el servidor (app.listen).');
-// 7. Iniciar servidor
-try {
-  app.listen(PORT, () => {
-    console.log(`14. Servidor escuchando en http://localhost:${PORT}`);
-    console.log(`Entorno: ${process.env.NODE_ENV || 'development'}`);
-    console.log('15. Callback de listen ejecutado. El servidor debería mantenerse vivo.');
-  });
-} catch (err) {
-  console.error('¡ERROR AL INICIAR EL SERVIDOR (fallo en listen)!');
-  console.error(err);
-  // process.exit(1);
-}
+// === Manejo global de errores ===
+app.use((err, req, res, next) => {
+  console.error('❌ Error inesperado:', err.stack);
+  res.status(500).json({ error: 'Error interno del servidor' });
+});
 
+// === Arranque del servidor ===
+app.listen(PORT, () => {
+  console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
+});
+
+const { createClient } = require('@supabase/supabase-js');
+
+// Variables desde Vercel (las pondremos luego)
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_KEY
+);
+
+module.exports = async (req, res) => {
+  if (req.method === 'GET' && req.url.includes('/products')) {
+    const { data, error } = await supabase.from('products').select('*');
+
+    if (error) {
+      console.error('Error al obtener productos:', error);
+      return res.status(500).json({ error: error.message });
+    }
+
+    return res.status(200).json(data);
+  }
+
+  return res.status(404).json({ error: 'Ruta no encontrada' });
+};
