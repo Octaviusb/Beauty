@@ -24,6 +24,7 @@ router.post('/', async (req, res) => {
   console.log('[POST /api/cart] Body recibido:', req.body);
   try {
     const { producto_id, nombre, precio, cantidad } = req.body;
+    console.log('[POST /api/cart] producto_id:', producto_id, 'nombre:', nombre, 'precio:', precio, 'cantidad:', cantidad);
 
     validateCartItem({ producto_id, nombre, precio, cantidad });
 
@@ -74,5 +75,8 @@ router.delete('/', async (req, res) => {
     res.status(500).json({ error: 'Error al vaciar carrito' });
   }
 });
+
+// El endpoint '/debug/clear' ha sido removido para mayor seguridad en producción.
+// Si necesitas funcionalidad de depuración, protégela con autenticación adecuada.
 
 module.exports = router;

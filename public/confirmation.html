@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Confirmación de Pago - BeautyGlow</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    /* Simple styles for the confirmation page */
+    .confirmation-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 80vh;
+      text-align: center;
+      padding: 2rem;
+    }
+    .status-icon {
+      font-size: 4rem;
+      margin-bottom: 1rem;
+    }
+    .status-icon.success { color: #28a745; }
+    .status-icon.pending { color: #ffc107; }
+    .status-icon.error { color: #dc3545; }
+  </style>
+</head>
+<body>
+  <div class="confirmation-container">
+    <div id="status-icon" class="status-icon pending">⏳</div>
+    <h1 id="status-title">Verificando tu pago...</h1>
+    <p id="status-message">Estamos confirmando el estado de tu transacción con Wompi. Por favor, espera un momento.</p>
+    <p>Tu ID de transacción es: <strong id="transaction-id"></strong></p>
+    <a href="/" class="checkout-btn" style="margin-top: 2rem; text-decoration: none;">Volver a la tienda</a>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const transactionId = urlParams.get('id');
+
+      const statusIconEl = document.getElementById('status-icon');
+      const statusTitleEl = document.getElementById('status-title');
+      const statusMessageEl = document.getElementById('status-message');
+      const transactionIdEl = document.getElementById('transaction-id');
+
+      if (!transactionId) {
+        statusTitleEl.textContent = 'No se encontró ID de transacción';
+        statusMessageEl.textContent = 'No pudimos obtener la referencia de tu pago. Por favor, contacta a soporte.';
+        statusIconEl.textContent = '❓';
+        statusIconEl.className = 'status-icon error';
+        return;
+      }
+
+      transactionIdEl.textContent = transactionId;
+
+      try {
+        const response = await fetch(`/api/payments/transaction/${transactionId}`);
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || 'Error al verificar el pago.');
+        }
+
+        switch (data.status) {
+          case 'APPROVED':
+            statusIconEl.textContent = '✅';
+            statusIconEl.className = 'status-icon success';
+            statusTitleEl.textContent = '¡Pago Aprobado!';
+            statusMessageEl.textContent = 'Tu pago ha sido confirmado exitosamente. Tu pedido está siendo procesado.';
+            // Aquí podrías limpiar el carrito del localStorage si lo deseas
+            localStorage.removeItem('carrito');
+            break;
+          case 'PENDING':
+            statusIconEl.textContent = '⏳';
+            statusIconEl.className = 'status-icon pending';
+            statusTitleEl.textContent = 'Pago Pendiente';
+            statusMessageEl.textContent = 'Tu pago aún está pendiente de confirmación. Te notificaremos cuando se complete.';
+            break;
+          case 'DECLINED':
+          case 'ERROR':
+          case 'VOIDED':
+            statusIconEl.textContent = '❌';
+            statusIconEl.className = 'status-icon error';
+            statusTitleEl.textContent = 'Pago Rechazado';
+            statusMessageEl.textContent = `El pago fue ${data.status.toLowerCase()}. Por favor, intenta de nuevo o contacta a tu banco.`;
+            break;
+        }
+
+      } catch (error) {
+        console.error('Error verificando la transacción:', error);
+        statusIconEl.textContent = '❌';
+        statusIconEl.className = 'status-icon error';
+        statusTitleEl.textContent = 'Error de Verificación';
+        statusMessageEl.textContent = 'No pudimos verificar el estado de tu pago en este momento. Por favor, contacta a soporte con tu ID de transacción.';
+      }
+    });
+  </script>
+</body>
+</html>
