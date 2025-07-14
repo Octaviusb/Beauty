@@ -59,24 +59,24 @@ router.post('/', async (req, res) => {
 });
 
 // Actualizar producto
-router.put('/:id', async (req, res) => {
+router.put('/:id', (req, res) => {
   try {
     validateProduct(req.body);
     const { id } = req.params;
-    
+
     // Verificar si el producto existe
-    const product = await req.db.prepare('SELECT id FROM products WHERE id = ?').get(id); // Usar req.db y 'products'
+    const productStmt = req.db.prepare('SELECT id FROM products WHERE id = ?');
+    const product = productStmt.get(id);
     if (!product) {
       return res.status(404).json({ error: 'Producto no encontrado' });
     }
-    
+
     const { name, category, price, description, image, badge } = req.body;
-    const result = await req.db // Usar req.db
-      .prepare(
-        'UPDATE products SET name=?, category=?, price=?, description=?, image=?, badge=? WHERE id=?' // Cambiado a 'products'
-      )
-      .run(name, category, price, description, image, badge, id);
-    
+    const updateStmt = req.db.prepare(
+      'UPDATE products SET name = ?, category = ?, price = ?, description = ?, image = ?, badge = ? WHERE id = ?'
+    );
+    const result = updateStmt.run(name, category, price, description, image, badge, id);
+
     res.json({ updated: result.changes });
   } catch (err) {
     console.error("Error al actualizar producto:", err);
@@ -85,15 +85,16 @@ router.put('/:id', async (req, res) => {
 });
 
 // Eliminar producto
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', (req, res) => {
   try {
     const { id } = req.params;
-    const result = await req.db.prepare('DELETE FROM products WHERE id=?').run(id); // Usar req.db y 'products'
-    
+    const stmt = req.db.prepare('DELETE FROM products WHERE id = ?');
+    const result = stmt.run(id);
+
     if (result.changes === 0) {
       return res.status(404).json({ error: 'Producto no encontrado' });
     }
-    
+
     res.json({ deleted: result.changes });
   } catch (err) {
     console.error("Error al eliminar producto:", err);
