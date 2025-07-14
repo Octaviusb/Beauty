@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Test Wompi</title>
+  <script src="https://checkout.wompi.co/widget.js"></script>
+</head>
+<body>
+  <button onclick="pagar()">Pagar</button>
+
+  <script>
+    function pagar() {
+      console.log("¿Wompi está definido?:", typeof WompiCheckout);
+      const checkout = new WompiCheckout({
+        currency: 'COP',
+        amountInCents: 10000,
+        reference: 'demo-123',
+        publicKey: 'pub_test_xxxxxxxxxxxxxxxxxx', // tu llave de sandbox
+        redirectUrl: window.location.href
+      });
+      checkout.open();
+    }
+  </script>
+</body>
+</html>

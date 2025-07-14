@@ -86,7 +86,11 @@
     "category": "accesorios",
     "price": 28000,
     "description": "Multivelocidad",
+<<<<<<< HEAD
     "image": "images/accesorios/lima-de-uñas-eléctrica.jpg",
+=======
+    "image": "images/accesorios/lima-de-uas-elctrica.jpg",
+>>>>>>> da2e45b (Guardando cambios antes de pull)
     "badge": ""
   },
   {

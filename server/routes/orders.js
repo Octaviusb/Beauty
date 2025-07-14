@@ -6,37 +6,33 @@ const path = require('path');
 const dbPath = path.join(__dirname, '../db.sqlite');
 const { enviarPedidoPorCorreo } = require('../email');
 const DESTINO_DESPACHO = process.env.CORREO_DESPACHO || 'despacho@tudominio.com'; // Cambia por el correo real
-const upload = require('../multerConfig');
+// Eliminamos la dependencia de multer para simplificar
+// const upload = require('../multerConfig');
 
-// POST /api/orders - crear pedido
-router.post('/', upload.single('comprobante'), async (req, res) => {
-  let data = req.body;
-  let items = data.items;
-  let payment_proof = null;
-  if (req.file) {
-    payment_proof = '/uploads/' + req.file.filename;
-  }
-  // Si viene como multipart, items es string
-  if (typeof items === 'string') {
-    try { items = JSON.parse(items); } catch { items = []; }
-  }
-  const { customer_name, customer_email, customer_phone, address, total } = data;
-  if (!items || !total) {
+// POST /api/orders - crear pedido (ahora solo JSON)
+router.post('/', async (req, res) => {
+  // Ya no se usa multer, esperamos un body JSON
+  const { customer_name, customer_email, customer_phone, address, items, total } = req.body;
+
+  if (!items || !total || !customer_name || !customer_email) {
     return res.status(400).json({ error: 'Faltan datos del pedido.' });
   }
+
   const db = new sqlite3.Database(dbPath);
-  db.run(
-    `INSERT INTO orders (customer_name, customer_email, customer_phone, address, items, total, status, payment_proof, updated_at) VALUES (?, ?, ?, ?, ?, ?, 'pendiente_pago', ?, CURRENT_TIMESTAMP)`,
-    [customer_name, customer_email, customer_phone, address, JSON.stringify(items), total, payment_proof],
-    function (err) {
-      db.close();
-      if (err) {
-        return res.status(500).json({ error: 'Error al registrar el pedido.' });
-      }
-      // El correo se enviará cuando un admin confirme el pago.
-      res.json({ success: true, order_id: this.lastID });
+  const reference = `beautyglow-${Date.now()}`;
+
+  // La columna payment_proof se dejará como NULL
+  const sql = `INSERT INTO orders (customer_name, customer_email, customer_phone, address, items, total, status, reference, updated_at) VALUES (?, ?, ?, ?, ?, ?, 'pendiente_pago', ?, CURRENT_TIMESTAMP)`;
+  const params = [customer_name, customer_email, customer_phone, address, JSON.stringify(items), total, reference];
+
+  db.run(sql, params, function (err) {
+    db.close();
+    if (err) {
+      console.error("Error al registrar pedido en DB:", err);
+      return res.status(500).json({ error: 'Error al registrar el pedido.' });
     }
-  );
+    res.status(201).json({ success: true, order_id: this.lastID, reference: reference });
+  });
 });
 
 // PATCH /api/orders/:id - actualizar estado (ej: marcar como pagado)

@@ -76,7 +76,20 @@ router.delete('/', async (req, res) => {
   }
 });
 
+<<<<<<< HEAD
 // El endpoint '/debug/clear' ha sido removido para mayor seguridad en producción.
 // Si necesitas funcionalidad de depuración, protégela con autenticación adecuada.
+=======
+// Eliminar todos los productos del carrito (DEBUG)
+router.delete('/debug/clear', async (req, res) => {
+  try {
+    const result = req.db.prepare('DELETE FROM carrito').run();
+    res.json({ cleared: result.changes });
+  } catch (err) {
+    console.error('Error al vaciar carrito:', err);
+    res.status(500).json({ error: 'Error al vaciar carrito' });
+  }
+});
+>>>>>>> da2e45b (Guardando cambios antes de pull)
 
 module.exports = router;
