@@ -1,4 +1,4 @@
-# BeautyGlow - E-Commerce de Cosméticos
+# Beauty Line - E-Commerce de Cosméticos
 
 Una aplicación de comercio electrónico completa y funcional con un backend robusto, base de datos y un panel de administración para la gestión de contenido.
 
