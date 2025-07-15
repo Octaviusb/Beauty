@@ -14,7 +14,7 @@ function enviarOrdenPorCorreo(cliente, productos, total) {
     total: `$${total}`
   };
 
-  emailjs.send("service_xxx", "template_xxx", templateParams)
+  emailjs.send("service_owxur5f", "template_sck7rdl", templateParams)
     .then(() => {
       alert("✅ Datos enviados por correo");
     })
