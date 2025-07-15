@@ -278,5 +278,4 @@ function configurarBotonCarrito() {
         submitBtn.textContent = originalText;
       }
     });
-  }
-});
+  };
