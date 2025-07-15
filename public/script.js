@@ -208,6 +208,10 @@ document.getElementById("formularioCompra").addEventListener("submit", async (e)
 
   // 🔹 Envía la orden al vendedor por correo
   enviarOrdenPorCorreo(cliente, productos, total);
+  document.querySelector(".checkout-btn").addEventListener("click", () => {
+  document.getElementById("checkoutForm").classList.remove("hidden");
+});
+
 
   // 🔹 Muestra el modal de confirmación (ya debería estar en tu HTML)
   document.getElementById("checkoutForm").classList.add("hidden");
