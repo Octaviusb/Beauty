@@ -174,7 +174,26 @@
     </div>
   </div>
 
-  <!-- Scripts -->
+    <!-- Formulario de pedido -->
+<section id="checkoutForm" class="hidden">
+  <h2>Confirmar pedido</h2>
+  <form id="formularioPedido">
+    <label>Nombre completo: <input name="nombre" required></label><br>
+    <label>Email: <input type="email" name="email" required></label><br>
+    <label>Dirección: <input name="direccion" required></label><br>
+    <label>Teléfono: <input name="telefono" required></label><br>
+    <label>Referidor (opcional): <input name="referidor"></label><br>
+
+    <button type="submit">Confirmar y enviar pedido</button>
+  </form>
+</section>
+
+<!-- Confirmación -->
+<div id="confirmationModal" class="hidden">
+  <p>✅ Pedido enviado correctamente. Gracias por tu compra.</p>
+</div>
+
+<!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
   <script>
     emailjs.init("Cqwg1EyqFLvPg7ULx");
