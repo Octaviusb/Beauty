@@ -29,9 +29,6 @@
   </script>
 </head>
 <body>
-  <!-- Skip to content link para accesibilidad -->
-  <a href="#main-content" class="skip-link">Saltar al contenido principal</a>
-
   <header class="main-header" role="banner">
     <div class="header-container">
       <h1 class="logo">
@@ -217,17 +214,11 @@
     <label>Dirección: <input name="direccion" required></label><br>
     <label>Teléfono: <input name="telefono" required></label><br>
     <label>Referidor (opcional): <input name="referidor"></label><br>
-
     <button type="submit">Confirmar y enviar pedido</button>
   </form>
 </section>
 
-<!-- Confirmación -->
-<div id="confirmationModal" class="hidden">
-  <p>✅ Pedido enviado correctamente. Gracias por tu compra.</p>
-</div>
-
-<!-- Scripts -->
+  <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
   <script>
     emailjs.init("Cqwg1EyqFLvPg7ULx");
