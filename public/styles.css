@@ -23,6 +23,44 @@
   --transition: all 0.3s ease;
 }
 
+/* Notificaciones */
+.notification {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: #4CAF50;
+  color: white;
+  padding: 15px;
+  border-radius: 4px;
+  z-index: 1000;
+  animation: slideIn 0.5s forwards;
+}
+
+.notification.fade-out {
+  animation: fadeOut 0.5s forwards;
+}
+
+.error-message {
+  background: #ffebee;
+  color: #c62828;
+  padding: 15px;
+  margin-bottom: 20px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+}
+
+/* Animaciones */
+@keyframes slideIn {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
 /* Clase para ocultar elementos */
 .hidden {
   display: none !important;
@@ -686,20 +724,20 @@ html { scroll-behavior: smooth; }
   min-width: 0;
 }
 .hero-image {
-  flex: 0 0 340px;
-  max-width: 340px;
-  min-width: 200px;
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
   display: flex;
   align-items: center;
   justify-content: flex-end;
 }
 .hero-image img {
-  width: 100%;
-  max-width: 320px;
+  max-width: 100%;
   height: auto;
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-md);
+  object-fit: cover;
+  display: block;
 }
+
 .hero h1 {
   font-size: 1.45rem;
   margin-bottom: 0.6rem;
