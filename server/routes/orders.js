@@ -1,4 +1,4 @@
-// Orders API routes for BeautyGlow
+// Orders API routes for BeautyLine
 const express = require('express');
 const router = express.Router();
 const sqlite3 = require('sqlite3').verbose();
@@ -19,7 +19,7 @@ router.post('/', async (req, res) => {
   }
 
   const db = new sqlite3.Database(dbPath);
-  const reference = `beautyglow-${Date.now()}`;
+  const reference = `beauty Line-${Date.now()}`;
 
   // La columna payment_proof se dejará como NULL
   const sql = `INSERT INTO orders (customer_name, customer_email, customer_phone, address, items, total, status, reference, updated_at) VALUES (?, ?, ?, ?, ?, ?, 'pendiente_pago', ?, CURRENT_TIMESTAMP)`;
