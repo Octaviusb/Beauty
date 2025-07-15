@@ -69,6 +69,7 @@
 <section id="categorias" class="categories" aria-labelledby="categories-heading">
   <div class="container">
     <div class="categories-grid" role="list">
+      
       <div class="category-card" role="listitem">
         <div class="category-icon">
           <i class="fas fa-palette" aria-hidden="true"></i>
@@ -77,7 +78,7 @@
         <p>Productos para realzar tu belleza natural</p>
         <a href="#productos?filter=maquillaje" class="category-link filter-btn" data-filter="maquillaje">Ver productos</a>
       </div>
-      
+
       <div class="category-card" role="listitem">
         <div class="category-icon">
           <i class="fas fa-spa" aria-hidden="true"></i>
@@ -86,7 +87,7 @@
         <p>Cuidado facial y corporal</p>
         <a href="#productos?filter=skincare" class="category-link filter-btn" data-filter="skincare">Ver productos</a>
       </div>
-      
+
       <div class="category-card" role="listitem">
         <div class="category-icon">
           <i class="fas fa-pump-soap" aria-hidden="true"></i>
@@ -95,7 +96,7 @@
         <p>Productos de limpieza y cuidado</p>
         <a href="#productos?filter=higiene" class="category-link filter-btn" data-filter="higiene">Ver productos</a>
       </div>
-      
+
       <div class="category-card" role="listitem">
         <div class="category-icon">
           <i class="fas fa-gem" aria-hidden="true"></i>
@@ -104,7 +105,7 @@
         <p>Herramientas y accesorios de belleza</p>
         <a href="#productos?filter=accesorios" class="category-link filter-btn" data-filter="accesorios">Ver productos</a>
       </div>
-      
+
       <div class="category-card" role="listitem">
         <div class="category-icon">
           <i class="fas fa-hand-sparkles" aria-hidden="true"></i>
@@ -113,26 +114,30 @@
         <p>Esmaltes y cuidado de uñas</p>
         <a href="#productos?filter=uñas" class="category-link filter-btn" data-filter="uñas">Ver productos</a>
       </div>
+
     </div>
   </div>
 </section>
-    
+
+<!-- SECCIÓN DE PRODUCTOS -->
 <section id="seccion-productos" class="productos-seccion">
-  <h2 class="seccion-titulo">Nuestros Productos</h2>
-  
+  <h2>Nuestros Productos</h2>
+
   <!-- Filtros -->
   <div class="filtros">
     <button class="filter-btn" data-filter="todos">Todos</button>
     <button class="filter-btn" data-filter="maquillaje">Maquillaje</button>
     <button class="filter-btn" data-filter="uñas">Uñas</button>
     <button class="filter-btn" data-filter="cuidado">Cuidado Personal</button>
+    <button class="filter-btn" data-filter="skincare">Skincare</button>
+    <button class="filter-btn" data-filter="higiene">Higiene</button>
+    <button class="filter-btn" data-filter="accesorios">Accesorios</button>
   </div>
-  
-  <!-- Aquí se insertarán dinámicamente las tarjetas -->
+
+  <!-- Aquí se insertan dinámicamente los productos -->
   <div id="product-list" class="productos-grid"></div>
 </section>
 
-</main>
 
   <!-- Footer -->
   <footer class="footer" aria-label="Pie de página">
