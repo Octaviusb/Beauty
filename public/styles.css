@@ -25,10 +25,9 @@
 
 /* Clase para ocultar elementos */
 .hidden {
-  display: none !important;
+  display: none;
   padding: 0;
 }
-
 /* NOTIFICACIONES OPTIMIZADAS */
 .notification {
   position: fixed;
@@ -72,8 +71,8 @@
   transition: opacity 0.3s, visibility 0.3s;
 }
 .modal.active {
+  display: flex;
   opacity: 1;
-  visibility: visible;
 }
 .modal-content {
   background: var(--white);
