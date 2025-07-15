@@ -140,7 +140,8 @@ function configurarBotonCarrito() {
 
   if (btn) btn.addEventListener('click', mostrarCarrito);
   if (cerrar) cerrar.addEventListener('click', () => {
-    document.getElementById('carrito').classList.remove('active', 'hidden');
+    document.getElementById('carrito').classList.remove('active');
+    document.getElementById('carrito').classList.add('hidden');
   });
   if (limpiar) limpiar.addEventListener('click', () => {
     appState.cart.clear();
