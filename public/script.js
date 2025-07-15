@@ -219,8 +219,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
       }
       document.getElementById("checkoutForm").classList.remove("hidden");
+      document.getElementById("checkoutForm").classList.add("active");
     });
   }
+
+  const closeBtn = document.querySelector('.close-form');
+if (closeBtn) {
+  closeBtn.addEventListener('click', () => {
+    document.getElementById("checkoutForm").classList.add("hidden");
+    document.getElementById("checkoutForm").classList.remove("active");
+  });
+}
 
   const formularioCompra = document.getElementById("formularioCompra");
   if (formularioCompra) {
