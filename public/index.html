@@ -257,24 +257,22 @@
         <p>Producto agregado al carrito ✅</p>
       </div>
     </div>
-
-
-  
-  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
   <script>
-    // Minimal test handler (keep for now)
+    emailjs.init("Cqwg1EyqFLvPg7ULx"); // Tu clave pública de EmailJS
+  </script>
+
+  <!-- Tu script que contiene la función enviarOrdenPorCorreo -->
+  <script src="/email.js"></script>
+
+  <!-- Script opcional para debug de clics y año dinámico -->
+  <script>
     document.addEventListener('click', function(e) {
       console.log('[HTML TEST] Document click', e.target);
     });
 
-    // Año dinámico en el footer - mover a script.js si es posible
     document.getElementById('current-year').textContent = new Date().getFullYear();
   </script>
-  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
-  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
-  <script>
-    emailjs.init("Cqwg1EyqFLvPg7ULx");
-  </script>
-  <script src="email.js"></script>
 </body>
 </html>
