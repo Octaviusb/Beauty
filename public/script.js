@@ -148,7 +148,8 @@ function configurarBotonCarrito() {
 
 async function cargarProductos() {
   try {
-    const response = await fetch("/api/products");
+    const baseURL = window.location.origin;
+    const response = await fetch(`${baseURL}/api/products`);
     if (!response.ok) throw new Error("Error al cargar productos");
     const productos = await response.json();
     appState.productos = productos;
