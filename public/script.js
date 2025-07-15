@@ -3,6 +3,8 @@
 const appState = {
   cart: {
     items: [],
+  },
+  productos: [],  // ← Aquí guardaremos todos los productos cargados
 
     addItem(item) {
       const index = this.items.findIndex(p => p.id === item.id);
@@ -37,7 +39,6 @@ const appState = {
       return this.items.reduce((sum, item) => sum + item.price * item.quantity, 0);
     }
   }
-};
 
 function actualizarContadorCarrito() {
   const countSpan = document.getElementById('cart-count');
@@ -160,15 +161,16 @@ function configurarBotonCarrito() {
 
 async function cargarProductos() {
   try {
-    const res = await fetch('/api/products');
-    const productos = await res.json();
-    renderizarProductos(productos);
-  } catch (err) {
-    console.error('❌ Error cargando productos:', err);
-    const contenedor = document.getElementById('product-list');
-    if (contenedor) {
-      contenedor.innerHTML = '<p class="error-msg">Error cargando productos. Intenta de nuevo.</p>';
-    }
+    const response = await fetch("/api/products");
+    const productos = await response.json();
+
+    // ✅ Guardar en appState
+    appState.productos = productos;
+
+    // ... renderizar en la interfaz
+    renderizarProductos(productos); // o como se llame tu función de renderizado
+  } catch (error) {
+    console.error("❌ Error al cargar productos:", error);
   }
 }
 
@@ -208,6 +210,10 @@ document.getElementById("formularioCompra").addEventListener("submit", async (e)
 
   // 🔹 Envía la orden al vendedor por correo
   enviarOrdenPorCorreo(cliente, productos, total);
+  document.querySelector(".checkout-btn").addEventListener("click", () => {
+  document.getElementById("checkoutForm").classList.remove("hidden");
+});
+
 
   // 🔹 Muestra el modal de confirmación (ya debería estar en tu HTML)
   document.getElementById("checkoutForm").classList.add("hidden");
@@ -238,5 +244,18 @@ function enviarOrdenPorCorreo(cliente, productos, total) {
       console.error("❌ Error al enviar email:", err);
       alert("Hubo un error al enviar la orden. Por favor intenta de nuevo.");
     });
+}
+
+document.querySelectorAll(".filter-btn").forEach(btn => {
+  btn.addEventListener("click", e => {
+    e.preventDefault();
+    const filtro = btn.dataset.filter;
+    filtrarProductosPorCategoria(filtro);
+  });
+});
+
+function filtrarProductosPorCategoria(categoria) {
+  const productosFiltrados = appState.productos.filter(p => p.category === categoria);
+  renderizarProductos(productosFiltrados);
 }
 

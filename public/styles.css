@@ -686,20 +686,20 @@ html { scroll-behavior: smooth; }
   min-width: 0;
 }
 .hero-image {
-  flex: 0 0 340px;
-  max-width: 340px;
-  min-width: 200px;
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
   display: flex;
   align-items: center;
   justify-content: flex-end;
 }
 .hero-image img {
-  width: 100%;
-  max-width: 320px;
+  max-width: 100%;
   height: auto;
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-md);
+  object-fit: cover;
+  display: block;
 }
+
 .hero h1 {
   font-size: 1.45rem;
   margin-bottom: 0.6rem;
