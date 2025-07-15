@@ -49,7 +49,7 @@ function actualizarContadorCarrito() {
 }
 
 function renderizarProductos(productos) {
-  const contenedor = document.getElementById('product-list') || document.getElementById('productsGrid');
+  const contenedor = document.getElementById('product-list');
   if (!contenedor) {
     console.error('❌ No se encontró el contenedor de productos');
     return;
@@ -58,11 +58,41 @@ function renderizarProductos(productos) {
   contenedor.innerHTML = '';
 
   productos.forEach((producto, index) => {
-    if (!producto || !producto.id || (!producto.name && !producto.nombre) || (!producto.price && !producto.precio)) {
-      console.warn(`⚠️ Producto inválido en índice ${index}:`, producto);
+    // Verificar si hay productos
+    if (productos.length === 0) {
+      contenedor.innerHTML = `
+        <div class="no-products">
+          <i class="fas fa-box-open"></i>
+          <p>No se encontraron productos</p>
+        </div>
+      `;
       return;
     }
 
+    // Renderizar cada producto
+  productos.forEach(producto => {
+    const card = document.createElement('div');
+    card.className = 'product-card';
+    card.innerHTML = `
+      <div class="product-image">
+        <img src="${producto.image || 'placeholder.jpg'}" 
+             alt="${producto.name}" 
+             loading="lazy">
+      </div>
+      <div class="product-info">
+        <h3>${producto.name}</h3>
+        <p class="product-description">${producto.description || ''}</p>
+        <div class="product-price">$${producto.price.toLocaleString()}</div>
+        <button class="add-to-cart" 
+                data-id="${producto.id}"
+                aria-label="Agregar ${producto.name} al carrito">
+          Agregar
+        </button>
+      </div>
+    `;
+    contenedor.appendChild(card);
+  });
+}
     const id = producto.id;
     const nombre = producto.name || producto.nombre;
     const precio = producto.price || producto.precio;
