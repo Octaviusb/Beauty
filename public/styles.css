@@ -813,6 +813,7 @@ html { scroll-behavior: smooth; }
 }
 .categories-grid {
   display: flex;
+  margin-bottom: 0;
   flex-wrap: nowrap;
   gap: 1.2rem;
   overflow-x: auto;
@@ -824,6 +825,7 @@ html { scroll-behavior: smooth; }
 }
 .categories-grid::-webkit-scrollbar {
   display: none;
+  margin-bottom: 0;
 }
 .category-card {
   min-width: 105px;
