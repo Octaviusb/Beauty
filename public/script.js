@@ -49,6 +49,7 @@ function actualizarContadorCarrito() {
 
 function renderizarProductos(productos) {
   const contenedor = document.getElementById('product-list');
+  console.log("🛠 Renderizando productos...", productos);
   if (!contenedor) {
     console.error('❌ No se encontró el contenedor de productos');
     return;
