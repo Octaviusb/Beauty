@@ -186,3 +186,57 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 });
+
+document.getElementById("formularioCompra").addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const formData = new FormData(e.target);
+  const cliente = {
+    nombre: formData.get("nombre"),
+    email: formData.get("email"),
+    direccion: formData.get("direccion"),
+    telefono: formData.get("telefono"),
+  };
+
+  const productos = appState.cart.items.map((item) => ({
+    name: item.name,
+    quantity: item.quantity,
+    price: item.price
+  }));
+
+  const total = appState.cart.getTotal();
+
+  // 🔹 Envía la orden al vendedor por correo
+  enviarOrdenPorCorreo(cliente, productos, total);
+
+  // 🔹 Muestra el modal de confirmación (ya debería estar en tu HTML)
+  document.getElementById("checkoutForm").classList.add("hidden");
+  document.getElementById("confirmationModal").classList.remove("hidden");
+
+  // 🔹 Limpia el carrito
+  appState.cart.clear();
+  actualizarCarritoUI();
+});
+
+function enviarOrdenPorCorreo(cliente, productos, total) {
+  const productosHTML = productos.map(p => `- ${p.name} (x${p.quantity}) - $${p.price * p.quantity}`).join("\n");
+
+  const templateParams = {
+    nombre: cliente.nombre,
+    email: cliente.email,
+    direccion: cliente.direccion,
+    telefono: cliente.telefono,
+    productos: productosHTML,
+    total: `$${total}`
+  };
+
+  emailjs.send("service_owxur5f", "template_sck7rdl", templateParams)
+    .then(() => {
+      alert("✅ Datos de la orden enviados al vendedor");
+    })
+    .catch(err => {
+      console.error("❌ Error al enviar email:", err);
+      alert("Hubo un error al enviar la orden. Por favor intenta de nuevo.");
+    });
+}
+
