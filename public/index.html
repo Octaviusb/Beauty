@@ -140,17 +140,19 @@
   </footer>
 
   <!-- Modales -->
-  <div id="carrito" class="modal active" role="dialog" aria-modal="true" aria-labelledby="cart-title">
-    <div class="modal-content">
-      <button class="close-cart" aria-label="Cerrar carrito">&times;</button>
-      <h2 id="cart-title">Tu Carrito</h2>
-      <div class="cart-items" role="list"></div>
-      <div class="cart-total">
-        <strong>Total:</strong> <span class="total-amount">$0.00</span>
-      </div>
-      <button id="finalizarCompra" class="checkout-btn">Finalizar Compra</button>
+  <!-- Modal del Carrito - Versión corregida -->
+<div id="carrito-modal" class="modal hidden" role="dialog" aria-modal="false" aria-labelledby="cart-title">
+  <div class="modal-content">
+    <button class="close-cart" aria-label="Cerrar carrito">&times;</button>
+    <h2 id="cart-title">Tu Carrito</h2>
+    <div class="cart-items" role="list"></div>
+    <div class="cart-total">
+      <strong>Total:</strong> <span class="total-amount">$0.00</span>
     </div>
+    <button id="finalizarCompra" class="checkout-btn">Finalizar Compra</button>
+    <button id="limpiarCarrito" class="clear-cart-btn">Limpiar Carrito</button>
   </div>
+</div>
 
   <!-- Modal de Compra -->
   <div id="checkoutForm" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="checkout-title">
