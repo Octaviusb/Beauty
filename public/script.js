@@ -2,7 +2,7 @@
 const appState = {
   cart: {
     items: [],
-    
+
     addItem(item) {
       const index = this.items.findIndex(p => p.id === item.id);
       if (index >= 0) {
@@ -10,27 +10,15 @@ const appState = {
       } else {
         this.items.push({ ...item, quantity: 1 });
       }
-      this.save();
       this.showFeedback(item.name);
     },
 
     removeItem(id) {
       this.items = this.items.filter(item => item.id !== id);
-      this.save();
     },
 
     clear() {
       this.items = [];
-      this.save();
-    },
-
-    save() {
-      localStorage.setItem('carrito', JSON.stringify(this.items));
-    },
-
-    load() {
-      const data = localStorage.getItem('carrito');
-      this.items = data ? JSON.parse(data) : [];
     },
 
     getTotal() {
