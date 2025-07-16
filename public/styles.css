@@ -328,6 +328,31 @@
   color: white;
 }
 
+#checkoutForm.modal {
+  background-color: rgba(0, 0, 0, 0.5); /* fondo oscuro semitransparente */
+  display: none;
+  align-items: center;
+  justify-content: center;
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  transition: opacity 0.3s ease;
+}
+
+#checkoutForm.modal.active {
+  display: flex;
+}
+
+#checkoutForm .modal-content {
+  background: #fff; /* fondo blanco sólido */
+  padding: 2rem;
+  border-radius: 10px;
+  width: 100%;
+  max-width: 500px;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+  position: relative;
+}
+
 /* Estilos para la confirmación */
 .confirmation-content {
   text-align: center;
