@@ -1,9 +1,8 @@
-// script.js - Versión corregida y ordenada
-
+// 1. Estado global MEJORADO
 const appState = {
   cart: {
     items: [],
-
+    
     addItem(item) {
       const index = this.items.findIndex(p => p.id === item.id);
       if (index >= 0) {
@@ -12,6 +11,7 @@ const appState = {
         this.items.push({ ...item, quantity: 1 });
       }
       this.save();
+      this.showFeedback(item.name);
     },
 
     removeItem(id) {
@@ -34,175 +34,252 @@ const appState = {
     },
 
     getTotal() {
-      return this.items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+      return this.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    },
+
+    showFeedback(productName) {
+      const feedback = document.createElement('div');
+      feedback.className = 'cart-feedback';
+      feedback.textContent = `✓ ${productName} agregado`;
+      document.body.appendChild(feedback);
+      setTimeout(() => feedback.remove(), 2000);
     }
   },
-  productos: []
+  productos: [],
+  currentFilter: 'all'
 };
 
-// ===== [1] PRIMERO DEFINIR FUNCIONES UTILITARIAS =====
-function actualizarContadorCarrito() {
-  const countSpan = document.getElementById('cart-count');
-  if (!countSpan) return;
-  const totalItems = appState.cart.items.reduce((sum, item) => sum + item.quantity, 0);
-  countSpan.textContent = totalItems;
+// 2. Funciones de renderizado MEJORADAS
+function renderizarProductos(productos) {
+  const contenedor = document.getElementById('product-list');
+  if (!contenedor) return;
+
+  // Aplicar filtro si existe
+  const productosFiltrados = appState.currentFilter === 'all' 
+    ? productos 
+    : productos.filter(p => p.category === appState.currentFilter);
+
+  contenedor.innerHTML = productosFiltrados.map(producto => `
+    <div class="product-card" data-category="${producto.category}">
+      <img src="${producto.image}" alt="${producto.name}" loading="lazy">
+      <h3>${producto.name}</h3>
+      <p class="product-description">${producto.description || ''}</p>
+      <div class="product-price">$${producto.price.toFixed(2)}</div>
+      <button class="add-to-cart" 
+              data-id="${producto.id}"
+              data-name="${producto.name}"
+              data-price="${producto.price}">
+        Agregar al carrito
+      </button>
+    </div>
+  `).join('');
+
+  // Event listeners mejorados
+  document.querySelectorAll('.add-to-cart').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const productData = {
+        id: btn.dataset.id,
+        name: btn.dataset.name,
+        price: Number(btn.dataset.price)
+      };
+      appState.cart.addItem(productData);
+      
+      // Feedback visual mejorado
+      btn.innerHTML = '✓ Agregado';
+      setTimeout(() => {
+        btn.innerHTML = 'Agregar al carrito';
+      }, 2000);
+    });
+  });
 }
 
 function mostrarCarrito() {
   const modal = document.getElementById('carrito-modal');
-  if (!modal) {
-    console.error('❌ No se encontró el modal del carrito');
-    return;
-  }
+  if (!modal) return;
 
-  const lista = modal.querySelector('.cart-items');
-  const total = modal.querySelector('.total-amount');
+  modal.innerHTML = `
+    <div class="cart-content">
+      <span class="close-cart">&times;</span>
+      <h2>Tu Carrito</h2>
+      <div class="cart-items">
+        ${appState.cart.items.length ? 
+          appState.cart.items.map(item => `
+            <div class="cart-item">
+              <span class="item-name">${item.name}</span>
+              <div class="item-controls">
+                <button class="quantity-btn" data-action="decrease" data-id="${item.id}">-</button>
+                <span class="item-quantity">${item.quantity}</span>
+                <button class="quantity-btn" data-action="increase" data-id="${item.id}">+</button>
+              </div>
+              <span class="item-price">$${(item.price * item.quantity).toFixed(2)}</span>
+              <button class="remove-item" data-id="${item.id}">🗑️</button>
+            </div>
+          `).join('') : 
+          '<p class="empty-cart">Tu carrito está vacío</p>'
+        }
+      </div>
+      <div class="cart-footer">
+        <div class="cart-total">Total: $${appState.cart.getTotal().toFixed(2)}</div>
+        <button id="limpiarCarrito">Vaciar Carrito</button>
+        <button id="finalizarCompra">Finalizar Compra</button>
+      </div>
+    </div>
+  `;
 
-  if (!lista || !total) {
-    console.error('❌ Elementos internos del carrito no encontrados');
-    return;
-  }
-
-  lista.innerHTML = '';
-
-  if (appState.cart.items.length === 0) {
-    lista.innerHTML = '<div class="empty-cart">Tu carrito está vacío</div>';
-    total.textContent = '$0.00';
-  } else {
-    appState.cart.items.forEach(item => {
-      const itemElement = document.createElement('div');
-      itemElement.className = 'cart-item';
-      itemElement.innerHTML = `
-        <div class="item-info">
-          <span class="item-name">${item.name}</span>
-          <span class="item-quantity">Cantidad: ${item.quantity}</span>
-        </div>
-        <div class="item-price">$${(item.price * item.quantity).toLocaleString()}</div>
-        <button class="remove-item" data-id="${item.id}">
-          <i class="fas fa-trash"></i>
-        </button>
-      `;
-      
-      itemElement.querySelector('.remove-item').addEventListener('click', (e) => {
-        e.stopPropagation();
-        appState.cart.removeItem(item.id);
-        mostrarCarrito();
-        actualizarContadorCarrito();
-      });
-      
-      lista.appendChild(itemElement);
+  // Event listeners dinámicos MEJORADOS
+  modal.querySelectorAll('.remove-item').forEach(btn => {
+    btn.addEventListener('click', () => {
+      appState.cart.removeItem(btn.dataset.id);
+      mostrarCarrito();
     });
+  });
 
-    total.textContent = `$${appState.cart.getTotal().toLocaleString()}`;
-  }
+  modal.querySelectorAll('.quantity-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const item = appState.cart.items.find(i => i.id === btn.dataset.id);
+      if (btn.dataset.action === 'increase') {
+        item.quantity++;
+      } else if (item.quantity > 1) {
+        item.quantity--;
+      }
+      appState.cart.save();
+      mostrarCarrito();
+    });
+  });
 
-  modal.classList.remove('hidden');
-  modal.classList.add('active');
-  modal.setAttribute('aria-modal', 'true');
-  document.body.style.overflow = 'hidden';
-}
+  modal.querySelector('.close-cart').addEventListener('click', () => {
+    modal.classList.remove('active');
+  });
 
-// 1. Primero define renderizarProductos
-function renderizarProductos(productos) {
-  const contenedor = document.getElementById('product-list');
-  if (!contenedor) {
-    console.error('❌ No se encontró el contenedor de productos');
-    return;
-  }
+  modal.querySelector('#limpiarCarrito').addEventListener('click', () => {
+    appState.cart.clear();
+    mostrarCarrito();
+  });
 
-  contenedor.innerHTML = '';
-
-  productos.forEach((producto) => {
-    const card = document.createElement('div');
-    card.className = 'product-card';
-    card.innerHTML = `
-      <div class="product-image">
-        <img src="${producto.image}" alt="${producto.name}">
-      </div>
-      <div class="product-info">
-        <h3>${producto.name}</h3>
-        <p>$${producto.price}</p>
-        <button class="add-to-cart" data-id="${producto.id}">Agregar</button>
-      </div>
-    `;
-    contenedor.appendChild(card);
+  modal.querySelector('#finalizarCompra').addEventListener('click', () => {
+    // Lógica de checkout...
+    console.log('Procesando compra:', appState.cart.items);
   });
 }
 
-// 2. Luego define cargarProductos (que usa renderizarProductos)
-async function cargarProductos() {
-  try {
-    const response = await fetch('/api/products');
-    const productos = await response.json();
-    appState.productos = productos;
-    renderizarProductos(productos); // ✅ Ahora renderizarProductos existe
-  } catch (error) {
-    console.error("❌ Error al cargar productos:", error);
+// 3. Funciones de lógica COMPLETAS
+function actualizarContadorCarrito() {
+  const count = appState.cart.items.reduce((sum, item) => sum + item.quantity, 0);
+  const countElement = document.getElementById('cart-count');
+  if (countElement) {
+    countElement.textContent = count;
+    countElement.style.display = count ? 'inline-block' : 'none';
   }
 }
 
 async function cargarProductos() {
   try {
-    const baseURL = window.location.origin;
-    const response = await fetch(`${baseURL}/api/products`);
-    if (!response.ok) throw new Error("Error al cargar productos");
+    const response = await fetch('/api/products');
+    if (!response.ok) throw new Error('Error en la respuesta');
     const productos = await response.json();
+    
+    // Validación básica
+    if (!Array.isArray(productos)) {
+      throw new Error('Formato de productos inválido');
+    }
+
     appState.productos = productos;
     renderizarProductos(productos);
+    setupFilters(); // Configurar filtros después de cargar
   } catch (error) {
-    console.error("❌ Error al cargar productos:", error);
+    console.error("Error al cargar productos:", error);
     const contenedor = document.getElementById('product-list');
     if (contenedor) {
-      contenedor.innerHTML = '<p class="error-message">No se pudieron cargar los productos.</p>';
+      contenedor.innerHTML = `
+        <div class="error-loading">
+          <p>No se pudieron cargar los productos</p>
+          <button id="retry-load">Reintentar</button>
+        </div>
+      `;
+      document.getElementById('retry-load').addEventListener('click', cargarProductos);
     }
   }
 }
 
-// ===== [2] LUEGO CONFIGURAR EVENTOS DEL CARRITO =====
+function setupFilters() {
+  const filterButtons = document.querySelectorAll('.filter-btn');
+  if (!filterButtons.length) return;
+
+  filterButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      appState.currentFilter = btn.dataset.filter;
+      renderizarProductos(appState.productos);
+      
+      // Actualizar estado activo de los botones
+      filterButtons.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    });
+  });
+}
+
+// 4. Configuración de eventos COMPLETA
 function configurarCarrito() {
   const cartButton = document.getElementById('cartButton');
   const cartModal = document.getElementById('carrito-modal');
-  const closeCart = document.querySelector('.close-cart');
-  const limpiarBtn = document.getElementById('limpiarCarrito');
-  const finalizarBtn = document.getElementById('finalizarCompra');
 
-  const abrirCarrito = () => {
-    mostrarCarrito();
-    cartModal.classList.remove('hidden');
+  if (!cartButton || !cartModal) return;
+
+  // Abrir carrito
+  cartButton.addEventListener('click', () => {
     cartModal.classList.add('active');
-  };
+    mostrarCarrito();
+  });
 
-  const cerrarCarrito = () => {
-    cartModal.classList.remove('active');
-    cartModal.classList.add('hidden');
-  };
+  // Cerrar al hacer clic fuera
+  cartModal.addEventListener('click', (e) => {
+    if (e.target === cartModal) {
+      cartModal.classList.remove('active');
+    }
+  });
 
-  if (cartButton) cartButton.addEventListener('click', abrirCarrito);
-  if (closeCart) closeCart.addEventListener('click', cerrarCarrito);
+  // Cerrar con ESC
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && cartModal.classList.contains('active')) {
+      cartModal.classList.remove('active');
+    }
+  });
+}
 
-  if (finalizarBtn) {
-    finalizarBtn.addEventListener('click', (e) => {
-      e.preventDefault();
-      cerrarCarrito();
-      
-      const checkoutForm = document.getElementById('checkoutForm');
-      if (checkoutForm) {
-        checkoutForm.classList.remove('hidden');
-        checkoutForm.classList.add('active');
-        
-        const firstInput = checkoutForm.querySelector('input, select, textarea');
-        if (firstInput) firstInput.focus();
-      } else {
-        console.error('❌ No se encontró el formulario de checkout');
-      }
-    });
-  }
-} // <-- ¡IMPORTANTE! Esta llave CIERRA configurarCarrito()
-
-// ===== [3] FINALMENTE INICIALIZAR =====
-window.addEventListener("DOMContentLoaded", () => {
+// 5. Inicialización COMPLETA
+document.addEventListener("DOMContentLoaded", () => {
+  // Cargar estado inicial
   appState.cart.load();
-  actualizarContadorCarrito(); // Ahora la función YA está definida
+  actualizarContadorCarrito();
+  
+  // Configurar eventos
   configurarCarrito();
+  
+  // Cargar productos
   cargarProductos();
+  
+  // Configuración adicional
+  document.addEventListener('click', (e) => {
+    if (e.target.classList.contains('add-to-cart')) {
+      actualizarContadorCarrito();
+    }
+  });
 });
+
+// Estilos dinámicos
+const style = document.createElement('style');
+style.textContent = `
+  .cart-feedback {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: #4CAF50;
+    color: white;
+    padding: 15px;
+    border-radius: 5px;
+    z-index: 1000;
+    animation: fadeIn 0.3s, fadeOut 0.3s 1.7s;
+  }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
+`;
+document.head.appendChild(style);
