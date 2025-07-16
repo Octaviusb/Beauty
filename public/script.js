@@ -102,6 +102,45 @@ function mostrarCarrito() {
   document.body.style.overflow = 'hidden';
 }
 
+// 1. Primero define renderizarProductos
+function renderizarProductos(productos) {
+  const contenedor = document.getElementById('product-list');
+  if (!contenedor) {
+    console.error('❌ No se encontró el contenedor de productos');
+    return;
+  }
+
+  contenedor.innerHTML = '';
+
+  productos.forEach((producto) => {
+    const card = document.createElement('div');
+    card.className = 'product-card';
+    card.innerHTML = `
+      <div class="product-image">
+        <img src="${producto.image}" alt="${producto.name}">
+      </div>
+      <div class="product-info">
+        <h3>${producto.name}</h3>
+        <p>$${producto.price}</p>
+        <button class="add-to-cart" data-id="${producto.id}">Agregar</button>
+      </div>
+    `;
+    contenedor.appendChild(card);
+  });
+}
+
+// 2. Luego define cargarProductos (que usa renderizarProductos)
+async function cargarProductos() {
+  try {
+    const response = await fetch('/api/products');
+    const productos = await response.json();
+    appState.productos = productos;
+    renderizarProductos(productos); // ✅ Ahora renderizarProductos existe
+  } catch (error) {
+    console.error("❌ Error al cargar productos:", error);
+  }
+}
+
 async function cargarProductos() {
   try {
     const baseURL = window.location.origin;
