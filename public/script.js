@@ -220,7 +220,27 @@ if (formulario) {
     const nombre = document.getElementById('nombre').value;
     const total = appState.cart.getTotal();
 
-    // 🔄 Aquí puedes llamar EmailJS si lo necesitas
+    emailjs.send("service_owxur5f", "template_sck7rdl", {
+  nombre: document.getElementById('nombre').value,
+  email: document.getElementById('email').value,
+  telefono: document.getElementById('telefono').value,
+  direccion: document.getElementById('direccion').value,
+  ciudad: document.getElementById('ciudad').value,
+<div class="form-group">
+  <label for="referidor">Nombre del Referidor*</label>
+  <input type="text" id="referidor" name="referidor" required autocomplete="off">
+</div>
+  metodo_pago: document.querySelector('input[name="payment-method"]:checked').value,
+  total: appState.cart.getTotal().toFixed(2),
+  carrito: appState.cart.items.map(item => `${item.quantity}x ${item.name} ($${item.price})`).join(", ")
+}, "Cqwg1EyqFLvPg7ULx") // tu public key
+.then(function(response) {
+  console.log("📧 Pedido enviado:", response.status, response.text);
+  redirigirAWompi(appState.cart.getTotal(), document.getElementById('nombre').value);
+}, function(error) {
+  console.error("❌ Error al enviar correo:", error);
+  alert("Hubo un error al enviar tu pedido. Por favor, intenta nuevamente.");
+});
 
     redirigirAWompi(total, nombre);
   });
