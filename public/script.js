@@ -76,77 +76,33 @@ function renderizarProductos(productos) {
 
 function mostrarCarrito() {
   const modal = document.getElementById('carrito-modal');
-  if (!modal) return;
+  const lista = modal.querySelector('.cart-items');
+  const total = modal.querySelector('.total-amount');
+
+  if (!modal || !lista || !total) return;
+
+  lista.innerHTML = ''; // vacía antes de actualizar
+
+  if (appState.cart.items.length === 0) {
+    lista.innerHTML = '<p class="empty-cart">Tu carrito está vacío</p>';
+    total.textContent = '$0.00';
+  } else {
+    appState.cart.items.forEach(item => {
+      const itemDiv = document.createElement('div');
+      itemDiv.className = 'cart-item';
+      itemDiv.innerHTML = `
+        <span class="item-name">${item.name}</span>
+        <span class="item-quantity">x${item.quantity}</span>
+        <span class="item-price">$${(item.price * item.quantity).toFixed(2)}</span>
+      `;
+      lista.appendChild(itemDiv);
+    });
+
+    total.textContent = `$${appState.cart.getTotal().toLocaleString()}`;
+  }
 
   modal.classList.remove('hidden');
   modal.classList.add('active');
-
-  let contenido = "<div class='cart-content'>" +
-    "<span class='close-cart'>&times;</span>" +
-    "<h2>Tu Carrito</h2><div class='cart-items'>";
-
-  if (appState.cart.items.length) {
-    contenido += appState.cart.items.map(item => `
-      <div class='cart-item'>
-        <span class='item-name'>${item.name}</span>
-        <div class='item-controls'>
-          <button class='quantity-btn' data-action='decrease' data-id='${item.id}'>-</button>
-          <span class='item-quantity'>${item.quantity}</span>
-          <button class='quantity-btn' data-action='increase' data-id='${item.id}'>+</button>
-        </div>
-        <span class='item-price'>$${(item.price * item.quantity).toFixed(2)}</span>
-        <button class='remove-item' data-id='${item.id}'>🗑️</button>
-      </div>
-    `).join('');
-  } else {
-    contenido += "<p class='empty-cart'>Tu carrito está vacío</p>";
-  }
-
-  contenido += "</div><div class='cart-footer'>" +
-    "<div class='cart-total'>Total: $" + appState.cart.getTotal().toFixed(2) + "</div>" +
-    "<button id='limpiarCarrito'>Vaciar Carrito</button>" +
-    "<button id='finalizarCompra'>Finalizar Compra</button>" +
-    "</div></div>";
-
-  modal.innerHTML = contenido;
-
-  modal.querySelectorAll('.remove-item').forEach(btn => {
-    btn.addEventListener('click', () => {
-      appState.cart.removeItem(btn.dataset.id);
-      mostrarCarrito();
-      actualizarContadorCarrito();
-    });
-  });
-
-  modal.querySelectorAll('.quantity-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const item = appState.cart.items.find(i => i.id === btn.dataset.id);
-      if (btn.dataset.action === 'increase') {
-        item.quantity++;
-      } else if (item.quantity > 1) {
-        item.quantity--;
-      }
-      mostrarCarrito();
-      actualizarContadorCarrito();
-    });
-  });
-
-  modal.querySelector('.close-cart').addEventListener('click', cerrarCarrito);
-  modal.querySelector('#limpiarCarrito').addEventListener('click', () => {
-    appState.cart.clear();
-    mostrarCarrito();
-    actualizarContadorCarrito();
-  });
-
-  modal.querySelector('#finalizarCompra').addEventListener('click', () => {
-    console.log('Procesando compra:', appState.cart.items);
-    cerrarCarrito();
-  });
-
-  // También puedes cerrar haciendo clic fuera del modal
-  modal.addEventListener('click', (e) => {
-    if (e.target === modal) cerrarCarrito();
-  });
 }
 
 function cerrarCarrito() {
@@ -211,6 +167,18 @@ function configurarCarrito() {
     });
   }
 }
+
+document.getElementById('finalizarCompra').addEventListener('click', () => {
+  const modalCarrito = document.getElementById('carrito-modal');
+  const formulario = document.getElementById('checkoutForm');
+
+  modalCarrito.classList.remove('active');
+  modalCarrito.classList.add('hidden');
+
+  formulario.classList.remove('hidden');
+  formulario.classList.add('active');
+});
+
 
 document.addEventListener("DOMContentLoaded", () => {
   console.log("🌐 DOM completamente cargado");
