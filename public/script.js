@@ -281,3 +281,10 @@ function configurarBotonCarrito() {
       }
     });
   };
+
+  window.addEventListener("DOMContentLoaded", () => {
+  appState.cart.load();
+  actualizarContadorCarrito();
+  configurarBotonCarrito();
+  cargarProductos(); // 🚨 ESTA LÍNEA ES LA QUE ACTIVA LA CARGA
+});
