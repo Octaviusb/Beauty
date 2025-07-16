@@ -155,49 +155,54 @@
 </div>
 
   <!-- Modal de Compra -->
-  <div id="checkoutForm" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="checkout-title">
-    <div class="modal-content">
-      <button class="close-form" aria-label="Cerrar formulario">&times;</button>
-      <h2 id="checkout-title">Formulario de Compra</h2>
-      <form id="formularioCompra" aria-labelledby="checkout-title">
-        <div class="form-group">
-  <label for="nombre">Nombre completo</label>
-  <input type="text" name="nombre" id="nombre" required>
-</div>
+  <!-- Modal de Checkout - Versión mejorada -->
+<!-- Modal de Checkout -->
+<div id="checkoutForm" class="modal hidden" role="dialog" aria-modal="false" aria-labelledby="checkout-title">
+  <div class="modal-content">
+    <button class="close-form" aria-label="Cerrar formulario">&times;</button>
+    <h2 id="checkout-title">Formulario de Compra</h2>
+    
+    <form id="formularioCompra">
+      <!-- Campos del formulario -->
+      <div class="form-group">
+        <label for="nombre">Nombre completo</label>
+        <input type="text" name="nombre" id="nombre" required autocomplete="name">
+      </div>
 
-<div class="form-group">
-  <label for="direccion">Dirección de envío</label>
-  <input type="text" name="direccion" id="direccion" required>
-</div>
+      <div class="form-group">
+        <label for="email">Correo electrónico</label>
+        <input type="email" name="email" id="email" required autocomplete="email">
+      </div>
 
-<div class="form-group">
-  <label for="telefono">Teléfono</label>
-  <input type="tel" name="telefono" id="telefono" required>
-</div>
+      <div class="form-group">
+        <label for="direccion">Dirección de envío</label>
+        <input type="text" name="direccion" id="direccion" required autocomplete="address-line1">
+      </div>
 
-<div class="form-group">
-  <label for="email">Correo electrónico</label>
-  <input type="email" name="email" id="email" required>
-</div>
+      <div class="form-group">
+        <label for="telefono">Teléfono</label>
+        <input type="tel" name="telefono" id="telefono" required autocomplete="tel">
+      </div>
 
-<div class="form-group">
-  <label for="referidor">Nombre del referidor </label>
-  <input type="text" name="referidor" id="referidor" required>
-</div>
+      <div class="form-group">
+        <label for="referidor">Nombre del referidor (opcional)</label>
+        <input type="text" name="referidor" id="referidor" autocomplete="off">
+      </div>
 
-<p class="nota">
-  📦 El pedido será despachado a más tardar 3 días después de haberse confirmado el pago del pedido.  
-  <br>
-  🚚 En todo pedido que sobrepase la cantidad de <strong>$200.000</strong> el transporte es gratuito.
-</p>
+      <!-- Nota informativa -->
+      <p class="nota">
+        📦 El pedido será despachado a más tardar 3 días después de haberse confirmado el pago del pedido.<br>
+        🚚 En todo pedido que sobrepase la cantidad de <strong>$200.000</strong> el transporte es gratuito.
+      </p>
 
-<div class="form-group">
-  <button type="submit" class="submit-btn">Finalizar compra</button>
-</div>
-
-      </form>
-    </div>
+      <!-- Botones de acción -->
+      <div class="form-actions">
+        <button type="button" class="btn-back-to-cart">Volver al carrito</button>
+        <button type="submit" class="btn-submit">Finalizar compra</button>
+      </div>
+    </form>
   </div>
+</div>
 
   <!-- Modal de Confirmación -->
   <div id="confirmationModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="confirmation-title">
