@@ -148,6 +148,5 @@ window.addEventListener("DOMContentLoaded", () => {
   appState.cart.load();
   actualizarContadorCarrito(); // Ahora la función YA está definida
   configurarCarrito();
-  configurarCheckoutForm();
   cargarProductos();
 });
