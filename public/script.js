@@ -226,12 +226,15 @@ if (formulario) {
   telefono: document.getElementById('telefono').value,
   direccion: document.getElementById('direccion').value,
   ciudad: document.getElementById('ciudad').value,
-const html = `
+const campoReferidor = `
   <div class="form-group">
     <label for="referidor">Nombre del Referidor*</label>
     <input type="text" id="referidor" name="referidor" required autocomplete="off">
   </div>
 `;
+
+document.querySelector(".form-column").insertAdjacentHTML("beforeend", campoReferidor);
+
   metodo_pago: document.querySelector('input[name="payment-method"]:checked').value,
   total: appState.cart.getTotal().toFixed(2),
   carrito: appState.cart.items.map(item => `${item.quantity}x ${item.name} ($${item.price})`).join(", ")
