@@ -78,32 +78,34 @@ function mostrarCarrito() {
   const modal = document.getElementById('carrito-modal');
   if (!modal) return;
 
+  modal.classList.remove('hidden');
+  modal.classList.add('active');
+
   let contenido = "<div class='cart-content'>" +
     "<span class='close-cart'>&times;</span>" +
     "<h2>Tu Carrito</h2><div class='cart-items'>";
 
   if (appState.cart.items.length) {
-    contenido += appState.cart.items.map(item =>
-      "<div class='cart-item'>" +
-        "<span class='item-name'>" + item.name + "</span>" +
-        "<div class='item-controls'>" +
-          "<button class='quantity-btn' data-action='decrease' data-id='" + item.id + "'>-</button>" +
-          "<span class='item-quantity'>" + item.quantity + "</span>" +
-          "<button class='quantity-btn' data-action='increase' data-id='" + item.id + "'>+</button>" +
-        "</div>" +
-        "<span class='item-price'>$" + (item.price * item.quantity).toFixed(2) + "</span>" +
-        "<button class='remove-item' data-id='" + item.id + "'>🗑️</button>" +
-      "</div>"
-    ).join('');
+    contenido += appState.cart.items.map(item => `
+      <div class='cart-item'>
+        <span class='item-name'>${item.name}</span>
+        <div class='item-controls'>
+          <button class='quantity-btn' data-action='decrease' data-id='${item.id}'>-</button>
+          <span class='item-quantity'>${item.quantity}</span>
+          <button class='quantity-btn' data-action='increase' data-id='${item.id}'>+</button>
+        </div>
+        <span class='item-price'>$${(item.price * item.quantity).toFixed(2)}</span>
+        <button class='remove-item' data-id='${item.id}'>🗑️</button>
+      </div>
+    `).join('');
   } else {
     contenido += "<p class='empty-cart'>Tu carrito está vacío</p>";
   }
 
-  contenido += "</div>" +
-    "<div class='cart-footer'>" +
-      "<div class='cart-total'>Total: $" + appState.cart.getTotal().toFixed(2) + "</div>" +
-      "<button id='limpiarCarrito'>Vaciar Carrito</button>" +
-      "<button id='finalizarCompra'>Finalizar Compra</button>" +
+  contenido += "</div><div class='cart-footer'>" +
+    "<div class='cart-total'>Total: $" + appState.cart.getTotal().toFixed(2) + "</div>" +
+    "<button id='limpiarCarrito'>Vaciar Carrito</button>" +
+    "<button id='finalizarCompra'>Finalizar Compra</button>" +
     "</div></div>";
 
   modal.innerHTML = contenido;
@@ -129,10 +131,7 @@ function mostrarCarrito() {
     });
   });
 
-  modal.querySelector('.close-cart').addEventListener('click', () => {
-    modal.classList.remove('active');
-  });
-
+  modal.querySelector('.close-cart').addEventListener('click', cerrarCarrito);
   modal.querySelector('#limpiarCarrito').addEventListener('click', () => {
     appState.cart.clear();
     mostrarCarrito();
@@ -141,9 +140,21 @@ function mostrarCarrito() {
 
   modal.querySelector('#finalizarCompra').addEventListener('click', () => {
     console.log('Procesando compra:', appState.cart.items);
+    cerrarCarrito();
   });
 
-  modal.classList.add('active');
+  // También puedes cerrar haciendo clic fuera del modal
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) cerrarCarrito();
+  });
+}
+
+function cerrarCarrito() {
+  const modal = document.getElementById('carrito-modal');
+  if (modal) {
+    modal.classList.remove('active');
+    modal.classList.add('hidden');
+  }
 }
 
 function actualizarContadorCarrito() {
