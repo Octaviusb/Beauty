@@ -59,18 +59,17 @@ function renderizarProductos(productos) {
     ? productos 
     : productos.filter(p => p.category === appState.currentFilter);
 
-  contenedor.innerHTML = productosFiltrados.map(producto => `
-    <div class="product-card" data-category="${producto.category}">
-      <img src="${producto.image}" alt="${producto.name}" loading="lazy">
-      <h3>${producto.name}</h3>
-      <p class="product-description">${producto.description || ''}</p>
-      <div class="product-price">$${producto.price.toFixed(2)}</div>
-      <button class="add-to-cart" 
-              data-id="${producto.id}"
-              data-name="${producto.name}"
-              data-price="${producto.price}">
-        Agregar al carrito
-      </button>
+ contenedor.innerHTML = productosFiltrados.map(producto => `
+    <div class="product-card">
+      <div class="product-image-container">
+        <img src="${producto.image}" alt="${producto.name}" class="product-image" loading="lazy">
+      </div>
+      <div class="product-info">
+        <h3 class="product-title">${producto.name}</h3>
+        ${producto.description ? `<p class="product-description">${producto.description}</p>` : ''}
+        <div class="product-price">$${producto.price.toFixed(2)}</div>
+        <button class="add-to-cart">Agregar al carrito</button>
+      </div>
     </div>
   `).join('');
 
