@@ -1,4 +1,5 @@
-// 1. Estado global MEJORADO
+
+// 1. Estado global MEJORADO (sin localStorage)
 const appState = {
   cart: {
     items: [],
@@ -28,7 +29,7 @@ const appState = {
     showFeedback(productName) {
       const feedback = document.createElement('div');
       feedback.className = 'cart-feedback';
-      feedback.textContent = `✓ ${productName} agregado`;
+      feedback.textContent = "✓ " + productName + " agregado";
       document.body.appendChild(feedback);
       setTimeout(() => feedback.remove(), 2000);
     }
@@ -37,31 +38,29 @@ const appState = {
   currentFilter: 'all'
 };
 
-// 2. Funciones de renderizado MEJORADAS
+// 2. Funciones de renderizado
 function renderizarProductos(productos) {
   const contenedor = document.getElementById('product-list');
   if (!contenedor) return;
 
-  // Aplicar filtro si existe
   const productosFiltrados = appState.currentFilter === 'all' 
     ? productos 
     : productos.filter(p => p.category === appState.currentFilter);
 
- contenedor.innerHTML = productosFiltrados.map(producto => `
-    <div class="product-card">
-      <div class="product-image-container">
-        <img src="${producto.image}" alt="${producto.name}" class="product-image" loading="lazy">
-      </div>
-      <div class="product-info">
-        <h3 class="product-title">${producto.name}</h3>
-        ${producto.description ? `<p class="product-description">${producto.description}</p>` : ''}
-        <div class="product-price">$${producto.price.toFixed(2)}</div>
-        <button class="add-to-cart">Agregar al carrito</button>
-      </div>
-    </div>
-  `).join('');
+  contenedor.innerHTML = productosFiltrados.map(producto => (
+    "<div class='product-card'>" +
+      "<div class='product-image-container'>" +
+        "<img src='" + producto.image + "' alt='" + producto.name + "' class='product-image' loading='lazy'>" +
+      "</div>" +
+      "<div class='product-info'>" +
+        "<h3 class='product-title'>" + producto.name + "</h3>" +
+        (producto.description ? "<p class='product-description'>" + producto.description + "</p>" : "") +
+        "<div class='product-price'>$" + producto.price.toFixed(2) + "</div>" +
+        "<button class='add-to-cart' data-id='" + producto.id + "' data-name='" + producto.name + "' data-price='" + producto.price + "'>Agregar al carrito</button>" +
+      "</div>" +
+    "</div>"
+  )).join('');
 
-  // Event listeners mejorados
   document.querySelectorAll('.add-to-cart').forEach(btn => {
     btn.addEventListener('click', () => {
       const productData = {
@@ -70,12 +69,7 @@ function renderizarProductos(productos) {
         price: Number(btn.dataset.price)
       };
       appState.cart.addItem(productData);
-      
-      // Feedback visual mejorado
-      btn.innerHTML = '✓ Agregado';
-      setTimeout(() => {
-        btn.innerHTML = 'Agregar al carrito';
-      }, 2000);
+      actualizarContadorCarrito();
     });
   });
 }
@@ -84,40 +78,41 @@ function mostrarCarrito() {
   const modal = document.getElementById('carrito-modal');
   if (!modal) return;
 
-  modal.innerHTML = `
-    <div class="cart-content">
-      <span class="close-cart">&times;</span>
-      <h2>Tu Carrito</h2>
-      <div class="cart-items">
-        ${appState.cart.items.length ? 
-          appState.cart.items.map(item => `
-            <div class="cart-item">
-              <span class="item-name">${item.name}</span>
-              <div class="item-controls">
-                <button class="quantity-btn" data-action="decrease" data-id="${item.id}">-</button>
-                <span class="item-quantity">${item.quantity}</span>
-                <button class="quantity-btn" data-action="increase" data-id="${item.id}">+</button>
-              </div>
-              <span class="item-price">$${(item.price * item.quantity).toFixed(2)}</span>
-              <button class="remove-item" data-id="${item.id}">🗑️</button>
-            </div>
-          `).join('') : 
-          '<p class="empty-cart">Tu carrito está vacío</p>'
-        }
-      </div>
-      <div class="cart-footer">
-        <div class="cart-total">Total: $${appState.cart.getTotal().toFixed(2)}</div>
-        <button id="limpiarCarrito">Vaciar Carrito</button>
-        <button id="finalizarCompra">Finalizar Compra</button>
-      </div>
-    </div>
-  `;
+  let contenido = "<div class='cart-content'>" +
+    "<span class='close-cart'>&times;</span>" +
+    "<h2>Tu Carrito</h2><div class='cart-items'>";
 
-  // Event listeners dinámicos MEJORADOS
+  if (appState.cart.items.length) {
+    contenido += appState.cart.items.map(item =>
+      "<div class='cart-item'>" +
+        "<span class='item-name'>" + item.name + "</span>" +
+        "<div class='item-controls'>" +
+          "<button class='quantity-btn' data-action='decrease' data-id='" + item.id + "'>-</button>" +
+          "<span class='item-quantity'>" + item.quantity + "</span>" +
+          "<button class='quantity-btn' data-action='increase' data-id='" + item.id + "'>+</button>" +
+        "</div>" +
+        "<span class='item-price'>$" + (item.price * item.quantity).toFixed(2) + "</span>" +
+        "<button class='remove-item' data-id='" + item.id + "'>🗑️</button>" +
+      "</div>"
+    ).join('');
+  } else {
+    contenido += "<p class='empty-cart'>Tu carrito está vacío</p>";
+  }
+
+  contenido += "</div>" +
+    "<div class='cart-footer'>" +
+      "<div class='cart-total'>Total: $" + appState.cart.getTotal().toFixed(2) + "</div>" +
+      "<button id='limpiarCarrito'>Vaciar Carrito</button>" +
+      "<button id='finalizarCompra'>Finalizar Compra</button>" +
+    "</div></div>";
+
+  modal.innerHTML = contenido;
+
   modal.querySelectorAll('.remove-item').forEach(btn => {
     btn.addEventListener('click', () => {
       appState.cart.removeItem(btn.dataset.id);
       mostrarCarrito();
+      actualizarContadorCarrito();
     });
   });
 
@@ -129,8 +124,8 @@ function mostrarCarrito() {
       } else if (item.quantity > 1) {
         item.quantity--;
       }
-      appState.cart.save();
       mostrarCarrito();
+      actualizarContadorCarrito();
     });
   });
 
@@ -141,15 +136,16 @@ function mostrarCarrito() {
   modal.querySelector('#limpiarCarrito').addEventListener('click', () => {
     appState.cart.clear();
     mostrarCarrito();
+    actualizarContadorCarrito();
   });
 
   modal.querySelector('#finalizarCompra').addEventListener('click', () => {
-    // Lógica de checkout...
     console.log('Procesando compra:', appState.cart.items);
   });
+
+  modal.classList.add('active');
 }
 
-// 3. Funciones de lógica COMPLETAS
 function actualizarContadorCarrito() {
   const count = appState.cart.items.reduce((sum, item) => sum + item.quantity, 0);
   const countElement = document.getElementById('cart-count');
@@ -164,67 +160,42 @@ async function cargarProductos() {
     const response = await fetch('/api/products');
     if (!response.ok) throw new Error('Error en la respuesta');
     const productos = await response.json();
-    
-    // Validación básica
-    if (!Array.isArray(productos)) {
-      throw new Error('Formato de productos inválido');
-    }
-
+    if (!Array.isArray(productos)) throw new Error('Formato inválido');
     appState.productos = productos;
     renderizarProductos(productos);
-    setupFilters(); // Configurar filtros después de cargar
+    setupFilters();
   } catch (error) {
     console.error("Error al cargar productos:", error);
     const contenedor = document.getElementById('product-list');
     if (contenedor) {
-      contenedor.innerHTML = `
-        <div class="error-loading">
-          <p>No se pudieron cargar los productos</p>
-          <button id="retry-load">Reintentar</button>
-        </div>
-      `;
-      document.getElementById('retry-load').addEventListener('click', cargarProductos);
+      contenedor.innerHTML = "<p class='error-message'>No se pudieron cargar los productos.</p>";
     }
   }
 }
 
 function setupFilters() {
   const filterButtons = document.querySelectorAll('.filter-btn');
-  if (!filterButtons.length) return;
-
   filterButtons.forEach(btn => {
     btn.addEventListener('click', () => {
       appState.currentFilter = btn.dataset.filter;
       renderizarProductos(appState.productos);
-      
-      // Actualizar estado activo de los botones
       filterButtons.forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
     });
   });
 }
 
-// 4. Configuración de eventos COMPLETA
 function configurarCarrito() {
   const cartButton = document.getElementById('cartButton');
   const cartModal = document.getElementById('carrito-modal');
-
   if (!cartButton || !cartModal) return;
 
-  // Abrir carrito
-  cartButton.addEventListener('click', () => {
-    cartModal.classList.add('active');
-    mostrarCarrito();
-  });
+  cartButton.addEventListener('click', mostrarCarrito);
 
-  // Cerrar al hacer clic fuera
   cartModal.addEventListener('click', (e) => {
-    if (e.target === cartModal) {
-      cartModal.classList.remove('active');
-    }
+    if (e.target === cartModal) cartModal.classList.remove('active');
   });
 
-  // Cerrar con ESC
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && cartModal.classList.contains('active')) {
       cartModal.classList.remove('active');
@@ -232,41 +203,9 @@ function configurarCarrito() {
   });
 }
 
-// 5. Inicialización COMPLETA
 document.addEventListener("DOMContentLoaded", () => {
-  // Cargar estado inicial
-  appState.cart.load();
+  appState.cart.items = [];
   actualizarContadorCarrito();
-  
-  // Configurar eventos
   configurarCarrito();
-  
-  // Cargar productos
   cargarProductos();
-  
-  // Configuración adicional
-  document.addEventListener('click', (e) => {
-    if (e.target.classList.contains('add-to-cart')) {
-      actualizarContadorCarrito();
-    }
-  });
 });
-
-// Estilos dinámicos
-const style = document.createElement('style');
-style.textContent = `
-  .cart-feedback {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    background: #4CAF50;
-    color: white;
-    padding: 15px;
-    border-radius: 5px;
-    z-index: 1000;
-    animation: fadeIn 0.3s, fadeOut 0.3s 1.7s;
-  }
-  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-  @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
-`;
-document.head.appendChild(style);
