@@ -188,20 +188,19 @@ function setupFilters() {
 function configurarCarrito() {
   const cartButton = document.getElementById('cartButton');
   const cartModal = document.getElementById('carrito-modal');
-  if (!cartButton || !cartModal) return;
 
-  cartButton.addEventListener('click', mostrarCarrito);
+  console.log("🛠 Ejecutando configurarCarrito()");
+  console.log("🛎 cartButton:", cartButton);
+  console.log("🛎 cartModal:", cartModal);
 
-  cartModal.addEventListener('click', (e) => {
-    if (e.target === cartModal) cartModal.classList.remove('active');
-  });
-
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && cartModal.classList.contains('active')) {
-      cartModal.classList.remove('active');
-    }
-  });
+  if (cartButton) {
+    cartButton.addEventListener('click', () => {
+      console.log("🟢 Click recibido en #cartButton");
+      mostrarCarrito();  // <- ESTA es la clave
+    });
+  }
 }
+
 document.addEventListener("DOMContentLoaded", () => {
   console.log("🌐 DOM completamente cargado");
 
