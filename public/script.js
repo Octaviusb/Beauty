@@ -101,52 +101,6 @@ function renderizarProductos(productos) {
   });
 }
 
-function configurarBotonCarrito() {
-  const btn = document.getElementById('cartButton');
-  const cerrar = document.querySelector('.close-cart');
-  const limpiar = document.getElementById('limpiarCarrito');
-
-  if (btn) {
-    btn.addEventListener('click', mostrarCarrito);
-    console.log("✅ Evento click agregado a #cartButton");
-  } else {
-    console.warn("❌ No se encontró #cartButton en el DOM");
-  }
-
-  if (cerrar) {
-    cerrar.addEventListener('click', () => {
-      const modal = document.getElementById('carrito');
-      modal.classList.remove('active');
-      modal.classList.add('hidden');
-    });
-  }
-
-  if (limpiar) {
-    limpiar.addEventListener('click', () => {
-      appState.cart.clear();
-      mostrarCarrito();
-      actualizarContadorCarrito();
-    });
-  }
-}
-
-function configurarBotonCarrito() {
-  const btn = document.getElementById('cartButton');
-  const cerrar = document.querySelector('.close-cart');
-  const limpiar = document.getElementById('limpiarCarrito');
-
-  if (btn) btn.addEventListener('click', mostrarCarrito);
-  if (cerrar) cerrar.addEventListener('click', () => {
-    document.getElementById('carrito').classList.remove('active');
-    document.getElementById('carrito').classList.add('hidden');
-  });
-  if (limpiar) limpiar.addEventListener('click', () => {
-    appState.cart.clear();
-    mostrarCarrito();
-    actualizarContadorCarrito();
-  });
-}
-
 async function cargarProductos() {
   try {
     const baseURL = window.location.origin;
@@ -178,7 +132,7 @@ function enviarOrdenPorCorreo(cliente, productos, total) {
     productos: productosHTML,
     total: `$${total.toLocaleString()}`,
     nota: `El pedido será despachado a más tardar 3 días después de haberse confirmado el pago del pedido.
-Todo pedido que sobrepase los $200.000, el transporte será gratuito.`
+En todo pedido que sobrepase los $200.000, el transporte será gratuito.`
   };
 
   return emailjs.send("service_owxur5f", "template_sck7rdl", templateParams)
@@ -203,33 +157,7 @@ document.querySelectorAll(".filter-btn").forEach(btn => {
   });
 });
 
-function configurarBotonCarrito() {
-  const btn = document.getElementById('cartButton');
-  console.log("🔎 botón encontrado:", btn); // 👈 Añade esto
 
-  const cerrar = document.querySelector('.close-cart');
-  const limpiar = document.getElementById('limpiarCarrito');
-
-  if (btn) {
-    btn.addEventListener('click', mostrarCarrito);
-  }
-
-  if (cerrar) {
-    cerrar.addEventListener('click', () => {
-      const modal = document.getElementById('carrito');
-      modal.classList.remove('active');
-      modal.classList.add('hidden');
-    });
-  }
-
-  if (limpiar) {
-    limpiar.addEventListener('click', () => {
-      appState.cart.clear();
-      mostrarCarrito();
-      actualizarContadorCarrito();
-    });
-  }
-}
 
   const formularioCompra = document.getElementById("formularioCompra");
   if (formularioCompra) {
@@ -282,7 +210,7 @@ function configurarBotonCarrito() {
     });
   };
 
-  function mostrarCarrito() {
+function mostrarCarrito() {
   const modal = document.getElementById('carrito');
   const lista = modal.querySelector('.cart-items');
   const total = modal.querySelector('.total-amount');
@@ -302,6 +230,35 @@ function configurarBotonCarrito() {
   total.textContent = `$${appState.cart.getTotal().toLocaleString()}`;
   modal.classList.remove('hidden');
   modal.classList.add('active');
+}
+
+function configurarBotonCarrito() {
+  const btn = document.getElementById('cartButton');
+  const cerrar = document.querySelector('.close-cart');
+  const limpiar = document.getElementById('limpiarCarrito');
+
+  if (btn) {
+    btn.addEventListener('click', mostrarCarrito);
+    console.log("✅ Evento click agregado a #cartButton");
+  } else {
+    console.warn("❌ No se encontró #cartButton en el DOM");
+  }
+
+  if (cerrar) {
+    cerrar.addEventListener('click', () => {
+      const modal = document.getElementById('carrito');
+      modal.classList.remove('active');
+      modal.classList.add('hidden');
+    });
+  }
+
+  if (limpiar) {
+    limpiar.addEventListener('click', () => {
+      appState.cart.clear();
+      mostrarCarrito();
+      actualizarContadorCarrito();
+    });
+  }
 }
 
 window.addEventListener("DOMContentLoaded", () => {
