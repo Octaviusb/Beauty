@@ -246,6 +246,42 @@ En todo pedido que sobrepase los $200.000, el transporte será gratuito.`
     });
 }
 
+function configurarCheckoutForm() {
+  const checkoutForm = document.getElementById('checkoutForm');
+  const closeCheckout = checkoutForm?.querySelector('.close-checkout');
+  
+  if (!checkoutForm) {
+    console.error('❌ No se encontró el formulario de checkout');
+    return;
+  }
+
+  // Función para cerrar el formulario de checkout
+  const cerrarCheckout = () => {
+    checkoutForm.classList.remove('active');
+    checkoutForm.classList.add('hidden');
+    document.body.style.overflow = 'auto';
+  };
+
+  // Configurar el botón de cerrar
+  if (closeCheckout) {
+    closeCheckout.addEventListener('click', cerrarCheckout);
+  }
+
+  // Cerrar al hacer clic fuera del formulario
+  checkoutForm.addEventListener('click', (e) => {
+    if (e.target === checkoutForm) {
+      cerrarCheckout();
+    }
+  });
+
+  // Cerrar con Escape key
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && checkoutForm.classList.contains('active')) {
+      cerrarCheckout();
+    }
+  });
+}
+  
 // Filtros de categoría
 document.querySelectorAll(".filter-btn").forEach(btn => {
   btn.addEventListener("click", e => {
@@ -316,6 +352,7 @@ if (formularioCompra) {
 window.addEventListener("DOMContentLoaded", () => {
   appState.cart.load();
   actualizarContadorCarrito();
-  configurarBotonCarrito(); // Ahora está definida antes de ser llamada
+  configurarCarrito();
+  configurarCheckoutForm(); // Añade esta línea
   cargarProductos();
 });
