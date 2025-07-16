@@ -282,6 +282,28 @@ function configurarBotonCarrito() {
     });
   };
 
+  function mostrarCarrito() {
+  const modal = document.getElementById('carrito');
+  const lista = modal.querySelector('.cart-items');
+  const total = modal.querySelector('.total-amount');
+
+  lista.innerHTML = '';
+
+  appState.cart.items.forEach(item => {
+    const div = document.createElement('div');
+    div.className = 'cart-item';
+    div.innerHTML = `
+      <span>${item.name} x${item.quantity}</span>
+      <span>$${(item.price * item.quantity).toLocaleString()}</span>
+    `;
+    lista.appendChild(div);
+  });
+
+  total.textContent = `$${appState.cart.getTotal().toLocaleString()}`;
+  modal.classList.remove('hidden');
+  modal.classList.add('active');
+}
+
 window.addEventListener("DOMContentLoaded", () => {
   appState.cart.load();
   actualizarContadorCarrito();
