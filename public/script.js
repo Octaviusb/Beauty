@@ -347,6 +347,7 @@ if (formularioCompra) {
     }
   });
 }
+}
 
 // Inicialización
 window.addEventListener("DOMContentLoaded", () => {
