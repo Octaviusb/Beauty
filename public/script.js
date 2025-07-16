@@ -168,6 +168,17 @@ function configurarCarrito() {
   }
 }
 
+function redirigirAWompi(montoEnPesos, nombreCliente) {
+  const amountInCents = Math.round(montoEnPesos * 100); // Wompi usa centavos
+  const publicKey = "pub_test_your_public_key"; // Reemplaza por tu llave pública real
+  const reference = `pedido_${Date.now()}`;
+
+  const checkoutUrl = `https://checkout.wompi.co/p/?public-key=${publicKey}&currency=COP&amount-in-cents=${amountInCents}&reference=${reference}&redirect-url=https://beauty-mocha-ten.vercel.app/pedido-confirmado.html`;
+
+  console.log("💳 Redirigiendo a Wompi con:", { amountInCents, reference });
+  window.location.href = checkoutUrl;
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   console.log("🌐 DOM completamente cargado");
 
@@ -201,3 +212,18 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
+const formulario = document.getElementById('formularioCompra');
+if (formulario) {
+  formulario.addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    const nombre = document.getElementById('nombre').value;
+    const total = appState.cart.getTotal();
+
+    // 🔄 Aquí puedes llamar EmailJS si lo necesitas
+
+    redirigirAWompi(total, nombre);
+  });
+} else {
+  console.warn("⚠️ Formulario #formularioCompra no encontrado");
+}
