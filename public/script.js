@@ -282,7 +282,7 @@ function configurarBotonCarrito() {
     });
   };
 
-  window.addEventListener("DOMContentLoaded", () => {
+window.addEventListener("DOMContentLoaded", () => {
   appState.cart.load();
   actualizarContadorCarrito();
   configurarBotonCarrito();
