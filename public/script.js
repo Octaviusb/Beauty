@@ -1,5 +1,5 @@
-
 // 1. Estado global MEJORADO (sin localStorage)
+console.log("📦 script.js cargado con defer");
 const appState = {
   cart: {
     items: [],
@@ -202,8 +202,17 @@ function configurarCarrito() {
     }
   });
 }
-
 document.addEventListener("DOMContentLoaded", () => {
+  console.log("🌐 DOM completamente cargado");
+
+  const btn = document.getElementById("cartButton");
+  console.log("🔍 Botón encontrado:", btn);
+
+  if (!btn) {
+    console.error("❌ Botón #cartButton no disponible al cargar");
+  }
+
+  // 🛒 Inicialización real
   appState.cart.items = [];
   actualizarContadorCarrito();
   configurarCarrito();
