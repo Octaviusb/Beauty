@@ -171,7 +171,7 @@ function configurarCarrito() {
 // 💳 Redirección a Wompi
 function redirigirAWompi(montoEnPesos, nombreCliente) {
   const amountInCents = Math.round(montoEnPesos * 100); // Wompi usa centavos
-  const publicKey = "pub_test_your_public_key"; // Reemplázala por la real
+  const publicKey = "pub_prod_XApVcADEVCLGJnnghUT1V8G3oEwrF7ZW";
   const reference = `pedido_${Date.now()}`;
 
   const checkoutUrl = `https://checkout.wompi.co/p/?public-key=${publicKey}&currency=COP&amount-in-cents=${amountInCents}&reference=${reference}&redirect-url=https://beauty-mocha-ten.vercel.app/pedido-confirmado.html`;
