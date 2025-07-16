@@ -168,9 +168,10 @@ function configurarCarrito() {
   }
 }
 
+// 💳 Redirección a Wompi
 function redirigirAWompi(montoEnPesos, nombreCliente) {
   const amountInCents = Math.round(montoEnPesos * 100); // Wompi usa centavos
-  const publicKey = "pub_test_your_public_key"; // Reemplaza por tu llave pública real
+  const publicKey = "pub_test_your_public_key"; // Reemplázala por la real
   const reference = `pedido_${Date.now()}`;
 
   const checkoutUrl = `https://checkout.wompi.co/p/?public-key=${publicKey}&currency=COP&amount-in-cents=${amountInCents}&reference=${reference}&redirect-url=https://beauty-mocha-ten.vercel.app/pedido-confirmado.html`;
@@ -179,22 +180,31 @@ function redirigirAWompi(montoEnPesos, nombreCliente) {
   window.location.href = checkoutUrl;
 }
 
+// 🧠 Inyectar el campo referidor al cargar DOM
 document.addEventListener("DOMContentLoaded", () => {
   console.log("🌐 DOM completamente cargado");
 
   const btn = document.getElementById("cartButton");
   console.log("🔍 Botón encontrado:", btn);
 
-  if (!btn) {
-    console.error("❌ Botón #cartButton no disponible al cargar");
-  }
+  if (!btn) console.error("❌ Botón #cartButton no disponible");
 
   appState.cart.items = [];
   actualizarContadorCarrito();
   configurarCarrito();
   cargarProductos();
 
-  // ✅ Mueve aquí el listener de finalizarCompra
+  // Agregar campo de referidor
+  const campoReferidor = `
+    <div class="form-group">
+      <label for="referidor">Nombre del Referidor*</label>
+      <input type="text" id="referidor" name="referidor" required autocomplete="off">
+    </div>
+  `;
+  const columna = document.querySelector(".form-column");
+  if (columna) columna.insertAdjacentHTML("beforeend", campoReferidor);
+
+  // Abrir formulario al finalizar compra
   const finalizarBtn = document.getElementById('finalizarCompra');
   if (finalizarBtn) {
     finalizarBtn.addEventListener('click', () => {
@@ -208,47 +218,45 @@ document.addEventListener("DOMContentLoaded", () => {
       formulario.classList.add('active');
     });
   } else {
-    console.warn("⚠️ Botón #finalizarCompra no encontrado en el DOM");
+    console.warn("⚠️ Botón #finalizarCompra no encontrado");
+  }
+
+  // 📧 Enviar pedido por EmailJS y redirigir
+  const formulario = document.getElementById('formularioCompra');
+  if (formulario) {
+    formulario.addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      const nombre = document.getElementById('nombre').value;
+      const email = document.getElementById('email').value;
+      const telefono = document.getElementById('telefono').value;
+      const direccion = document.getElementById('direccion').value;
+      const ciudad = document.getElementById('ciudad').value;
+      const referidor = document.getElementById('referidor').value;
+      const metodo_pago = document.querySelector('input[name="payment-method"]:checked').value;
+      const carrito = appState.cart.items.map(item => `${item.quantity}x ${item.name} ($${item.price})`).join(", ");
+      const total = appState.cart.getTotal();
+
+      emailjs.send("service_owxur5f", "template_sck7rdl", {
+        nombre,
+        email,
+        telefono,
+        direccion,
+        ciudad,
+        referidor,
+        metodo_pago,
+        total: total.toFixed(2),
+        carrito
+      }, "Cqwg1EyqFLvPg7ULx") // Tu public key
+      .then(function(response) {
+        console.log("📧 Pedido enviado:", response.status, response.text);
+        redirigirAWompi(total, nombre);
+      }, function(error) {
+        console.error("❌ Error al enviar correo:", error);
+        alert("Hubo un error al enviar tu pedido. Por favor, intenta nuevamente.");
+      });
+    });
+  } else {
+    console.warn("⚠️ Formulario #formularioCompra no encontrado");
   }
 });
-
-const formulario = document.getElementById('formularioCompra');
-if (formulario) {
-  formulario.addEventListener('submit', function(e) {
-    e.preventDefault();
-
-    const nombre = document.getElementById('nombre').value;
-    const total = appState.cart.getTotal();
-
-    emailjs.send("service_owxur5f", "template_sck7rdl", {
-  nombre: document.getElementById('nombre').value,
-  email: document.getElementById('email').value,
-  telefono: document.getElementById('telefono').value,
-  direccion: document.getElementById('direccion').value,
-  ciudad: document.getElementById('ciudad').value,
-const campoReferidor = `
-  <div class="form-group">
-    <label for="referidor">Nombre del Referidor*</label>
-    <input type="text" id="referidor" name="referidor" required autocomplete="off">
-  </div>
-`;
-
-document.querySelector(".form-column").insertAdjacentHTML("beforeend", campoReferidor);
-
-  metodo_pago: document.querySelector('input[name="payment-method"]:checked').value,
-  total: appState.cart.getTotal().toFixed(2),
-  carrito: appState.cart.items.map(item => `${item.quantity}x ${item.name} ($${item.price})`).join(", ")
-}, "Cqwg1EyqFLvPg7ULx") // tu public key
-.then(function(response) {
-  console.log("📧 Pedido enviado:", response.status, response.text);
-  redirigirAWompi(appState.cart.getTotal(), document.getElementById('nombre').value);
-}, function(error) {
-  console.error("❌ Error al enviar correo:", error);
-  alert("Hubo un error al enviar tu pedido. Por favor, intenta nuevamente.");
-});
-
-    redirigirAWompi(total, nombre);
-  });
-} else {
-  console.warn("⚠️ Formulario #formularioCompra no encontrado");
-}
