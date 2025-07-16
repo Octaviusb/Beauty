@@ -41,34 +41,50 @@ const appState = {
 };
 
 // Mover la función configurarBotonCarrito al principio
-function configurarBotonCarrito() {
-  const btn = document.getElementById('cartButton');
-  const cerrar = document.querySelector('.close-cart');
-  const limpiar = document.getElementById('limpiarCarrito');
+function configurarCarrito() {
+  const cartButton = document.getElementById('cartButton');
+  const cartModal = document.getElementById('carrito-modal');
+  const closeCart = document.querySelector('.close-cart');
+  const limpiarBtn = document.getElementById('limpiarCarrito');
+  const finalizarBtn = document.getElementById('finalizarCompra');
 
-  if (btn) {
-    btn.addEventListener('click', mostrarCarrito);
-    console.log("✅ Evento click agregado a #cartButton");
-  } else {
-    console.warn("❌ No se encontró #cartButton en el DOM");
-  }
+  // Función para abrir el carrito
+  const abrirCarrito = () => {
+    mostrarCarrito();
+    cartModal.classList.remove('hidden');
+    cartModal.classList.add('active');
+  };
 
-  if (cerrar) {
-    cerrar.addEventListener('click', () => {
-      const modal = document.getElementById('carrito');
-      modal.classList.remove('active');
-      modal.classList.add('hidden');
+  // Función para cerrar el carrito
+  const cerrarCarrito = () => {
+    cartModal.classList.remove('active');
+    cartModal.classList.add('hidden');
+  };
+
+  // Configurar el botón de finalizar compra
+  if (finalizarBtn) {
+    finalizarBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      
+      // Cerrar el carrito
+      cerrarCarrito();
+      
+      // Abrir el formulario de checkout
+      const checkoutForm = document.getElementById('checkoutForm');
+      if (checkoutForm) {
+        checkoutForm.classList.remove('hidden');
+        checkoutForm.classList.add('active');
+        
+        // Enfocar el primer campo del formulario
+        const firstInput = checkoutForm.querySelector('input, select, textarea');
+        if (firstInput) {
+          firstInput.focus();
+        }
+      } else {
+        console.error('❌ No se encontró el formulario de checkout');
+      }
     });
   }
-
-  if (limpiar) {
-    limpiar.addEventListener('click', () => {
-      appState.cart.clear();
-      mostrarCarrito();
-      actualizarContadorCarrito();
-    });
-  }
-}
 
 function actualizarContadorCarrito() {
   const countSpan = document.getElementById('cart-count');
