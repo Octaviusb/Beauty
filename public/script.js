@@ -168,18 +168,6 @@ function configurarCarrito() {
   }
 }
 
-document.getElementById('finalizarCompra').addEventListener('click', () => {
-  const modalCarrito = document.getElementById('carrito-modal');
-  const formulario = document.getElementById('checkoutForm');
-
-  modalCarrito.classList.remove('active');
-  modalCarrito.classList.add('hidden');
-
-  formulario.classList.remove('hidden');
-  formulario.classList.add('active');
-});
-
-
 document.addEventListener("DOMContentLoaded", () => {
   console.log("🌐 DOM completamente cargado");
 
@@ -190,9 +178,26 @@ document.addEventListener("DOMContentLoaded", () => {
     console.error("❌ Botón #cartButton no disponible al cargar");
   }
 
-  // 🛒 Inicialización real
   appState.cart.items = [];
   actualizarContadorCarrito();
   configurarCarrito();
   cargarProductos();
+
+  // ✅ Mueve aquí el listener de finalizarCompra
+  const finalizarBtn = document.getElementById('finalizarCompra');
+  if (finalizarBtn) {
+    finalizarBtn.addEventListener('click', () => {
+      const modalCarrito = document.getElementById('carrito-modal');
+      const formulario = document.getElementById('checkoutForm');
+
+      modalCarrito.classList.remove('active');
+      modalCarrito.classList.add('hidden');
+
+      formulario.classList.remove('hidden');
+      formulario.classList.add('active');
+    });
+  } else {
+    console.warn("⚠️ Botón #finalizarCompra no encontrado en el DOM");
+  }
 });
+
