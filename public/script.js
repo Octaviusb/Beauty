@@ -1,4 +1,4 @@
-// script.js - Catálogo, carrito, pedido por correo y redirección a Wompi
+// script.js - Versión corregida
 
 const appState = {
   cart: {
@@ -40,11 +40,63 @@ const appState = {
   productos: []
 };
 
+// Mover la función configurarBotonCarrito al principio
+function configurarBotonCarrito() {
+  const btn = document.getElementById('cartButton');
+  const cerrar = document.querySelector('.close-cart');
+  const limpiar = document.getElementById('limpiarCarrito');
+
+  if (btn) {
+    btn.addEventListener('click', mostrarCarrito);
+    console.log("✅ Evento click agregado a #cartButton");
+  } else {
+    console.warn("❌ No se encontró #cartButton en el DOM");
+  }
+
+  if (cerrar) {
+    cerrar.addEventListener('click', () => {
+      const modal = document.getElementById('carrito');
+      modal.classList.remove('active');
+      modal.classList.add('hidden');
+    });
+  }
+
+  if (limpiar) {
+    limpiar.addEventListener('click', () => {
+      appState.cart.clear();
+      mostrarCarrito();
+      actualizarContadorCarrito();
+    });
+  }
+}
+
 function actualizarContadorCarrito() {
   const countSpan = document.getElementById('cart-count');
   if (!countSpan) return;
   const totalItems = appState.cart.items.reduce((sum, item) => sum + item.quantity, 0);
   countSpan.textContent = totalItems;
+}
+
+function mostrarCarrito() {
+  const modal = document.getElementById('carrito');
+  const lista = modal.querySelector('.cart-items');
+  const total = modal.querySelector('.total-amount');
+
+  lista.innerHTML = '';
+
+  appState.cart.items.forEach(item => {
+    const div = document.createElement('div');
+    div.className = 'cart-item';
+    div.innerHTML = `
+      <span>${item.name} x${item.quantity}</span>
+      <span>$${(item.price * item.quantity).toLocaleString()}</span>
+    `;
+    lista.appendChild(div);
+  });
+
+  total.textContent = `$${appState.cart.getTotal().toLocaleString()}`;
+  modal.classList.remove('hidden');
+  modal.classList.add('active');
 }
 
 function renderizarProductos(productos) {
@@ -157,228 +209,18 @@ document.querySelectorAll(".filter-btn").forEach(btn => {
   });
 });
 
+// Configuración del formulario de compra
+const formularioCompra = document.getElementById("formularioCompra");
+if (formularioCompra) {
+  formularioCompra.addEventListener("submit", async (e) => {
+    e.preventDefault();
 
-
-  const formularioCompra = document.getElementById("formularioCompra");
-  if (formularioCompra) {
-    formularioCompra.addEventListener("submit", async (e) => {
-      e.preventDefault();
-
-      const submitBtn = e.target.querySelector('button[type="submit"]');
-      const originalText = submitBtn.textContent;
-      submitBtn.disabled = true;
-      submitBtn.textContent = "Procesando...";
-
-      const formData = new FormData(e.target);
-      const cliente = {
-        nombre: formData.get("nombre"),
-        email: formData.get("email"),
-        direccion: formData.get("direccion"),
-        telefono: formData.get("telefono"),
-        referidor: formData.get("referidor") || "No especificado"
-      };
-
-      try {
-        const emailSuccess = await enviarOrdenPorCorreo(
-          cliente,
-          appState.cart.items,
-          appState.cart.getTotal()
-        );
-
-        if (!emailSuccess) throw new Error("Fallo al enviar el correo");
-
-        document.getElementById("checkoutForm").classList.add("hidden");
-        document.getElementById("confirmationModal").classList.remove("hidden");
-
-        const total = appState.cart.getTotal();
-        const url = `https://checkout.wompi.co/l/VPOS_nJo3xk?amount=${total * 100}&currency=COP`;
-        
-        setTimeout(() => {
-          window.open(url, '_blank');
-          appState.cart.clear();
-          actualizarContadorCarrito();
-          document.getElementById("confirmationModal").classList.add("hidden");
-          formularioCompra.reset();
-        }, 3000);
-      } catch (error) {
-        alert("Hubo un error al procesar tu pedido.");
-        console.error(error);
-      } finally {
-        submitBtn.disabled = false;
-        submitBtn.textContent = originalText;
-      }
-    });
-  };
-
-function mostrarCarrito() {
-  const modal = document.getElementById('carrito');
-  const lista = modal.querySelector('.cart-items');
-  const total = modal.querySelector('.total-amount');
-
-  lista.innerHTML = '';
-
-  appState.cart.items.forEach(item => {
-    const div = document.createElement('div');
-    div.className = 'cart-item';
-    div.innerHTML = `
-      <span>${item.name} x${item.quantity}</span>
-      <span>$${(item.price * item.quantity).toLocaleString()}</span>
-    `;
-    lista.appendChild(div);
-  });
-
-  total.textContent = `$${appState.cart.getTotal().toLocaleString()}`;
-  modal.classList.remove('hidden');
-  modal.classList.add('active');
-}
-
-// Configuración del carrito - Versión mejorada
-function configurarCarrito() {
-  const cartButton = document.getElementById('cartButton');
-  const cartModal = document.getElementById('carrito-modal');
-  const closeCart = document.querySelector('.close-cart');
-  const limpiarBtn = document.getElementById('limpiarCarrito');
-  const finalizarBtn = document.getElementById('finalizarCompra');
-
-  // Función para abrir el carrito
-  const abrirCarrito = () => {
-    mostrarCarrito(); // Actualiza el contenido
-    cartModal.classList.remove('hidden');
-    cartModal.classList.add('active');
-    cartModal.setAttribute('aria-modal', 'true');
-    document.body.style.overflow = 'hidden';
-  };
-
-  // Función para cerrar el carrito
-  const cerrarCarrito = () => {
-    cartModal.classList.remove('active');
-    cartModal.classList.add('hidden');
-    cartModal.setAttribute('aria-modal', 'false');
-    document.body.style.overflow = '';
-  };
-
-  // Event listeners
-  if (cartButton) {
-    cartButton.addEventListener('click', abrirCarrito);
-    console.log("✅ Botón del carrito configurado");
-  } else {
-    console.error("❌ No se encontró el botón del carrito");
-  }
-
-  if (closeCart) {
-    closeCart.addEventListener('click', cerrarCarrito);
-  }
-
-  if (limpiarBtn) {
-    limpiarBtn.addEventListener('click', () => {
-      appState.cart.clear();
-      mostrarCarrito();
-      actualizarContadorCarrito();
-      mostrarNotificacion("Carrito vaciado");
-    });
-  }
-
-  if (finalizarBtn) {
-    finalizarBtn.addEventListener('click', () => {
-      cerrarCarrito();
-      document.getElementById('checkoutForm').classList.remove('hidden');
-    });
-  }
-
-  // Cerrar al hacer clic fuera del modal
-  cartModal.addEventListener('click', (e) => {
-    if (e.target === cartModal) {
-      cerrarCarrito();
-    }
-  });
-}
-
-// Función mejorada para mostrar el carrito
-function mostrarCarrito() {
-  const modal = document.getElementById('carrito-modal');
-  const lista = modal.querySelector('.cart-items');
-  const total = modal.querySelector('.total-amount');
-
-  if (!modal || !lista || !total) {
-    console.error("❌ Elementos del carrito no encontrados");
-    return;
-  }
-
-  lista.innerHTML = '';
-
-  if (appState.cart.items.length === 0) {
-    lista.innerHTML = '<div class="empty-cart">Tu carrito está vacío</div>';
-    total.textContent = '$0.00';
-    return;
-  }
-
-  appState.cart.items.forEach(item => {
-    const itemElement = document.createElement('div');
-    itemElement.className = 'cart-item';
-    itemElement.innerHTML = `
-      <div class="item-info">
-        <span class="item-name">${item.name}</span>
-        <span class="item-quantity">Cantidad: ${item.quantity}</span>
-      </div>
-      <div class="item-price">$${(item.price * item.quantity).toLocaleString()}</div>
-      <button class="remove-item" data-id="${item.id}">
-        <i class="fas fa-trash"></i>
-      </button>
-    `;
-    
-    itemElement.querySelector('.remove-item').addEventListener('click', () => {
-      appState.cart.removeItem(item.id);
-      mostrarCarrito();
-      actualizarContadorCarrito();
-      mostrarNotificacion(`${item.name} eliminado`);
-    });
-    
-    lista.appendChild(itemElement);
-  });
-
-  total.textContent = `$${appState.cart.getTotal().toLocaleString()}`;
-}
-
-// Función auxiliar para notificaciones
-function mostrarNotificacion(mensaje) {
-  const notification = document.createElement('div');
-  notification.className = 'notification';
-  notification.textContent = mensaje;
-  document.body.appendChild(notification);
-  
-  setTimeout(() => {
-    notification.classList.add('fade-out');
-    setTimeout(() => notification.remove(), 500);
-  }, 2000);
-}
-
-// Inicialización
-document.addEventListener('DOMContentLoaded', () => {
-  appState.cart.load();
-  actualizarContadorCarrito();
-  configurarCarrito();
-  cargarProductos();
-  
-  // Configurar el formulario de compra
-  const formularioCompra = document.getElementById("formularioCompra");
-  if (formularioCompra) {
-    formularioCompra.addEventListener("submit", manejarEnvioFormulario);
-  }
-});
-
-// Función para manejar el envío del formulario
-async function manejarEnvioFormulario(e) {
-  e.preventDefault();
-  
-  const form = e.target;
-  const submitBtn = form.querySelector('button[type="submit"]');
-  const originalText = submitBtn.textContent;
-  
-  try {
+    const submitBtn = e.target.querySelector('button[type="submit"]');
+    const originalText = submitBtn.textContent;
     submitBtn.disabled = true;
     submitBtn.textContent = "Procesando...";
-    
-    const formData = new FormData(form);
+
+    const formData = new FormData(e.target);
     const cliente = {
       nombre: formData.get("nombre"),
       email: formData.get("email"),
@@ -386,40 +228,43 @@ async function manejarEnvioFormulario(e) {
       telefono: formData.get("telefono"),
       referidor: formData.get("referidor") || "No especificado"
     };
-    
-    const emailEnviado = await enviarOrdenPorCorreo(
-      cliente,
-      appState.cart.items,
-      appState.cart.getTotal()
-    );
-    
-    if (!emailEnviado) throw new Error("Error al enviar el correo");
-    
-    document.getElementById("checkoutForm").classList.add("hidden");
-    document.getElementById("confirmationModal").classList.remove("hidden");
-    
-    setTimeout(() => {
+
+    try {
+      const emailSuccess = await enviarOrdenPorCorreo(
+        cliente,
+        appState.cart.items,
+        appState.cart.getTotal()
+      );
+
+      if (!emailSuccess) throw new Error("Fallo al enviar el correo");
+
+      document.getElementById("checkoutForm").classList.add("hidden");
+      document.getElementById("confirmationModal").classList.remove("hidden");
+
       const total = appState.cart.getTotal();
       const url = `https://checkout.wompi.co/l/VPOS_nJo3xk?amount=${total * 100}&currency=COP`;
-      window.open(url, '_blank');
-      appState.cart.clear();
-      actualizarContadorCarrito();
-      document.getElementById("confirmationModal").classList.add("hidden");
-      form.reset();
-    }, 3000);
-    
-  } catch (error) {
-    console.error("Error en el proceso de compra:", error);
-    mostrarNotificacion("Error al procesar tu pedido");
-  } finally {
-    submitBtn.disabled = false;
-    submitBtn.textContent = originalText;
-  }
+      
+      setTimeout(() => {
+        window.open(url, '_blank');
+        appState.cart.clear();
+        actualizarContadorCarrito();
+        document.getElementById("confirmationModal").classList.add("hidden");
+        formularioCompra.reset();
+      }, 3000);
+    } catch (error) {
+      alert("Hubo un error al procesar tu pedido.");
+      console.error(error);
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = originalText;
+    }
+  });
 }
 
+// Inicialización
 window.addEventListener("DOMContentLoaded", () => {
   appState.cart.load();
   actualizarContadorCarrito();
-  configurarBotonCarrito();
-  cargarProductos(); // 🚨 ESTA LÍNEA ES LA QUE ACTIVA LA CARGA
+  configurarBotonCarrito(); // Ahora está definida antes de ser llamada
+  cargarProductos();
 });
