@@ -63,65 +63,65 @@
     </section>
 
     <!-- Categorías -->
-<section id="categorias" class="categories" aria-labelledby="categories-heading">
-  <div class="container">
-    <div class="categories-grid" role="list">
-      
-      <div class="category-card" role="listitem">
-        <div class="category-icon">
-          <i class="fas fa-palette" aria-hidden="true"></i>
+    <section id="categorias" class="categories" aria-labelledby="categories-heading">
+      <div class="container">
+        <div class="categories-grid" role="list">
+          
+          <div class="category-card" role="listitem">
+            <div class="category-icon">
+              <i class="fas fa-palette" aria-hidden="true"></i>
+            </div>
+            <h3>Maquillaje</h3>
+            <p>Productos para realzar tu belleza natural</p>
+            <a href="#productos?filter=maquillaje" class="category-link filter-btn" data-filter="maquillaje">Ver productos</a>
+          </div>
+
+          <div class="category-card" role="listitem">
+            <div class="category-icon">
+              <i class="fas fa-spa" aria-hidden="true"></i>
+            </div>
+            <h3>Skincare</h3>
+            <p>Cuidado facial y corporal</p>
+            <a href="#productos?filter=skincare" class="category-link filter-btn" data-filter="skincare">Ver productos</a>
+          </div>
+
+          <div class="category-card" role="listitem">
+            <div class="category-icon">
+              <i class="fas fa-pump-soap" aria-hidden="true"></i>
+            </div>
+            <h3>Higiene</h3>
+            <p>Productos de limpieza y cuidado</p>
+            <a href="#productos?filter=higiene" class="category-link filter-btn" data-filter="higiene">Ver productos</a>
+          </div>
+
+          <div class="category-card" role="listitem">
+            <div class="category-icon">
+              <i class="fas fa-gem" aria-hidden="true"></i>
+            </div>
+            <h3>Accesorios</h3>
+            <p>Herramientas y accesorios de belleza</p>
+            <a href="#productos?filter=accesorios" class="category-link filter-btn" data-filter="accesorios">Ver productos</a>
+          </div>
+
+          <div class="category-card" role="listitem">
+            <div class="category-icon">
+              <i class="fas fa-hand-sparkles" aria-hidden="true"></i>
+            </div>
+            <h3>Uñas</h3>
+            <p>Esmaltes y cuidado de uñas</p>
+            <a href="#productos?filter=uñas" class="category-link filter-btn" data-filter="esmaltes">Ver productos</a>
+          </div>
         </div>
-        <h3>Maquillaje</h3>
-        <p>Productos para realzar tu belleza natural</p>
-        <a href="#productos?filter=maquillaje" class="category-link filter-btn" data-filter="maquillaje">Ver productos</a>
       </div>
+    </section>
 
-      <div class="category-card" role="listitem">
-        <div class="category-icon">
-          <i class="fas fa-spa" aria-hidden="true"></i>
-        </div>
-        <h3>Skincare</h3>
-        <p>Cuidado facial y corporal</p>
-        <a href="#productos?filter=skincare" class="category-link filter-btn" data-filter="skincare">Ver productos</a>
-      </div>
+    <section id="seccion-productos" class="productos-seccion">
+      <h2>Nuestros Productos</h2>
 
-      <div class="category-card" role="listitem">
-        <div class="category-icon">
-          <i class="fas fa-pump-soap" aria-hidden="true"></i>
-        </div>
-        <h3>Higiene</h3>
-        <p>Productos de limpieza y cuidado</p>
-        <a href="#productos?filter=higiene" class="category-link filter-btn" data-filter="higiene">Ver productos</a>
-      </div>
-
-      <div class="category-card" role="listitem">
-        <div class="category-icon">
-          <i class="fas fa-gem" aria-hidden="true"></i>
-        </div>
-        <h3>Accesorios</h3>
-        <p>Herramientas y accesorios de belleza</p>
-        <a href="#productos?filter=accesorios" class="category-link filter-btn" data-filter="accesorios">Ver productos</a>
-      </div>
-
-      <div class="category-card" role="listitem">
-        <div class="category-icon">
-          <i class="fas fa-hand-sparkles" aria-hidden="true"></i>
-        </div>
-        <h3>Uñas</h3>
-        <p>Esmaltes y cuidado de uñas</p>
-        <a href="#productos?filter=uñas" class="category-link filter-btn" data-filter="esmaltes">Ver productos</a>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section id="seccion-productos" class="productos-seccion">
-  <h2>Nuestros Productos</h2>
-
-  <!-- Aquí se insertan los productos -->
-  <div id="product-list" class="productos-grid"></div>
-</section>
-
+      <!-- Aquí se insertan los productos -->
+      <div id="product-list" class="productos-grid"></div>
+    </section>
+  </main>
 
   <!-- Footer -->
   <footer class="footer" aria-label="Pie de página">
@@ -140,80 +140,125 @@
   </footer>
 
   <!-- Modales -->
-  <!-- Modal del Carrito - Versión corregida -->
-<div id="carrito-modal" class="modal hidden" role="dialog" aria-modal="false" aria-labelledby="cart-title">
-  <div class="modal-content">
-    <button class="close-cart" aria-label="Cerrar carrito">&times;</button>
-    <h2 id="cart-title">Tu Carrito</h2>
-    <div class="cart-items" role="list"></div>
-    <div class="cart-total">
-      <strong>Total:</strong> <span class="total-amount">$0.00</span>
+  <!-- Modal del Carrito -->
+  <div id="carrito-modal" class="modal hidden" role="dialog" aria-modal="false" aria-labelledby="cart-title">
+    <div class="modal-content">
+      <button class="close-cart" aria-label="Cerrar carrito">&times;</button>
+      <h2 id="cart-title">Tu Carrito</h2>
+      <div class="cart-items" role="list"></div>
+      <div class="cart-total">
+        <strong>Total:</strong> <span class="total-amount">$0.00</span>
+      </div>
+      <div class="cart-actions">
+        <button id="limpiarCarrito" class="clear-cart-btn">Vaciar Carrito</button>
+        <button id="finalizarCompra" class="checkout-btn">Finalizar Compra</button>
+      </div>
     </div>
-    <button id="finalizarCompra" class="checkout-btn">Finalizar Compra</button>
-    <button id="limpiarCarrito" class="clear-cart-btn">Limpiar Carrito</button>
   </div>
-</div>
 
-  <!-- Modal de Compra -->
-  <!-- Modal de Checkout - Versión mejorada -->
-<!-- Modal de Checkout -->
-<div id="checkoutForm" class="modal hidden" role="dialog" aria-modal="false" aria-labelledby="checkout-title">
-  <div class="modal-content">
-    <button class="close-form" aria-label="Cerrar formulario">&times;</button>
-    <h2 id="checkout-title">Formulario de Compra</h2>
-    
-    <form id="formularioCompra">
-      <!-- Campos del formulario -->
-      <div class="form-group">
-        <label for="nombre">Nombre completo</label>
-        <input type="text" name="nombre" id="nombre" required autocomplete="name">
-      </div>
-
-      <div class="form-group">
-        <label for="email">Correo electrónico</label>
-        <input type="email" name="email" id="email" required autocomplete="email">
-      </div>
-
-      <div class="form-group">
-        <label for="direccion">Dirección de envío</label>
-        <input type="text" name="direccion" id="direccion" required autocomplete="address-line1">
-      </div>
-
-      <div class="form-group">
-        <label for="telefono">Teléfono</label>
-        <input type="tel" name="telefono" id="telefono" required autocomplete="tel">
-      </div>
-
-      <div class="form-group">
-        <label for="referidor">Nombre del referidor (opcional)</label>
-        <input type="text" name="referidor" id="referidor" autocomplete="off">
-      </div>
-
-      <!-- Nota informativa -->
-      <p class="nota">
-        📦 El pedido será despachado a más tardar 3 días después de haberse confirmado el pago del pedido.<br>
-        🚚 En todo pedido que sobrepase la cantidad de <strong>$200.000</strong> el transporte es gratuito.
-      </p>
-
-      <!-- Botones de acción -->
-      <div class="form-actions">
-        <button type="button" class="btn-back-to-cart">Volver al carrito</button>
-        <button type="submit" class="btn-submit">Finalizar compra</button>
-      </div>
-    </form>
+  <!-- Modal de Checkout - FORMULARIO COMPLETO -->
+  <div id="checkoutForm" class="modal hidden" role="dialog" aria-modal="false" aria-labelledby="checkout-title">
+    <div class="modal-content checkout-content">
+      <button class="close-form" aria-label="Cerrar formulario">&times;</button>
+      <h2 id="checkout-title">Finalizar Compra</h2>
+      
+      <form id="formularioCompra" class="checkout-form">
+        <div class="form-grid">
+          <!-- Columna de información del cliente -->
+          <div class="form-column">
+            <h3>Información Personal</h3>
+            
+            <div class="form-group">
+              <label for="nombre">Nombre completo*</label>
+              <input type="text" id="nombre" name="nombre" required autocomplete="name">
+            </div>
+            
+            <div class="form-group">
+              <label for="email">Correo electrónico*</label>
+              <input type="email" id="email" name="email" required autocomplete="email">
+            </div>
+            
+            <div class="form-group">
+              <label for="telefono">Teléfono*</label>
+              <input type="tel" id="telefono" name="telefono" required autocomplete="tel">
+            </div>
+            
+            <div class="form-group">
+              <label for="direccion">Dirección completa*</label>
+              <textarea id="direccion" name="direccion" required autocomplete="street-address"></textarea>
+            </div>
+            
+            <div class="form-group">
+              <label for="ciudad">Ciudad*</label>
+              <input type="text" id="ciudad" name="ciudad" required autocomplete="address-level2">
+            </div>
+          </div>
+          
+          <!-- Columna de resumen del pedido -->
+          <div class="order-summary">
+            <h3>Tu Pedido</h3>
+            <div class="summary-items">
+              <!-- Los productos se agregarán dinámicamente aquí -->
+            </div>
+            <div class="summary-totals">
+              <div class="summary-row">
+                <span>Subtotal:</span>
+                <span class="subtotal-amount">$0.00</span>
+              </div>
+              <div class="summary-row">
+                <span>Envío:</span>
+                <span class="shipping-amount">$0.00</span>
+              </div>
+              <div class="summary-row total-row">
+                <strong>Total:</strong>
+                <strong class="total-amount">$0.00</strong>
+              </div>
+            </div>
+            
+            <div class="payment-methods">
+              <h4>Método de Pago</h4>
+              <div class="payment-options">
+                <label class="payment-option">
+                  <input type="radio" name="payment-method" value="wompi" checked>
+                  <span>Pago con Tarjeta (Wompi)</span>
+                </label>
+                <label class="payment-option">
+                  <input type="radio" name="payment-method" value="transferencia">
+                  <span>Transferencia Bancaria</span>
+                </label>
+              </div>
+            </div>
+            
+            <div class="form-notas">
+              <p><strong>Nota importante:</strong> El envío será despachado en un plazo máximo de 3 días hábiles después de confirmado el pago.</p>
+              <p>Envío gratuito para compras superiores a $200.000</p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="form-actions">
+          <button type="button" class="btn-back-to-cart">Volver al Carrito</button>
+          <button type="submit" class="btn-submit-order">Realizar Pedido</button>
+        </div>
+      </form>
+    </div>
   </div>
-</div>
 
   <!-- Modal de Confirmación -->
   <div id="confirmationModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="confirmation-title">
-    <div class="modal-content">
-      <h2 id="confirmation-title">¡Pedido recibido!</h2>
-      <!-- Contenido de confirmación -->
+    <div class="modal-content confirmation-content">
+      <div class="confirmation-icon">
+        <i class="fas fa-check-circle"></i>
+      </div>
+      <h2 id="confirmation-title">¡Pedido Recibido!</h2>
+      <p class="confirmation-message">Hemos recibido tu pedido correctamente. En breve recibirás un correo electrónico con los detalles.</p>
+      <p class="confirmation-number">Número de pedido: <span id="order-number">BL-0000</span></p>
+      <div class="confirmation-actions">
+        <button id="btn-continue-shopping" class="btn-primary">Seguir Comprando</button>
+        <a href="/mis-pedidos" class="btn-secondary">Ver mis pedidos</a>
+      </div>
     </div>
   </div>
-
-    <!-- Formulario de pedido -->
-
 
   <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
