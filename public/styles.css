@@ -54,78 +54,126 @@
 }
 
 /* MODALES OPTIMIZADOS */
+/* Estilos para el modal del carrito */
 .modal {
   position: fixed;
   top: 0;
   left: 0;
-  display: none;
-  align-items: center;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.7);
+  display: flex;
   justify-content: center;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(0,0,0,0.5);
+  align-items: center;
   z-index: 1000;
-  overflow: hidden;
   opacity: 0;
   visibility: hidden;
-  transition: opacity 0.3s, visibility 0.3s;
+  transition: all 0.3s ease;
 }
+
 .modal.active {
-  display: flex;
   opacity: 1;
-  pointer-events: auto;
+  visibility: visible;
 }
+
 .modal-content {
-  background: var(--white);
+  background: white;
   padding: 2rem;
-  border-radius: var(--radius-md);
-  max-width: 500px;
+  border-radius: 8px;
   width: 90%;
-  position: relative;
-  box-shadow: var(--shadow-lg);
-  animation: modalFadeIn 0.3s;
+  max-width: 500px;
+  max-height: 80vh;
   overflow-y: auto;
-  max-height: 90vh;
-  margin: 20px auto;
+  position: relative;
+  transform: translateY(-20px);
+  transition: transform 0.3s ease;
 }
-@keyframes modalFadeIn {
-  from { opacity: 0; transform: translateY(-20px); }
-  to { opacity: 1; transform: translateY(0); }
+
+.modal.active .modal-content {
+  transform: translateY(0);
 }
-.modal-content h2 {
-  margin: 0 0 1.5rem 0;
-  color: var(--primary-dark);
-  font-size: 1.5rem;
-}
-.modal-content p {
+
+/* Estilos para los items del carrito */
+.cart-items {
+  max-height: 300px;
+  overflow-y: auto;
   margin: 1rem 0;
-  color: var(--text-medium);
+  padding: 0.5rem;
 }
-.close-cart,
-.close-form,
-.close-verification,
-.btn-close-confirmation {
-  color: var(--text-dark);
-  font-size: 1.5rem;
-  font-weight: bold;
-  cursor: pointer;
-  transition: var(--transition);
-  position: absolute;
-  right: 20px;
-  top: 20px;
-  padding: 10px;
+
+.cart-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.8rem 0;
+  border-bottom: 1px solid #eee;
+}
+
+.item-info {
+  flex: 1;
+}
+
+.item-name {
+  font-weight: 600;
+  display: block;
+}
+
+.item-quantity {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.item-price {
+  font-weight: 600;
+  margin: 0 1rem;
+}
+
+.remove-item {
   background: none;
   border: none;
-  z-index: 10;
+  color: #ff4444;
+  cursor: pointer;
+  font-size: 1.2rem;
+  transition: all 0.2s;
 }
-.close-cart:hover,
-.close-form:hover,
-.close-verification:hover,
-.btn-close-confirmation:hover {
-  color: var(--primary-color);
+
+.remove-item:hover {
   transform: scale(1.1);
 }
 
+.empty-cart {
+  text-align: center;
+  padding: 2rem;
+  color: #666;
+}
+
+.cart-total {
+  font-size: 1.2rem;
+  font-weight: 600;
+  text-align: right;
+  margin: 1rem 0;
+  padding-top: 1rem;
+  border-top: 2px solid #eee;
+}
+
+/* Notificaciones */
+.notification {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: #4CAF50;
+  color: white;
+  padding: 12px 24px;
+  border-radius: 4px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+  z-index: 1001;
+  opacity: 1;
+  transition: opacity 0.5s;
+}
+
+.notification.fade-out {
+  opacity: 0;
+}
 /* FORMULARIOS OPTIMIZADOS */
 .form-section {
   margin-bottom: 2rem;
