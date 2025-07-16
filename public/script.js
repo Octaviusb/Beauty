@@ -78,25 +78,60 @@ function actualizarContadorCarrito() {
 }
 
 function mostrarCarrito() {
-  const modal = document.getElementById('carrito');
+  const modal = document.getElementById('carrito-modal'); // Cambiado a 'carrito-modal'
+  
+  // Verificación de elementos existentes
+  if (!modal) {
+    console.error('❌ No se encontró el modal del carrito');
+    return;
+  }
+
   const lista = modal.querySelector('.cart-items');
   const total = modal.querySelector('.total-amount');
 
+  if (!lista || !total) {
+    console.error('❌ Elementos internos del carrito no encontrados');
+    return;
+  }
+
   lista.innerHTML = '';
 
-  appState.cart.items.forEach(item => {
-    const div = document.createElement('div');
-    div.className = 'cart-item';
-    div.innerHTML = `
-      <span>${item.name} x${item.quantity}</span>
-      <span>$${(item.price * item.quantity).toLocaleString()}</span>
-    `;
-    lista.appendChild(div);
-  });
+  if (appState.cart.items.length === 0) {
+    lista.innerHTML = '<div class="empty-cart">Tu carrito está vacío</div>';
+    total.textContent = '$0.00';
+  } else {
+    appState.cart.items.forEach(item => {
+      const itemElement = document.createElement('div');
+      itemElement.className = 'cart-item';
+      itemElement.innerHTML = `
+        <div class="item-info">
+          <span class="item-name">${item.name}</span>
+          <span class="item-quantity">Cantidad: ${item.quantity}</span>
+        </div>
+        <div class="item-price">$${(item.price * item.quantity).toLocaleString()}</div>
+        <button class="remove-item" data-id="${item.id}">
+          <i class="fas fa-trash"></i>
+        </button>
+      `;
+      
+      itemElement.querySelector('.remove-item').addEventListener('click', (e) => {
+        e.stopPropagation();
+        appState.cart.removeItem(item.id);
+        mostrarCarrito();
+        actualizarContadorCarrito();
+      });
+      
+      lista.appendChild(itemElement);
+    });
 
-  total.textContent = `$${appState.cart.getTotal().toLocaleString()}`;
+    total.textContent = `$${appState.cart.getTotal().toLocaleString()}`;
+  }
+
+  // Mostrar el modal
   modal.classList.remove('hidden');
   modal.classList.add('active');
+  modal.setAttribute('aria-modal', 'true');
+  document.body.style.overflow = 'hidden';
 }
 
 function renderizarProductos(productos) {
