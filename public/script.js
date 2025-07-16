@@ -82,6 +82,22 @@ function mostrarCarrito() {
           <i class="fas fa-trash"></i>
         </button>
       `;
+async function cargarProductos() {
+  try {
+    const baseURL = window.location.origin;
+    const response = await fetch(`${baseURL}/api/products`);
+    if (!response.ok) throw new Error("Error al cargar productos");
+    const productos = await response.json();
+    appState.productos = productos;
+    renderizarProductos(productos);
+  } catch (error) {
+    console.error("❌ Error al cargar productos:", error);
+    const contenedor = document.getElementById('product-list');
+    if (contenedor) {
+      contenedor.innerHTML = '<p class="error-message">No se pudieron cargar los productos.</p>';
+    }
+  }
+}
       
       itemElement.querySelector('.remove-item').addEventListener('click', (e) => {
         e.stopPropagation();
