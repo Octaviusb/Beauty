@@ -167,6 +167,7 @@ function configurarCarrito() {
 // 💳 Redirección a Wompi
 async function redirigirAWompi(monto, nombreCliente) {
   const publicKey = "pub_prod_XApVcADEVCLGJnnghUT1V8G3oEwrF7ZW";
+  console.log("🟢 Public Key actual:", publicKey);
 
   if (!monto || !publicKey) {
     console.error("❌ Faltan datos para generar la redirección.");
