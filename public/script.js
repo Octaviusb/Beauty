@@ -166,34 +166,48 @@ function configurarCarrito() {
 
 // 💳 Redirección a Wompi
 async function redirigirAWompi(monto, nombreCliente) {
+  const publicKey = "pub_prod_XApVcADEVCLGJnnghUT1V8G3oEwrF7ZW";
+
+  if (!monto || !publicKey) {
+    console.error("❌ Faltan datos para generar la redirección.");
+    alert("No se pudo iniciar el pago: datos incompletos.");
+    return;
+  }
+
   try {
     const montoEnCentavos = Math.round(monto * 100);
     const referencia = `pedido_${Date.now()}`;
 
+    const payload = {
+      amountInCents: montoEnCentavos,
+      currency: "COP",
+      reference: referencia,
+      publicKey: publicKey
+    };
+
+    console.log("📤 Enviando a /api/wompi-link:", payload);
+
     const respuesta = await fetch("/api/wompi-link", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        amountInCents: montoEnCentavos,
-        currency: "COP",
-        reference: referencia,
-        publicKey: "pub_prod_XApVcADEVCLGJnnghUT1V8G3oEwrF7ZW"
-      })
+      body: JSON.stringify(payload)
     });
 
     const data = await respuesta.json();
 
     if (respuesta.ok && data.checkoutUrl) {
+      console.log("✅ Redirigiendo a Wompi:", data.checkoutUrl);
       window.location.href = data.checkoutUrl;
     } else {
-      console.error("❌ Error al generar enlace de pago:", data);
-      alert("No se pudo generar el enlace de pago. Intenta de nuevo.");
+      console.error("❌ Error en backend Wompi:", data);
+      alert("No se pudo generar el enlace de pago. Revisa los datos e intenta nuevamente.");
     }
   } catch (error) {
-    console.error("🚫 Error en redirección a Wompi:", error);
-    alert("Ocurrió un error al procesar el pago.");
+    console.error("🚫 Error de redirección a Wompi:", error);
+    alert("Ocurrió un error inesperado al procesar el pago.");
   }
 }
+
 
 // DOMContentLoaded
 
