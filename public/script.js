@@ -1,5 +1,7 @@
-// 1. Estado global MEJORADO (sin localStorage)
+// 📦 script.js cargado con defer
 console.log("📦 script.js cargado con defer");
+
+// 1. Estado global
 const appState = {
   cart: {
     items: [],
@@ -38,7 +40,7 @@ const appState = {
   currentFilter: 'all'
 };
 
-// 2. Funciones de renderizado
+// 2. Renderizar productos
 function renderizarProductos(productos) {
   const contenedor = document.getElementById('product-list');
   if (!contenedor) return;
@@ -81,7 +83,7 @@ function mostrarCarrito() {
 
   if (!modal || !lista || !total) return;
 
-  lista.innerHTML = ''; // vacía antes de actualizar
+  lista.innerHTML = '';
 
   if (appState.cart.items.length === 0) {
     lista.innerHTML = '<p class="empty-cart">Tu carrito está vacío</p>';
@@ -97,7 +99,6 @@ function mostrarCarrito() {
       `;
       lista.appendChild(itemDiv);
     });
-
     total.textContent = `$${appState.cart.getTotal().toLocaleString()}`;
   }
 
@@ -156,55 +157,65 @@ function configurarCarrito() {
   const cartButton = document.getElementById('cartButton');
   const cartModal = document.getElementById('carrito-modal');
 
-  console.log("🛠 Ejecutando configurarCarrito()");
-  console.log("🛎 cartButton:", cartButton);
-  console.log("🛎 cartModal:", cartModal);
-
   if (cartButton) {
     cartButton.addEventListener('click', () => {
-      console.log("🟢 Click recibido en #cartButton");
-      mostrarCarrito();  // <- ESTA es la clave
+      mostrarCarrito();
     });
   }
 }
 
 // 💳 Redirección a Wompi
-function redirigirAWompi(montoEnPesos, nombreCliente) {
-  const amountInCents = Math.round(montoEnPesos * 100); // Wompi usa centavos
-  const publicKey = "pub_prod_XApVcADEVCLGJnnghUT1V8G3oEwrF7ZW";
-  const reference = `pedido_${Date.now()}`;
+async function redirigirAWompi(monto, nombreCliente) {
+  try {
+    const montoEnCentavos = Math.round(monto * 100);
+    const referencia = `pedido_${Date.now()}`;
 
-  const checkoutUrl = `https://checkout.wompi.co/p/?public-key=${publicKey}&currency=COP&amount-in-cents=${amountInCents}&reference=${reference}&redirect-url=https://beauty-mocha-ten.vercel.app/pedido-confirmado.html`;
+    const respuesta = await fetch("/api/wompi-link", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        amountInCents: montoEnCentavos,
+        currency: "COP",
+        reference: referencia,
+        publicKey: "pub_prod_XApVcADEVCLGJnnghUT1V8G3oEwrF7ZW"
+      })
+    });
 
-  console.log("💳 Redirigiendo a Wompi con:", { amountInCents, reference });
-  window.location.href = checkoutUrl;
+    const data = await respuesta.json();
+
+    if (respuesta.ok && data.checkoutUrl) {
+      window.location.href = data.checkoutUrl;
+    } else {
+      console.error("❌ Error al generar enlace de pago:", data);
+      alert("No se pudo generar el enlace de pago. Intenta de nuevo.");
+    }
+  } catch (error) {
+    console.error("🚫 Error en redirección a Wompi:", error);
+    alert("Ocurrió un error al procesar el pago.");
+  }
 }
 
-// 🧠 Inyectar el campo referidor al cargar DOM
+// DOMContentLoaded
+
+
+// 📧 Envío del formulario y redirección
+
 document.addEventListener("DOMContentLoaded", () => {
-  console.log("🌐 DOM completamente cargado");
-
-  const btn = document.getElementById("cartButton");
-  console.log("🔍 Botón encontrado:", btn);
-
-  if (!btn) console.error("❌ Botón #cartButton no disponible");
-
   appState.cart.items = [];
   actualizarContadorCarrito();
   configurarCarrito();
   cargarProductos();
 
-  // Agregar campo de referidor
-  const campoReferidor = `
-    <div class="form-group">
-      <label for="referidor">Nombre del Referidor*</label>
-      <input type="text" id="referidor" name="referidor" required autocomplete="off">
-    </div>
-  `;
   const columna = document.querySelector(".form-column");
-  if (columna) columna.insertAdjacentHTML("beforeend", campoReferidor);
+  if (columna) {
+    columna.insertAdjacentHTML("beforeend", `
+      <div class="form-group">
+        <label for="referidor">Nombre del Referidor*</label>
+        <input type="text" id="referidor" name="referidor" required autocomplete="off">
+      </div>
+    `);
+  }
 
-  // Abrir formulario al finalizar compra
   const finalizarBtn = document.getElementById('finalizarCompra');
   if (finalizarBtn) {
     finalizarBtn.addEventListener('click', () => {
@@ -217,11 +228,8 @@ document.addEventListener("DOMContentLoaded", () => {
       formulario.classList.remove('hidden');
       formulario.classList.add('active');
     });
-  } else {
-    console.warn("⚠️ Botón #finalizarCompra no encontrado");
   }
 
-  // 📧 Enviar pedido por EmailJS y redirigir
   const formulario = document.getElementById('formularioCompra');
   if (formulario) {
     formulario.addEventListener('submit', function(e) {
@@ -247,47 +255,14 @@ document.addEventListener("DOMContentLoaded", () => {
         metodo_pago,
         total: total.toFixed(2),
         carrito
-      }, "Cqwg1EyqFLvPg7ULx") // Tu public key
+      }, "Cqwg1EyqFLvPg7ULx")
       .then(function(response) {
         console.log("📧 Pedido enviado:", response.status, response.text);
-        .then(function(response) {
-  console.log("📧 Pedido enviado:", response.status, response.text);
-
-  // 🔁 Nuevo bloque que llama al backend seguro para generar la firma
-  fetch("/api/wompi-link", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      nombre: document.getElementById('nombre').value,
-      monto: appState.cart.getTotal()
-    })
-  })
-    .then(res => res.json())
-    .then(data => {
-      if (data.checkoutUrl) {
-        console.log("💳 Redirigiendo a Wompi con URL firmada:", data.checkoutUrl);
-        window.location.href = data.checkoutUrl;
-      } else {
-        console.error("❌ Error en la respuesta del backend:", data);
-        alert("No se pudo generar el enlace de pago. Intenta nuevamente.");
-      }
-    })
-    .catch(err => {
-      console.error("❌ Error al conectarse con el backend:", err);
-      alert("No se pudo conectar con el servidor de pago.");
-    });
-
-}, function(error) {
-  console.error("❌ Error al enviar correo:", error);
-  alert("Hubo un error al enviar tu pedido. Por favor, intenta nuevamente.");
-});
-
+        redirigirAWompi(total, nombre);
       }, function(error) {
         console.error("❌ Error al enviar correo:", error);
         alert("Hubo un error al enviar tu pedido. Por favor, intenta nuevamente.");
       });
     });
-  } else {
-    console.warn("⚠️ Formulario #formularioCompra no encontrado");
   }
 });
