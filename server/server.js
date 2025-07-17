@@ -1,30 +1,32 @@
-// server/server.js
-const express = require('express');
-const cors = require('cors');
-const crypto = require('crypto');
-const { createClient } = require('@supabase/supabase-js');
-require('dotenv').config();
+const express = require("express");
+const { createClient } = require("@supabase/supabase-js");
+const crypto = require("crypto");
+const cors = require("cors");
+require("dotenv").config();
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_KEY
+);
 
-// Obtener productos
-app.get('/api/products', async (req, res) => {
+// Ruta para obtener productos
+app.get("/api/products", async (req, res) => {
   try {
-    const { data, error } = await supabase.from('products').select('*');
+    const { data, error } = await supabase.from("products").select("*");
     if (error) throw error;
-    res.status(200).json(data);
+    return res.status(200).json(data);
   } catch (err) {
-    console.error('❌ Error al obtener productos:', err.message);
-    res.status(500).json({ error: 'Error interno' });
+    console.error("❌ Error al obtener productos:", err.message);
+    return res.status(500).json({ error: "Error interno" });
   }
 });
 
-// Wompi: generar link firmado
-app.post('/api/wompi-link', (req, res) => {
+// Ruta para generar enlace de pago Wompi firmado
+app.post("/api/wompi-link", async (req, res) => {
   const { amountInCents, currency, reference, publicKey } = req.body;
 
   if (!amountInCents || !currency || !reference || !publicKey) {
@@ -46,8 +48,17 @@ app.post('/api/wompi-link', (req, res) => {
   return res.status(200).json({ checkoutUrl });
 });
 
-// Iniciar servidor local
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`🚀 Servidor escuchando en http://localhost:${PORT}`);
+// Ruta fallback
+app.use((req, res) => {
+  return res.status(404).json({ error: "Ruta no encontrada" });
 });
+
+// Inicia servidor local (si pruebas en modo dev)
+if (require.main === module) {
+  const PORT = process.env.PORT || 3000;
+  app.listen(PORT, () => {
+    console.log(`🚀 Servidor escuchando en http://localhost:${PORT}`);
+  });
+}
+
+module.exports = app;
