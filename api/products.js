@@ -1,28 +1,29 @@
-// /api/products.js
-import { createClient } from '@supabase/supabase-js'
+const { createClient } = require('@supabase/supabase-js');
 
-const supabaseUrl = 'https://lsxojnbkbqhuwaydiqqb.supabase.co'
-const supabaseKey = process.env.SUPABASE_KEY
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_KEY
+);
 
-const supabase = createClient(supabaseUrl, supabaseKey)
-
-export default async function handler(req, res) {
-  if (req.method !== 'GET') {
-    return res.status(405).json({ error: 'Método no permitido' })
-  }
-
+module.exports = async (req, res) => {
   try {
-    console.log('🔍 Obteniendo productos desde Supabase...')
-    const { data, error } = await supabase.from('products').select('*')
-
-    if (error) {
-      console.error('❌ Error de Supabase:', error.message)
-      return res.status(500).json({ error: error.message })
+    if (req.method === 'GET' && req.url.includes('/products')) {
+      const { data, error } = await supabase.from('products').select('*');
+      if (error) {
+        return res.status(500).json({ error: 'Error al obtener productos' });
+      }
+      return res.status(200).json(data);
     }
 
-    return res.status(200).json(data)
+    if (req.method === 'GET' && req.url.includes('/checkout')) {
+      const paymentLink = 'https://checkout.wompi.co/l/VPOS_nJo3xk';
+      return res.status(200).json({ url: paymentLink });
+    }
+
+    return res.status(404).json({ error: 'Ruta no encontrada' });
+
   } catch (err) {
-    console.error('🔥 Error general en /api/products:', err)
-    return res.status(500).json({ error: 'Error interno del servidor' })
+    console.error('❌ Error en server.js:', err.message);
+    return res.status(500).json({ error: 'Error interno del servidor' });
   }
-}
+};
