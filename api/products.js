@@ -1,22 +1,28 @@
 // /api/products.js
-const { createClient } = require('@supabase/supabase-js');
+import { createClient } from '@supabase/supabase-js'
 
-const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_KEY
-);
+const supabaseUrl = 'https://lsxojnbkbqhuwaydiqqb.supabase.co'
+const supabaseKey = process.env.SUPABASE_KEY
 
-module.exports = async (req, res) => {
+const supabase = createClient(supabaseUrl, supabaseKey)
+
+export default async function handler(req, res) {
   if (req.method !== 'GET') {
-    return res.status(405).json({ error: 'Método no permitido' });
+    return res.status(405).json({ error: 'Método no permitido' })
   }
 
   try {
-    const { data, error } = await supabase.from("products").select("*");
-    if (error) throw error;
-    return res.status(200).json(data);
+    console.log('🔍 Obteniendo productos desde Supabase...')
+    const { data, error } = await supabase.from('products').select('*')
+
+    if (error) {
+      console.error('❌ Error de Supabase:', error.message)
+      return res.status(500).json({ error: error.message })
+    }
+
+    return res.status(200).json(data)
   } catch (err) {
-    console.error("❌ Error en /api/products:", err.message);
-    return res.status(500).json({ error: 'Error interno al obtener productos' });
+    console.error('🔥 Error general en /api/products:', err)
+    return res.status(500).json({ error: 'Error interno del servidor' })
   }
-};
+}
