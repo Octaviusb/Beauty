@@ -250,7 +250,38 @@ document.addEventListener("DOMContentLoaded", () => {
       }, "Cqwg1EyqFLvPg7ULx") // Tu public key
       .then(function(response) {
         console.log("📧 Pedido enviado:", response.status, response.text);
-        redirigirAWompi(total, nombre);
+        .then(function(response) {
+  console.log("📧 Pedido enviado:", response.status, response.text);
+
+  // 🔁 Nuevo bloque que llama al backend seguro para generar la firma
+  fetch("/api/wompi-link", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      nombre: document.getElementById('nombre').value,
+      monto: appState.cart.getTotal()
+    })
+  })
+    .then(res => res.json())
+    .then(data => {
+      if (data.checkoutUrl) {
+        console.log("💳 Redirigiendo a Wompi con URL firmada:", data.checkoutUrl);
+        window.location.href = data.checkoutUrl;
+      } else {
+        console.error("❌ Error en la respuesta del backend:", data);
+        alert("No se pudo generar el enlace de pago. Intenta nuevamente.");
+      }
+    })
+    .catch(err => {
+      console.error("❌ Error al conectarse con el backend:", err);
+      alert("No se pudo conectar con el servidor de pago.");
+    });
+
+}, function(error) {
+  console.error("❌ Error al enviar correo:", error);
+  alert("Hubo un error al enviar tu pedido. Por favor, intenta nuevamente.");
+});
+
       }, function(error) {
         console.error("❌ Error al enviar correo:", error);
         alert("Hubo un error al enviar tu pedido. Por favor, intenta nuevamente.");
