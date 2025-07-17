@@ -24,7 +24,7 @@ module.exports = async (req, res) => {
     }
 
     // ✅ Ruta Wompi con firma dinámica
-    if (req.method === 'POST' && req.url.includes('/wompi-link')) {
+    if (req.method === 'POST' && req.url === '/api/wompi-link') {
       const { amountInCents, currency, reference, publicKey } = req.body;
 
       if (!amountInCents || !currency || !reference || !publicKey) {
