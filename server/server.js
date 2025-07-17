@@ -18,10 +18,10 @@ module.exports = async (req, res) => {
     }
 
     // 🔗 GET /api/checkout (modo fijo)
-    if (req.method === 'GET' && req.url.includes('/checkout')) {
+    /*if (req.method === 'GET' && req.url.includes('/checkout')) {
       const paymentLink = 'https://checkout.wompi.co/l/VPOS_nJo3xk';
       return res.status(200).json({ url: paymentLink });
-    }
+    }*/
 
     // 💳 POST /api/wompi-link (modo firmado)
     if (req.method === 'POST' && req.url.includes('/wompi-link')) {
