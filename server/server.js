@@ -1,13 +1,15 @@
 const { createClient } = require('@supabase/supabase-js');
 const crypto = require('crypto');
 
-const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_KEY;
-const supabase = createClient(supabaseUrl, supabaseKey);
+// Configura Supabase
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_KEY
+);
 
 module.exports = async (req, res) => {
   try {
-    // 🟩 Obtener productos
+    // GET /api/products
     if (req.method === 'GET' && req.url === '/api/products') {
       const { data, error } = await supabase.from('productos').select('*');
       if (error) throw error;
@@ -16,43 +18,50 @@ module.exports = async (req, res) => {
       return res.end(JSON.stringify(data));
     }
 
-    // 🟨 Generar enlace firmado para Wompi
+    // POST /api/wompi-link
     if (req.method === 'POST' && req.url === '/api/wompi-link') {
       let body = '';
 
+      // Recolecta el cuerpo del POST
       req.on('data', chunk => {
         body += chunk;
       });
 
       req.on('end', () => {
-        const { amountInCents, currency, reference, publicKey } = JSON.parse(body);
+        try {
+          const { amountInCents, currency, reference, publicKey } = JSON.parse(body);
 
-        if (!amountInCents || !currency || !reference || !publicKey) {
+          if (!amountInCents || !currency || !reference || !publicKey) {
+            res.writeHead(400, { 'Content-Type': 'application/json' });
+            return res.end(JSON.stringify({ error: 'Faltan datos para la firma' }));
+          }
+
+          const privateKey = process.env.WOMPI_PRIVATE_KEY;
+          if (!privateKey) {
+            res.writeHead(500, { 'Content-Type': 'application/json' });
+            return res.end(JSON.stringify({ error: 'Clave privada no configurada' }));
+          }
+
+          const stringToSign = `${amountInCents}${currency}${reference}${publicKey}`;
+          const hmac = crypto.createHmac('sha256', privateKey);
+          hmac.update(stringToSign);
+          const signature = hmac.digest('hex');
+
+          const checkoutUrl = `https://checkout.wompi.co/p/?public-key=${publicKey}&currency=${currency}&amount-in-cents=${amountInCents}&reference=${reference}&signature=${signature}&redirect-url=https://beauty-mocha-ten.vercel.app/pedido-confirmado.html`;
+
+          res.writeHead(200, { 'Content-Type': 'application/json' });
+          return res.end(JSON.stringify({ checkoutUrl }));
+        } catch (err) {
+          console.error('❌ Error parseando el body:', err.message);
           res.writeHead(400, { 'Content-Type': 'application/json' });
-          return res.end(JSON.stringify({ error: 'Faltan datos para la firma' }));
+          return res.end(JSON.stringify({ error: 'Cuerpo inválido' }));
         }
-
-        const privateKey = process.env.WOMPI_PRIVATE_KEY;
-        if (!privateKey) {
-          res.writeHead(500, { 'Content-Type': 'application/json' });
-          return res.end(JSON.stringify({ error: 'Clave privada no configurada' }));
-        }
-
-        const stringToSign = `${amountInCents}${currency}${reference}${publicKey}`;
-        const hmac = crypto.createHmac('sha256', privateKey);
-        hmac.update(stringToSign);
-        const signature = hmac.digest('hex');
-
-        const checkoutUrl = `https://checkout.wompi.co/p/?public-key=${publicKey}&currency=${currency}&amount-in-cents=${amountInCents}&reference=${reference}&signature=${signature}&redirect-url=https://beauty-mocha-ten.vercel.app/pedido-confirmado.html`;
-
-        res.writeHead(200, { 'Content-Type': 'application/json' });
-        return res.end(JSON.stringify({ checkoutUrl }));
       });
 
       return;
     }
 
-    // ❌ Ruta no encontrada
+    // Ruta no encontrada
     res.writeHead(404, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({ error: 'Ruta no encontrada' }));
 
