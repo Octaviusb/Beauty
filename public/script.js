@@ -270,9 +270,9 @@ function configurarCarrito() {
   }
 }
 
-// 💳 Redirección a Wompi (versión simplificada)
+// 💳 Redirección a página de pago
 function redirigirAWompi(monto, nombreCliente) {
-  console.log('💳 Iniciando proceso de pago con Wompi');
+  console.log('💳 Iniciando proceso de pago');
   console.log('💰 Monto:', monto);
 
   if (!monto) {
@@ -282,19 +282,14 @@ function redirigirAWompi(monto, nombreCliente) {
   }
 
   try {
-    // Crear URL directa al checkout de Wompi sin usar API ni widget
-    const publicKey = "pub_prod_XApVcADEVCLGJnnghUT1V8G3oEwrF7ZW";
-    const montoEnCentavos = Math.round(monto * 100);
-    const referencia = `pedido_${Date.now()}`;
+    // Redireccionar a la página de pago intermedia
+    const pagoUrl = `/pago.html?monto=${monto}&nombre=${encodeURIComponent(nombreCliente || '')}`;
     
-    // URL directa al checkout de Wompi
-    const checkoutUrl = `https://checkout.wompi.co/p/?public-key=${publicKey}&currency=COP&amount-in-cents=${montoEnCentavos}&reference=${referencia}&redirect-url=${window.location.origin}/pedido-confirmado.html`;
-    
-    console.log('✅ Redirigiendo a Wompi:', checkoutUrl);
-    window.location.href = checkoutUrl;
+    console.log('✅ Redirigiendo a página de pago:', pagoUrl);
+    window.location.href = pagoUrl;
     
   } catch (error) {
-    console.error('🚫 Error de redirección a Wompi:', error);
+    console.error('🚫 Error de redirección:', error);
     alert("Ocurrió un error inesperado al procesar el pago. Por favor, intenta nuevamente.");
   }
 }
@@ -366,6 +361,11 @@ document.addEventListener("DOMContentLoaded", () => {
         redirigirAWompi(total, nombre);
       }, function(error) {
         console.error("❌ Error al enviar correo:", error);
+        alert("Hubo un error al enviar tu pedido. Por favor, intenta nuevamente.");
+      });
+    });
+  }
+});
         alert("Hubo un error al enviar tu pedido. Por favor, intenta nuevamente.");
       });
     });
