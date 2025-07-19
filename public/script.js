@@ -199,8 +199,8 @@ function configurarCarrito() {
   }
 }
 
-// 💳 Redirección a Wompi
-async function redirigirAWompi(monto, nombreCliente) {
+// 💳 Redirección a Wompi (versión simplificada)
+function redirigirAWompi(monto, nombreCliente) {
   console.log('💳 Iniciando proceso de pago con Wompi');
   console.log('💰 Monto:', monto);
 
@@ -211,39 +211,17 @@ async function redirigirAWompi(monto, nombreCliente) {
   }
 
   try {
+    // Crear URL directa al checkout de Wompi sin usar API ni widget
     const publicKey = "pub_prod_XApVcADEVCLGJnnghUT1V8G3oEwrF7ZW";
     const montoEnCentavos = Math.round(monto * 100);
     const referencia = `pedido_${Date.now()}`;
     
-    console.log('📨 Enviando solicitud a /api/wompi-link');
+    // URL directa al checkout de Wompi
+    const checkoutUrl = `https://checkout.wompi.co/p/?public-key=${publicKey}&currency=COP&amount-in-cents=${montoEnCentavos}&reference=${referencia}&redirect-url=https://beauty-mocha-ten.vercel.app/pedido-confirmado.html`;
     
-    // Usar el endpoint existente para generar la URL
-    const respuesta = await fetch('/api/wompi-link', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        amountInCents: montoEnCentavos,
-        currency: "COP",
-        reference: referencia,
-        publicKey: publicKey
-      })
-    });
+    console.log('✅ Redirigiendo a Wompi:', checkoutUrl);
+    window.location.href = checkoutUrl;
     
-    console.log('💯 Respuesta recibida, status:', respuesta.status);
-    
-    if (!respuesta.ok) {
-      throw new Error(`Error en la respuesta: ${respuesta.status}`);
-    }
-    
-    const data = await respuesta.json();
-    console.log('📥 Datos recibidos:', data);
-    
-    if (data.checkoutUrl) {
-      console.log('✅ Redirigiendo a Wompi:', data.checkoutUrl);
-      window.location.href = data.checkoutUrl;
-    } else {
-      throw new Error('No se recibió URL de checkout');
-    }
   } catch (error) {
     console.error('🚫 Error de redirección a Wompi:', error);
     alert("Ocurrió un error inesperado al procesar el pago. Por favor, intenta nuevamente.");
@@ -300,6 +278,28 @@ document.addEventListener("DOMContentLoaded", () => {
       const metodo_pago = document.querySelector('input[name="payment-method"]:checked').value;
       const carrito = appState.cart.items.map(item => `${item.quantity}x ${item.name} ($${item.price})`).join(", ");
       const total = appState.cart.getTotal();
+
+      emailjs.send("service_owxur5f", "template_sck7rdl", {
+        nombre,
+        email,
+        telefono,
+        direccion,
+        ciudad,
+        referidor,
+        metodo_pago,
+        total: total.toFixed(2),
+        carrito
+      }, "Cqwg1EyqFLvPg7ULx")
+      .then(function(response) {
+        console.log("📧 Pedido enviado:", response.status, response.text);
+        redirigirAWompi(total, nombre);
+      }, function(error) {
+        console.error("❌ Error al enviar correo:", error);
+        alert("Hubo un error al enviar tu pedido. Por favor, intenta nuevamente.");
+      });
+    });
+  }
+});
 
       emailjs.send("service_owxur5f", "template_sck7rdl", {
         nombre,
