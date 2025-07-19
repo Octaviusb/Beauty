@@ -1,0 +1,49 @@
+/* Estilos para el modal de Wompi */
+.payment-details {
+  background: #f5f5f5;
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin: 1.5rem 0;
+  border-left: 4px solid #2a5ea7;
+}
+
+.important-note {
+  color: #d81b60;
+  font-weight: bold;
+  margin-top: 1rem;
+  font-size: 1.1rem;
+}
+
+#wompiModal .payment-info {
+  text-align: center;
+}
+
+#wompiModal .payment-details {
+  text-align: left;
+  max-width: 400px;
+  margin: 1.5rem auto;
+}
+
+#wompiModal .btn-submit-order {
+  background-color: #00aff0;
+  margin-top: 1rem;
+  padding: 1rem 2rem;
+  font-size: 1.1rem;
+}
+
+#wompiModal .btn-submit-order:hover {
+  background-color: #0095cc;
+}
+
+/* Animación para destacar el monto */
+@keyframes highlight {
+  0% { background-color: #f5f5f5; }
+  50% { background-color: #e0f7fa; }
+  100% { background-color: #f5f5f5; }
+}
+
+#wompiModal .payment-details p:first-child {
+  animation: highlight 2s ease-in-out infinite;
+  padding: 0.5rem;
+  border-radius: 4px;
+}
