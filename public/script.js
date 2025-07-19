@@ -144,43 +144,50 @@ function actualizarContadorCarrito() {
   }
 }
 
+// Cargar productos desde Supabase con respaldo estático
 async function cargarProductos() {
+  console.log('🔄 Intentando cargar productos desde Supabase...');
+  
   try {
-    console.log('🔄 Cargando productos...');
+    // Mostrar productos estáticos inmediatamente mientras se cargan los de Supabase
+    if (typeof productosEstaticos !== 'undefined' && Array.isArray(productosEstaticos)) {
+      appState.productos = productosEstaticos;
+      console.log('📡 Mostrando productos estáticos mientras se cargan los reales');
+      renderizarProductos(productosEstaticos);
+      setupFilters();
+    }
     
     // Intentar cargar productos desde la API
     const response = await fetch('/api/products');
     console.log('📊 Estado de respuesta:', response.status);
     
     if (!response.ok) {
-      console.error('❌ Error en la respuesta:', response.status, response.statusText);
       throw new Error(`Error en la respuesta: ${response.status}`);
     }
     
     const productos = await response.json();
-    console.log('📦 Productos recibidos:', productos ? (productos.length || 'No es un array') : 'null');
     
-    if (!productos || !Array.isArray(productos)) {
-      console.error('❌ Formato inválido, no es un array:', productos);
-      throw new Error('Formato inválido');
+    if (!productos || !Array.isArray(productos) || productos.length === 0) {
+      throw new Error('No se recibieron productos válidos');
     }
     
-    if (productos.length === 0) {
-      console.warn('⚠️ No hay productos en la respuesta');
-    }
-    
+    // Actualizar con los productos reales de Supabase
     appState.productos = productos;
-    console.log('✅ Productos guardados en estado:', appState.productos.length);
+    console.log('✅ Productos de Supabase cargados:', productos.length);
     renderizarProductos(productos);
     setupFilters();
+    
   } catch (error) {
-    console.error("❌ Error al cargar productos:", error);
-    const contenedor = document.getElementById('product-list');
-    if (contenedor) {
-      contenedor.innerHTML = "<p class='error-message'>No se pudieron cargar los productos. Error: " + error.message + "</p>";
+    console.error('❌ Error al cargar productos de Supabase:', error);
+    
+    // Si ya se mostraron los productos estáticos, no hacer nada más
+    if (appState.productos.length > 0) {
+      console.log('🚨 Manteniendo productos estáticos ya mostrados');
+      return;
     }
     
-    // Cargar productos de respaldo si la API falla
+    // Si no hay productos estáticos, usar respaldo
+    console.warn('⚠️ Usando productos de respaldo');
     cargarProductosRespaldo();
   }
 }
@@ -361,11 +368,6 @@ document.addEventListener("DOMContentLoaded", () => {
         redirigirAWompi(total, nombre);
       }, function(error) {
         console.error("❌ Error al enviar correo:", error);
-        alert("Hubo un error al enviar tu pedido. Por favor, intenta nuevamente.");
-      });
-    });
-  }
-});
         alert("Hubo un error al enviar tu pedido. Por favor, intenta nuevamente.");
       });
     });
