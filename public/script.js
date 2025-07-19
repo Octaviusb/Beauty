@@ -1,4 +1,4 @@
-// 📦 script.js cargado con defer
+
 console.log("📦 script.js cargado con defer");
 
 // 1. Estado global
