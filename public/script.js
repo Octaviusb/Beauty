@@ -197,6 +197,7 @@ async function cargarProductosCompletos() {
   }
   
   // Si no se pudo cargar desde JSON, usar la lista de respaldo
+  // Nota: Esta lista debe coincidir con productos.json
   const productosCompletos = [
     {
       id: "1",
