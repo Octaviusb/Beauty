@@ -288,7 +288,7 @@ function redirigirAWompi(monto, nombreCliente) {
     const referencia = `pedido_${Date.now()}`;
     
     // URL directa al checkout de Wompi
-    const checkoutUrl = `https://checkout.wompi.co/p/?public-key=${publicKey}&currency=COP&amount-in-cents=${montoEnCentavos}&reference=${referencia}&redirect-url=https://beauty-mocha-ten.vercel.app/pedido-confirmado.html`;
+    const checkoutUrl = `https://checkout.wompi.co/p/?public-key=${publicKey}&currency=COP&amount-in-cents=${montoEnCentavos}&reference=${referencia}&redirect-url=${window.location.origin}/pedido-confirmado.html`;
     
     console.log('✅ Redirigiendo a Wompi:', checkoutUrl);
     window.location.href = checkoutUrl;
