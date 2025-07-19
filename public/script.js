@@ -176,51 +176,16 @@ async function redirigirAWompi(monto, nombreCliente) {
   }
 
   try {
+    // Crear URL directa al checkout de Wompi
     const montoEnCentavos = Math.round(monto * 100);
     const referencia = `pedido_${Date.now()}`;
     
-    // Usar directamente el widget de Wompi en lugar de la redirección
-    if (typeof window.WompiCheckout === 'function') {
-      const checkout = new window.WompiCheckout({
-        currency: 'COP',
-        amountInCents: montoEnCentavos,
-        reference: referencia,
-        publicKey: publicKey,
-        redirectUrl: 'https://beauty-mocha-ten.vercel.app/pedido-confirmado.html'
-      });
-      
-      console.log("✅ Abriendo widget de Wompi");
-      checkout.open();
-      return;
-    }
+    // URL directa al checkout de Wompi sin usar el widget
+    const checkoutUrl = `https://checkout.wompi.co/p/?public-key=${publicKey}&currency=COP&amount-in-cents=${montoEnCentavos}&reference=${referencia}&redirect-url=https://beauty-mocha-ten.vercel.app/pedido-confirmado.html`;
     
-    // Fallback a la API si el widget no está disponible
-    console.log("⚠️ Widget de Wompi no disponible, usando API fallback");
+    console.log("✅ Redirigiendo a Wompi:", checkoutUrl);
+    window.location.href = checkoutUrl;
     
-    const payload = {
-      amountInCents: montoEnCentavos,
-      currency: "COP",
-      reference: referencia,
-      publicKey: publicKey
-    };
-
-    console.log("📤 Enviando a /api/wompi-link:", payload);
-
-    const respuesta = await fetch("/api/wompi-link", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
-    });
-
-    const data = await respuesta.json();
-
-    if (respuesta.ok && data.checkoutUrl) {
-      console.log("✅ Redirigiendo a Wompi:", data.checkoutUrl);
-      window.location.href = data.checkoutUrl;
-    } else {
-      console.error("❌ Error en backend Wompi:", data);
-      alert("No se pudo generar el enlace de pago. Revisa los datos e intenta nuevamente.");
-    }
   } catch (error) {
     console.error("🚫 Error de redirección a Wompi:", error);
     alert("Ocurrió un error inesperado al procesar el pago.");
@@ -282,6 +247,23 @@ document.addEventListener("DOMContentLoaded", () => {
         nombre,
         email,
         telefono,
+        direccion,
+        ciudad,
+        referidor,
+        metodo_pago,
+        total: total.toFixed(2),
+        carrito
+      }, "Cqwg1EyqFLvPg7ULx")
+      .then(function(response) {
+        console.log("📧 Pedido enviado:", response.status, response.text);
+        redirigirAWompi(total, nombre);
+      }, function(error) {
+        console.error("❌ Error al enviar correo:", error);
+        alert("Hubo un error al enviar tu pedido. Por favor, intenta nuevamente.");
+      });
+    });
+  }
+});
         direccion,
         ciudad,
         referidor,
