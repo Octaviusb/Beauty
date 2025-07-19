@@ -81,15 +81,6 @@
     "badge": ""
   },
   {
-    "id": 10,
-    "name": "Lima de Uñas Eléctrica",
-    "category": "accesorios",
-    "price": 39200,
-    "description": "Multivelocidad",
-    "image": "images/accesorios/lima-de-uñas-eléctrica.jpg",
-    "badge": ""
-  },
-  {
     "id": 11,
     "name": "Organizador de Maquillaje",
     "category": "accesorios",
@@ -351,15 +342,6 @@
     "badge": ""
   },
   {
-    "id": 40,
-    "name": "Jabón Antibacterial",
-    "category": "higiene",
-    "price": 21000,
-    "description": "Elimina el 99.9% de bacterias",
-    "image": "images/higiene/jabn-antibacterial.jpg",
-    "badge": ""
-  },
-  {
     "id": 41,
     "name": "Maquillaje 1",
     "category": "maquillaje",
@@ -429,15 +411,6 @@
     "price": 52000,
     "description": "Regeneración nocturna intensiva",
     "image": "images/skincare/crema-de-noche.jpg",
-    "badge": ""
-  },
-  {
-    "id": 49,
-    "name": "Crema Nutritiva",
-    "category": "skincare",
-    "price": 49000,
-    "description": "Nutrición profunda para piel seca",
-    "image": "images/skincare/crema-nutritiva.jpg",
     "badge": ""
   },
   {
@@ -522,6 +495,33 @@
     "badge": ""
   },
   {
+    "id": 59,
+    "name": "Kit de Uñas 4",
+    "category": "uñas",
+    "price": 42000,
+    "description": "Kit profesional para uñas de gel",
+    "image": "images/uñas/img197.jpg",
+    "badge": "Nuevo"
+  },
+  {
+    "id": 60,
+    "name": "Kit de Uñas 5",
+    "category": "uñas",
+    "price": 38000,
+    "description": "Kit completo para nail art",
+    "image": "images/uñas/img203.jpg",
+    "badge": ""
+  },
+  {
+    "id": 61,
+    "name": "Kit de Uñas 6",
+    "category": "uñas",
+    "price": 45000,
+    "description": "Kit profesional para decoración de uñas",
+    "image": "images/uñas/img204.jpg",
+    "badge": ""
+  }
+]
     "id": 59,
     "name": "Kit de Uñas 4",
     "category": "uñas",
