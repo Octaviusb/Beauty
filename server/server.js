@@ -1,56 +1,67 @@
+const express = require('express');
+const cors = require('cors');
+const path = require('path');
 const { createClient } = require('@supabase/supabase-js');
-const crypto = require('crypto');
+require('dotenv').config();
 
+const app = express();
+app.use(cors());
+app.use(express.json());
+
+// Configuración de Supabase
 const supabase = createClient(
   process.env.SUPABASE_URL,
   process.env.SUPABASE_KEY
 );
 
-module.exports = async (req, res) => {
+// Servir archivos estáticos
+app.use(express.static(path.join(__dirname, '../public')));
+
+// Rutas API
+app.get('/api/products', async (req, res) => {
   try {
-    // 🛍️ GET /api/products
-    if (req.method === 'GET' && req.url.includes('/products')) {
-      const { data, error } = await supabase.from('products').select('*');
-      if (error) {
-        return res.status(500).json({ error: 'Error al obtener productos' });
+    // Intenta obtener productos de Supabase
+    const { data, error } = await supabase.from('products').select('*');
+    
+    if (error) {
+      console.log('Error de Supabase:', error);
+      
+      // Si hay error, intenta leer el archivo JSON local
+      const fs = require('fs');
+      const productsPath = path.join(__dirname, '../productos.json');
+      
+      if (fs.existsSync(productsPath)) {
+        const productsData = fs.readFileSync(productsPath, 'utf8');
+        return res.status(200).json(JSON.parse(productsData));
+      } else {
+        return res.status(500).json({ error: 'No se pudieron obtener los productos' });
       }
-      return res.status(200).json(data);
     }
-
-    // 🔗 GET /api/checkout (modo fijo)
-    /*if (req.method === 'GET' && req.url.includes('/checkout')) {
-      const paymentLink = 'https://checkout.wompi.co/l/VPOS_nJo3xk';
-      return res.status(200).json({ url: paymentLink });
-    }*/
-
-    // 💳 POST /api/wompi-link (modo firmado)
-    if (req.method === 'POST' && req.url.includes('/wompi-link')) {
-      const { amountInCents, currency, reference, publicKey } = req.body;
-
-      if (!amountInCents || !currency || !reference || !publicKey) {
-        return res.status(400).json({ error: 'Faltan datos para firmar el enlace' });
-      }
-
-      const privateKey = process.env.WOMPI_PRIVATE_KEY;
-      if (!privateKey) {
-        return res.status(500).json({ error: 'Clave privada no configurada' });
-      }
-
-      const stringToSign = `${amountInCents}${currency}${reference}${publicKey}`;
-      const hmac = crypto.createHmac('sha256', privateKey);
-      hmac.update(stringToSign);
-      const signature = hmac.digest('hex');
-
-      const checkoutUrl = `https://checkout.wompi.co/p/?public-key=${publicKey}&currency=${currency}&amount-in-cents=${amountInCents}&reference=${reference}&signature=${signature}&redirect-url=https://beauty-mocha-ten.vercel.app/pedido-confirmado.html`;
-
-      return res.status(200).json({ checkoutUrl });
-    }
-
-    // ❌ Ruta no encontrada
-    return res.status(404).json({ error: 'Ruta no encontrada' });
-
+    
+    return res.status(200).json(data);
   } catch (err) {
-    console.error('❌ Error general en server.js:', err.message);
+    console.error('❌ Error al obtener productos:', err.message);
     return res.status(500).json({ error: 'Error interno del servidor' });
   }
-};
+});
+
+app.get('/api/checkout', (req, res) => {
+  const paymentLink = 'https://checkout.wompi.co/l/VPOS_nJo3xk';
+  return res.status(200).json({ url: paymentLink });
+});
+
+// Ruta para todas las demás solicitudes (SPA fallback)
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../public/index.html'));
+});
+
+// Para desarrollo local
+if (process.env.NODE_ENV !== 'production') {
+  const PORT = process.env.PORT || 3000;
+  app.listen(PORT, () => {
+    console.log(`Servidor ejecutándose en http://localhost:${PORT}`);
+  });
+}
+
+// Para Vercel
+module.exports = app;
