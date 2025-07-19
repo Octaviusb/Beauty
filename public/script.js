@@ -1,275 +1,1293 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Tienda de productos de belleza y cuidado personal - Beauty Line. Productos naturales de alta calidad para el cuidado de la piel y maquillaje.">
-  <title>Beauty Line - Tienda de Belleza y Cuidado Personal | Productos Naturales</title>
-  
-  <!-- Preload de recursos críticos -->
-  <link rel="preload" href="styles.css" as="style">
-  <link rel="preload" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600&display=swap" as="style">
-  <link rel="preload" href="script.js" as="script">
-  
-  <!-- Hojas de estilo -->
-  <link rel="stylesheet" href="styles.css" />
-  <link rel="stylesheet" href="styles-form.css" />
-  <link rel="stylesheet" href="styles-wompi.css" />
-  <link rel="stylesheet" href="styles-warning.css" />
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="icon" href="./assets/favicon.ico" type="image/x-icon">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-  
-  <!-- Scripts -->
-  <script src="script.js"></script>
-  <script>
-    if(window.location.hostname === "localhost") {
-      window.OtAutoBlock = false; // Desactiva el bloqueo en desarrollo local
+// Estado global de la aplicación
+const appState = {
+  cart: {
+    items: [],
+
+    addItem(item) {
+      const index = this.items.findIndex(p => p.id === item.id);
+      if (index >= 0) {
+        this.items[index].quantity += 1;
+      } else {
+        this.items.push({ ...item, quantity: 1 });
+      }
+      this.showFeedback(item.name);
+    },
+
+    removeItem(id) {
+      this.items = this.items.filter(item => item.id !== id);
+    },
+
+    clear() {
+      this.items = [];
+    },
+
+    getTotal() {
+      return this.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    },
+
+    showFeedback(productName) {
+      const feedback = document.createElement('div');
+      feedback.className = 'cart-feedback';
+      feedback.textContent = "✓ " + productName + " agregado";
+      document.body.appendChild(feedback);
+      setTimeout(() => feedback.remove(), 2000);
     }
-  </script>
-</head>
-<body>
-  <header class="main-header" role="banner">
-    <div class="header-container">
-      <h1 class="logo">
-        <a href="/" aria-label="Beauty Line - Inicio">Beauty<span>Line</span></a>
-      </h1>
+  },
+  productos: [],
+  currentFilter: 'all'
+};
 
-      <button class="cart-icon" id="cartButton" aria-label="Carrito de compras" aria-expanded="false">
-        <span id="cart-count" aria-live="polite">0</span>
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-          <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/>
-        </svg>
-      </button>
-    </div>
-  </header>
+// Renderizar productos
+function renderizarProductos(productos) {
+  console.log('📊 Renderizando productos:', productos?.length || 0);
+  const contenedor = document.getElementById('product-list');
+  if (!contenedor) {
+    console.error('❌ Contenedor de productos no encontrado');
+    return;
+  }
 
-  <main id="main-content">
-    <!-- Hero Section -->
-    <section id="inicio" class="hero" aria-labelledby="hero-heading">
-      <div class="hero-container">
-        <div class="hero-content">
-          <h1 id="hero-heading">Descubre tu Belleza Natural</h1>
-          <p>Los mejores cosméticos naturales para realzar tu belleza. Productos de alta calidad que cuidan tu piel.</p>
+  if (!productos || productos.length === 0) {
+    console.warn('⚠️ No hay productos para mostrar');
+    contenedor.innerHTML = "<p class='info-message'>No hay productos disponibles en este momento.</p>";
+    return;
+  }
+
+  const productosFiltrados = appState.currentFilter === 'all' 
+    ? productos 
+    : productos.filter(p => p.category === appState.currentFilter);
+  
+  console.log('🔍 Productos filtrados:', productosFiltrados.length, 'Filtro actual:', appState.currentFilter);
+
+  try {
+    contenedor.innerHTML = productosFiltrados.map(producto => (
+      `<div class='product-card'>
+        <div class='product-image-container'>
+          <img src='${producto.image}' alt='${producto.name}' class='product-image' loading='lazy'>
+          ${producto.badge ? `<span class="product-badge">${producto.badge}</span>` : ''}
         </div>
-        <div class="hero-image">
-          <img src="https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" 
-               alt="Variedad de cosméticos naturales en exhibición" 
-               loading="eager"
-               width="600"
-               height="400">
+        <div class='product-info'>
+          <h3 class='product-title'>${producto.name}</h3>
+          ${producto.description ? `<p class='product-description'>${producto.description}</p>` : ''}
+          <div class='product-price'>$${producto.price.toLocaleString()}</div>
+          <button class='add-to-cart' data-id='${producto.id}' data-name='${producto.name}' data-price='${producto.price}'>
+            Agregar al carrito
+          </button>
         </div>
-      </div>
-    </section>
+      </div>`
+    )).join('');
 
-    <!-- Categorías -->
-    <section id="categorias" class="categories" aria-labelledby="categories-heading">
-      <div class="container">
-        <div class="categories-grid" role="list">
-          
-          <div class="category-card" role="listitem">
-            <div class="category-icon">
-              <i class="fas fa-palette" aria-hidden="true"></i>
-            </div>
-            <h3>Maquillaje</h3>
-            <p>Productos para realzar tu belleza natural</p>
-            <a href="#productos?filter=maquillaje" class="category-link filter-btn" data-filter="maquillaje">Ver productos</a>
-          </div>
+    document.querySelectorAll('.add-to-cart').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const productData = {
+          id: btn.dataset.id,
+          name: btn.dataset.name,
+          price: Number(btn.dataset.price)
+        };
+        appState.cart.addItem(productData);
+        actualizarContadorCarrito();
+      });
+    });
+    
+    console.log('✅ Eventos de botones configurados');
+  } catch (error) {
+    console.error('❌ Error al renderizar productos:', error);
+    contenedor.innerHTML = `<p class='error-message'>Error al mostrar los productos: ${error.message}</p>`;
+  }
+}
 
-          <div class="category-card" role="listitem">
-            <div class="category-icon">
-              <i class="fas fa-spa" aria-hidden="true"></i>
-            </div>
-            <h3>Skincare</h3>
-            <p>Cuidado facial y corporal</p>
-            <a href="#productos?filter=skincare" class="category-link filter-btn" data-filter="skincare">Ver productos</a>
-          </div>
+// Mostrar carrito
+function mostrarCarrito() {
+  const modal = document.getElementById('carrito-modal');
+  const lista = modal.querySelector('.cart-items');
+  const total = modal.querySelector('.total-amount');
 
-          <div class="category-card" role="listitem">
-            <div class="category-icon">
-              <i class="fas fa-pump-soap" aria-hidden="true"></i>
-            </div>
-            <h3>Higiene</h3>
-            <p>Productos de limpieza y cuidado</p>
-            <a href="#productos?filter=higiene" class="category-link filter-btn" data-filter="higiene">Ver productos</a>
-          </div>
+  if (!modal || !lista || !total) return;
 
-          <div class="category-card" role="listitem">
-            <div class="category-icon">
-              <i class="fas fa-gem" aria-hidden="true"></i>
-            </div>
-            <h3>Accesorios</h3>
-            <p>Herramientas y accesorios de belleza</p>
-            <a href="#productos?filter=accesorios" class="category-link filter-btn" data-filter="accesorios">Ver productos</a>
-          </div>
+  lista.innerHTML = '';
 
-          <div class="category-card" role="listitem">
-            <div class="category-icon">
-              <i class="fas fa-hand-sparkles" aria-hidden="true"></i>
-            </div>
-            <h3>Uñas</h3>
-            <p>Esmaltes y cuidado de uñas</p>
-            <a href="#productos?filter=uñas" class="category-link filter-btn" data-filter="esmaltes">Ver productos</a>
-          </div>
-        </div>
-      </div>
-    </section>
+  if (appState.cart.items.length === 0) {
+    lista.innerHTML = '<p class="empty-cart">Tu carrito está vacío</p>';
+    total.textContent = '$0';
+  } else {
+    appState.cart.items.forEach(item => {
+      const itemDiv = document.createElement('div');
+      itemDiv.className = 'cart-item';
+      itemDiv.innerHTML = `
+        <span class="item-name">${item.name}</span>
+        <span class="item-quantity">x${item.quantity}</span>
+        <span class="item-price">$${(item.price * item.quantity).toLocaleString()}</span>
+      `;
+      lista.appendChild(itemDiv);
+    });
+    total.textContent = `$${appState.cart.getTotal().toLocaleString()}`;
+  }
 
-    <section id="seccion-productos" class="productos-seccion">
-      <h2>Nuestros Productos</h2>
+  modal.classList.remove('hidden');
+  modal.classList.add('active');
+  modal.setAttribute('aria-modal', 'true');
+}
 
-      <!-- Aquí se insertan los productos -->
-      <div id="product-list" class="productos-grid"></div>
-    </section>
-  </main>
+// Cerrar carrito
+function cerrarCarrito() {
+  const modal = document.getElementById('carrito-modal');
+  if (modal) {
+    modal.classList.remove('active');
+    modal.classList.add('hidden');
+    modal.setAttribute('aria-modal', 'false');
+  }
+}
 
-  <!-- Footer -->
-  <footer class="footer" aria-label="Pie de página">
-    <div class="container">
-      <div class="footer-content">
-        <div class="footer-col">
-          <h3>Beauty Line</h3>
-          <p>Tu tienda de confianza para productos de belleza de alta calidad.</p>
-        </div>
-        <!-- Otras columnas del footer -->
-      </div>
-      <div class="footer-bottom">
-        <p class="footer-legal">&copy; <span id="current-year"></span> Beauty Line. Todos los derechos reservados.</p>
-      </div>
-    </div>
-  </footer>
+// Actualizar contador del carrito
+function actualizarContadorCarrito() {
+  const count = appState.cart.items.reduce((sum, item) => sum + item.quantity, 0);
+  const countElement = document.getElementById('cart-count');
+  if (countElement) {
+    countElement.textContent = count;
+    countElement.style.display = count ? 'inline-block' : 'none';
+  }
+}
 
-  <!-- Modales -->
-  <!-- Modal del Carrito -->
-  <div id="carrito-modal" class="modal hidden" role="dialog" aria-modal="false" aria-labelledby="cart-title">
-    <div class="modal-content">
-      <button class="close-cart" aria-label="Cerrar carrito">&times;</button>
-      <h2 id="cart-title">Tu Carrito</h2>
-      <div class="cart-items" role="list"></div>
-      <div class="cart-total">
-        <strong>Total:</strong> <span class="total-amount">$0.00</span>
-      </div>
-      <div class="cart-actions">
-        <button id="limpiarCarrito" class="clear-cart-btn">Vaciar Carrito</button>
-        <button id="finalizarCompra" class="checkout-btn">Finalizar Compra</button>
-      </div>
-    </div>
-  </div>
+// Cargar productos
+function cargarProductos() {
+  console.log('🔄 Cargando productos...');
+  
+  // Usar productos de respaldo primero para mostrar algo rápido
+  cargarProductosRespaldo();
+  
+  // Intentar cargar productos desde la API
+  fetch('/api/products')
+    .then(response => {
+      if (!response.ok) throw new Error(`Error: ${response.status}`);
+      return response.json();
+    })
+    .then(productos => {
+      if (Array.isArray(productos) && productos.length > 0) {
+        appState.productos = productos;
+        console.log('✅ Productos de API cargados:', productos.length);
+        renderizarProductos(productos);
+        setupFilters();
+      }
+    })
+    .catch(error => {
+      console.error('❌ Error al cargar productos de API:', error);
+    });
+}
 
-  <!-- Modal de Checkout - FORMULARIO COMPLETO -->
-  <div id="checkoutForm" class="modal hidden" role="dialog" aria-modal="false" aria-labelledby="checkout-title">
-    <div class="modal-content checkout-content">
-      <button class="close-form" aria-label="Cerrar formulario">&times;</button>
-      <h2 id="checkout-title">Finalizar Compra</h2>
-      
-      <form id="formularioCompra" class="checkout-form">
-        <div class="form-grid">
-          <!-- Columna de información del cliente -->
-          <div class="form-column">
-            <h3>Información Personal</h3>
-            
-            <div class="form-group">
-              <label for="nombre">Nombre completo*</label>
-              <input type="text" id="nombre" name="nombre" required autocomplete="name">
-            </div>
-            
-            <div class="form-group">
-              <label for="email">Correo electrónico*</label>
-              <input type="email" id="email" name="email" required autocomplete="email">
-            </div>
-            
-            <div class="form-group">
-              <label for="telefono">Teléfono*</label>
-              <input type="tel" id="telefono" name="telefono" required autocomplete="tel">
-            </div>
-            
-            <div class="form-group">
-              <label for="direccion">Dirección completa*</label>
-              <textarea id="direccion" name="direccion" required autocomplete="street-address"></textarea>
-            </div>
-            
-            <div class="form-group">
-              <label for="ciudad">Ciudad*</label>
-              <input type="text" id="ciudad" name="ciudad" required autocomplete="address-level2">
-            </div>
-          </div>
-          
-          <!-- Columna de resumen del pedido -->
-          <div class="order-summary">
-            <h3>Tu Pedido</h3>
-            <div class="summary-items">
-              <!-- Los productos se agregarán dinámicamente aquí -->
-            </div>
-            <div class="summary-totals">
-              <div class="summary-row">
-                <span>Subtotal:</span>
-                <span class="subtotal-amount">$0.00</span>
-              </div>
-              <div class="summary-row">
-                <span>Envío:</span>
-                <span class="shipping-amount">$0.00</span>
-              </div>
-              <div class="summary-row total-row">
-                <strong>Total:</strong>
-                <strong class="total-amount">$0.00</strong>
-              </div>
-            </div>
-            
-            <div class="payment-methods">
-              <h4>Método de Pago</h4>
-              <div class="payment-options">
-                <label class="payment-option">
-                  <input type="radio" name="payment-method" value="wompi" checked>
-                  <span>Pago con Wompi (Tarjeta, Nequi, Daviplata)</span>
-                </label>
-                <label class="payment-option">
-                  <input type="radio" name="payment-method" value="pse">
-                  <span>PSE</span>
-                </label>
-              </div>
-            </div>
-            
-            <div class="form-notas">
-              <p><strong>Nota importante:</strong> El envío será despachado en un plazo máximo de 3 días hábiles después de confirmado el pago.</p>
-              <p>Envío gratuito para compras superiores a $200.000</p>
-              <p class="warning-note"><strong>Por favor, tome nota del valor exacto de su pedido, cualquier inconsistencia impedirá que el pedido sea despachado.</strong></p>
-            </div>
-          </div>
-        </div>
+// Productos de respaldo
+function cargarProductosRespaldo() {
+  console.log('🚨 Cargando productos de respaldo...');
+  
+  // Datos de productos de respaldo
+  const productosRespaldo = [
+    {
+      id: "1",
+      name: "Brocha Kabuki",
+      category: "accesorios",
+      price: 23800,
+      description: "Ideal para polvos sueltos",
+      image: "images/accesorios/brocha-kabuki.jpg",
+      badge: ""
+    },
+    {
+      id: "2",
+      name: "Caja de Almacenamiento",
+      category: "accesorios",
+      price: 44800,
+      description: "Para cosméticos y accesorios",
+      image: "images/accesorios/caja-de-almacenamiento.jpg",
+      badge: ""
+    },
+    {
+      id: "3",
+      name: "Cepillo Facial Eléctrico",
+      category: "accesorios",
+      price: 64400,
+      description: "Limpieza profunda",
+      image: "images/accesorios/cepillo-facial-elctrico.jpg",
+      badge: ""
+    },
+    {
+      id: "15",
+      name: "Esmalte 1",
+      category: "esmaltes",
+      price: 7000,
+      description: "Color y brillo intenso",
+      image: "images/esmaltes/img1.jpg",
+      badge: ""
+    },
+    {
+      id: "39",
+      name: "Gel de Baño",
+      category: "higiene",
+      price: 29400,
+      description: "Gel suave para piel sensible",
+      image: "images/higiene/gel-de-bao.jpg",
+      badge: ""
+    },
+    {
+      id: "41",
+      name: "Maquillaje 1",
+      category: "maquillaje",
+      price: 35000,
+      description: "Producto de maquillaje",
+      image: "images/maquillaje/img70.jpg",
+      badge: ""
+    },
+    {
+      id: "43",
+      name: "Agua Micelar",
+      category: "skincare",
+      price: 39200,
+      description: "Limpieza sin enjuague",
+      image: "images/skincare/agua-micelar.jpg",
+      badge: ""
+    }
+  ];
+  
+  appState.productos = productosRespaldo;
+  console.log('✅ Productos de respaldo cargados:', appState.productos.length);
+  renderizarProductos(productosRespaldo);
+  setupFilters();
+}
+
+// Configurar filtros
+function setupFilters() {
+  const filterButtons = document.querySelectorAll('.filter-btn');
+  filterButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      appState.currentFilter = btn.dataset.filter;
+      renderizarProductos(appState.productos);
+      filterButtons.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    });
+  });
+}
+
+// Configurar carrito
+function configurarCarrito() {
+  const cartButton = document.getElementById('cartButton');
+  const finalizarCompraBtn = document.getElementById('finalizarCompra');
+  const limpiarCarritoBtn = document.getElementById('limpiarCarrito');
+  const closeCartBtn = document.querySelector('.close-cart');
+
+  if (cartButton) {
+    cartButton.addEventListener('click', () => {
+      mostrarCarrito();
+    });
+  }
+
+  if (closeCartBtn) {
+    closeCartBtn.addEventListener('click', cerrarCarrito);
+  }
+
+  if (limpiarCarritoBtn) {
+    limpiarCarritoBtn.addEventListener('click', () => {
+      appState.cart.clear();
+      actualizarContadorCarrito();
+      mostrarCarrito();
+    });
+  }
+
+  if (finalizarCompraBtn) {
+    finalizarCompraBtn.addEventListener('click', mostrarFormularioPedido);
+  }
+}
+
+// Mostrar formulario de pedido
+function mostrarFormularioPedido() {
+  console.log('🧾 Mostrando formulario de pedido');
+  const checkoutForm = document.getElementById('checkoutForm');
+  const summaryItems = checkoutForm.querySelector('.summary-items');
+  const subtotalElement = checkoutForm.querySelector('.subtotal-amount');
+  const shippingElement = checkoutForm.querySelector('.shipping-amount');
+  const totalElement = checkoutForm.querySelector('.total-amount');
+  
+  // Cerrar el modal del carrito
+  cerrarCarrito();
+  
+  // Llenar el resumen del pedido
+  summaryItems.innerHTML = '';
+  appState.cart.items.forEach(item => {
+    const itemDiv = document.createElement('div');
+    itemDiv.className = 'summary-item';
+    itemDiv.innerHTML = `
+      <span class="item-name">${item.name} x${item.quantity}</span>
+      <span class="item-price">$${(item.price * item.quantity).toLocaleString()}</span>
+    `;
+    summaryItems.appendChild(itemDiv);
+  });
+  
+  // Calcular totales
+  const subtotal = appState.cart.getTotal();
+  const shipping = subtotal > 200000 ? 0 : 12000; // Envío gratis para compras mayores a $200,000
+  const total = subtotal + shipping;
+  
+  // Actualizar montos en el formulario
+  subtotalElement.textContent = `$${subtotal.toLocaleString()}`;
+  shippingElement.textContent = shipping === 0 ? 'Gratis' : `$${shipping.toLocaleString()}`;
+  totalElement.textContent = `$${total.toLocaleString()}`;
+  
+  // Mostrar el formulario
+  checkoutForm.classList.remove('hidden');
+  checkoutForm.classList.add('active');
+  checkoutForm.setAttribute('aria-modal', 'true');
+  
+  // Configurar eventos del formulario
+  configurarFormularioPedido();
+}
+
+// Configurar eventos del formulario de pedido
+function configurarFormularioPedido() {
+  const checkoutForm = document.getElementById('checkoutForm');
+  const closeFormBtn = checkoutForm.querySelector('.close-form');
+  const backToCartBtn = checkoutForm.querySelector('.btn-back-to-cart');
+  const formulario = document.getElementById('formularioCompra');
+  
+  // Cerrar formulario
+  if (closeFormBtn) {
+    closeFormBtn.addEventListener('click', () => {
+      checkoutForm.classList.remove('active');
+      checkoutForm.classList.add('hidden');
+      checkoutForm.setAttribute('aria-modal', 'false');
+    });
+  }
+  
+  // Volver al carrito
+  if (backToCartBtn) {
+    backToCartBtn.addEventListener('click', () => {
+      checkoutForm.classList.remove('active');
+      checkoutForm.classList.add('hidden');
+      mostrarCarrito();
+    });
+  }
+  
+  // Enviar formulario
+  if (formulario) {
+    formulario.addEventListener('submit', procesarPedido);
+  }
+}
+
+// Procesar pedido
+function procesarPedido(event) {
+  event.preventDefault();
+  console.log('🛒 Procesando pedido...');
+  
+  try {
+    // Obtener datos del formulario
+    const formulario = document.getElementById('formularioCompra');
+    const nombre = formulario.querySelector('#nombre').value;
+    const email = formulario.querySelector('#email').value;
+    const telefono = formulario.querySelector('#telefono').value;
+    const direccion = formulario.querySelector('#direccion').value;
+    const ciudad = formulario.querySelector('#ciudad').value;
+    const referidor = formulario.querySelector('#referidor')?.value || '';
+    
+    // Validar datos básicos
+    if (!nombre || !email || !telefono || !direccion || !ciudad) {
+      alert('Por favor completa todos los campos obligatorios.');
+      return;
+    }
+    
+    // Calcular totales
+    const subtotal = appState.cart.getTotal();
+    const shipping = subtotal > 200000 ? 0 : 12000;
+    const total = subtotal + shipping;
+    
+    // Generar número de pedido
+    const orderNumber = `BL-${Date.now().toString().slice(-6)}`;
+    
+    // Preparar datos del carrito para el correo
+    const carrito = appState.cart.items.map(item => `${item.quantity}x ${item.name} ($${item.price.toLocaleString()})`).join(", ");
+    
+    // Enviar correo con los datos del pedido usando EmailJS
+    if (typeof emailjs !== 'undefined') {
+      emailjs.send("service_owxur5f", "template_sck7rdl", {
+        nombre,
+        email,
+        telefono,
+        direccion: `${direccion}, ${ciudad}`,
+        referidor,
+        metodo_pago: 'Wompi',
+        total: total.toLocaleString(),
+        carrito,
+        referencia: orderNumber
+      }, "Cqwg1EyqFLvPg7ULx")
+      .then(function(response) {
+        console.log("📧 Pedido enviado correctamente");
         
-        <div class="form-actions">
-          <button type="button" class="btn-back-to-cart">Volver al Carrito</button>
-          <button type="submit" class="btn-submit-order">Realizar Pedido</button>
+        // Cerrar formulario de checkout
+        const checkoutForm = document.getElementById('checkoutForm');
+        checkoutForm.classList.remove('active');
+        checkoutForm.classList.add('hidden');
+        
+        // Mostrar modal de Wompi
+        mostrarModalWompi(total, orderNumber);
+      })
+      .catch(function(error) {
+        console.error("❌ Error al enviar correo:", error);
+        alert("Hubo un error al procesar el pedido. Por favor, intenta nuevamente.");
+      });
+    } else {
+      console.error('❌ EmailJS no está disponible');
+      alert("Error al procesar el pedido: El servicio de correo no está disponible. Por favor, intenta nuevamente.");
+    }
+  } catch (error) {
+    console.error('❌ Error en procesarPedido:', error);
+    alert("Ocurrió un error inesperado. Por favor, intenta nuevamente.");
+  }
+}
+
+// Mostrar modal de Wompi
+function mostrarModalWompi(total, orderNumber) {
+  console.log('💳 Preparando pago con Wompi...');
+  
+  // Crear un modal con instrucciones para Wompi
+  const wompiModal = document.createElement('div');
+  wompiModal.className = 'modal active';
+  wompiModal.id = 'wompiModal';
+  wompiModal.innerHTML = `
+    <div class="modal-content payment-modal">
+      <button class="close-modal" aria-label="Cerrar">&times;</button>
+      <h2>Pago con Wompi</h2>
+      <div class="payment-info">
+        <p>A continuación serás redirigido a Wompi para completar tu pago.</p>
+        <div class="payment-details">
+          <p><strong>Monto a pagar:</strong> $${total.toLocaleString()}</p>
+          <p><strong>Número de pedido:</strong> ${orderNumber}</p>
+          <p class="important-note">IMPORTANTE: Por favor ingresa exactamente el monto indicado arriba. Cualquier inconsistencia impedirá que el pedido sea despachado.</p>
         </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- Modal de Confirmación -->
-  <div id="confirmationModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="confirmation-title">
-    <div class="modal-content confirmation-content">
-      <div class="confirmation-icon">
-        <i class="fas fa-check-circle"></i>
-      </div>
-      <h2 id="confirmation-title">¡Pedido Recibido!</h2>
-      <p class="confirmation-message">Hemos recibido tu pedido correctamente. En breve recibirás un correo electrónico con los detalles.</p>
-      <p class="confirmation-number">Número de pedido: <span id="order-number">BL-0000</span></p>
-      <div class="confirmation-actions">
-        <button id="btn-continue-shopping" class="btn-primary">Seguir Comprando</button>
-        <a href="/mis-pedidos" class="btn-secondary">Ver mis pedidos</a>
+        <div class="form-actions">
+          <button id="btnIrAWompi" class="btn-submit-order">Ir a Wompi</button>
+        </div>
       </div>
     </div>
-  </div>
+  `;
+  
+  document.body.appendChild(wompiModal);
+  
+  // Configurar el botón para ir a Wompi
+  document.getElementById('btnIrAWompi').addEventListener('click', () => {
+    // Enlace de Wompi proporcionado
+    window.location.href = 'https://checkout.wompi.co/l/VPOS_nJo3xk';
+  });
+  
+  // Configurar el botón de cerrar
+  wompiModal.querySelector('.close-modal').addEventListener('click', () => {
+    document.getElementById('wompiModal').remove();
+    mostrarConfirmacionPedido(orderNumber);
+    
+    // Limpiar carrito
+    appState.cart.clear();
+    actualizarContadorCarrito();
+  });
+}
 
-  <!-- Scripts -->
-  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
-  <script>
-    emailjs.init("Cqwg1EyqFLvPg7ULx");
-    document.getElementById('current-year').textContent = new Date().getFullYear();
-  </script>
-</body>
-</html>
-</body>
-</html>
+// Mostrar confirmación de pedido
+function mostrarConfirmacionPedido(orderNumber) {
+  const confirmationModal = document.getElementById('confirmationModal');
+  const orderNumberElement = document.getElementById('order-number');
+  const continuarComprandoBtn = document.getElementById('btn-continue-shopping');
+  
+  // Actualizar número de pedido
+  if (orderNumberElement) {
+    orderNumberElement.textContent = orderNumber;
+  }
+  
+  // Mostrar modal
+  confirmationModal.classList.remove('hidden');
+  confirmationModal.classList.add('active');
+  
+  // Configurar botón para continuar comprando
+  if (continuarComprandoBtn) {
+    continuarComprandoBtn.addEventListener('click', () => {
+      confirmationModal.classList.remove('active');
+      confirmationModal.classList.add('hidden');
+    });
+  }
+}
+
+// Inicialización
+document.addEventListener('DOMContentLoaded', () => {
+  console.log('🚀 Inicializando aplicación...');
+  cargarProductos();
+  configurarCarrito();
+  actualizarContadorCarrito();
+  
+  // Actualizar año en el footer
+  document.getElementById('current-year').textContent = new Date().getFullYear();
+});
+            <div class="form-group">
+              <label for="cardName">Nombre en la Tarjeta</label>
+              <input type="text" id="cardName" placeholder="NOMBRE APELLIDO" required>
+            </div>
+            <button type="submit" class="btn-submit-payment">Pagar Ahora</button>
+          </form>
+        </div>
+      </div>
+    `;
+    
+    document.body.appendChild(modalPagoTarjeta);
+    
+    // Configurar eventos
+    const closeBtn = modalPagoTarjeta.querySelector('.close-modal');
+    const form = modalPagoTarjeta.querySelector('#formPagoTarjeta');
+    
+    closeBtn.addEventListener('click', () => {
+      modalPagoTarjeta.classList.remove('active');
+      modalPagoTarjeta.classList.add('hidden');
+    });
+    
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      procesarPagoTarjeta(total, orderNumber, cliente, carrito);
+    });
+  }
+  
+  // Mostrar modal
+  modalPagoTarjeta.classList.remove('hidden');
+  modalPagoTarjeta.classList.add('active');
+}
+
+// Función para procesar pago con tarjeta usando Wompi
+function procesarPagoTarjeta(total, orderNumber, cliente, carrito) {
+  console.log('💳 Procesando pago con tarjeta...');
+  
+  // Enviar correo con los datos del pedido
+  emailjs.send("service_owxur5f", "template_sck7rdl", {
+    nombre: cliente.nombre,
+    email: cliente.email,
+    telefono: cliente.telefono,
+    direccion: cliente.direccion,
+    referidor: cliente.referidor,
+    metodo_pago: 'Tarjeta de crédito/débito (Wompi)',
+    total: total.toFixed(2),
+    carrito: carrito,
+    referencia: orderNumber
+  }, "Cqwg1EyqFLvPg7ULx")
+  .then(function(response) {
+    console.log("📧 Pedido con pago de tarjeta enviado correctamente");
+    
+    // Cerrar modal de pago
+    const modalPagoTarjeta = document.getElementById('modalPagoTarjeta');
+    modalPagoTarjeta.classList.remove('active');
+    modalPagoTarjeta.classList.add('hidden');
+    
+    // Cerrar formulario de checkout
+    const checkoutForm = document.getElementById('checkoutForm');
+    checkoutForm.classList.remove('active');
+    checkoutForm.classList.add('hidden');
+    
+    // Crear un modal con instrucciones para Wompi
+    const wompiModal = document.createElement('div');
+    wompiModal.className = 'modal active';
+    wompiModal.id = 'wompiModal';
+    wompiModal.innerHTML = `
+      <div class="modal-content payment-modal">
+        <button class="close-modal" aria-label="Cerrar">&times;</button>
+        <h2>Pago con Wompi</h2>
+        <div class="payment-info">
+          <p>A continuación serás redirigido a Wompi para completar tu pago.</p>
+          <div class="payment-details">
+            <p><strong>Monto a pagar:</strong> $${total.toLocaleString()}</p>
+            <p><strong>Número de pedido:</strong> ${orderNumber}</p>
+            <p class="important-note">IMPORTANTE: Por favor ingresa exactamente el monto indicado arriba.</p>
+          </div>
+          <div class="form-actions">
+            <button id="btnIrAWompi" class="btn-submit-order">Ir a Wompi</button>
+          </div>
+        </div>
+      </div>
+    `;
+    
+    document.body.appendChild(wompiModal);
+    
+    // Configurar el botón para ir a Wompi
+    document.getElementById('btnIrAWompi').addEventListener('click', () => {
+      // Enlace de Wompi proporcionado
+      window.location.href = 'https://checkout.wompi.co/l/VPOS_nJo3xk';
+    });
+    
+    // Configurar el botón de cerrar
+    wompiModal.querySelector('.close-modal').addEventListener('click', () => {
+      document.getElementById('wompiModal').remove();
+      mostrarConfirmacionPedido(orderNumber);
+      
+      // Limpiar carrito
+      appState.cart.clear();
+      actualizarContadorCarrito();
+    });
+  })
+  .catch(function(error) {
+    console.error("❌ Error al enviar correo:", error);
+    alert("Hubo un error al procesar el pago. Por favor, intenta nuevamente.");
+  });
+}
+
+// Función para mostrar modal de pago PSE
+function mostrarModalPagoPSE(total, orderNumber, cliente, carrito) {
+  // Crear modal de pago PSE si no existe
+  let modalPagoPSE = document.getElementById('modalPagoPSE');
+  
+  if (!modalPagoPSE) {
+    modalPagoPSE = document.createElement('div');
+    modalPagoPSE.id = 'modalPagoPSE';
+    modalPagoPSE.className = 'modal hidden';
+    modalPagoPSE.setAttribute('role', 'dialog');
+    modalPagoPSE.setAttribute('aria-modal', 'true');
+    
+    modalPagoPSE.innerHTML = `
+      <div class="modal-content payment-modal">
+        <button class="close-modal" aria-label="Cerrar">&times;</button>
+        <h2>Pago con PSE</h2>
+        <div class="payment-info">
+          <p>Total a pagar: <strong>$${total.toLocaleString()}</strong></p>
+          <p>Número de pedido: <strong>${orderNumber}</strong></p>
+          
+          <form id="formPagoPSE" class="payment-form">
+            <div class="form-group">
+              <label for="pseBank">Selecciona tu banco</label>
+              <select id="pseBank" required>
+                <option value="">Selecciona un banco</option>
+                <option value="bancolombia">Bancolombia</option>
+                <option value="davivienda">Davivienda</option>
+                <option value="bbva">BBVA</option>
+                <option value="bogota">Banco de Bogotá</option>
+                <option value="popular">Banco Popular</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="pseType">Tipo de persona</label>
+              <select id="pseType" required>
+                <option value="natural">Persona Natural</option>
+                <option value="juridica">Persona Jurídica</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="pseDocument">Número de documento</label>
+              <input type="text" id="pseDocument" required>
+            </div>
+            <button type="submit" class="btn-submit-payment">Continuar al Banco</button>
+          </form>
+        </div>
+      </div>
+    `;
+    
+    document.body.appendChild(modalPagoPSE);
+    
+    // Configurar eventos
+    const closeBtn = modalPagoPSE.querySelector('.close-modal');
+    const form = modalPagoPSE.querySelector('#formPagoPSE');
+    
+    closeBtn.addEventListener('click', () => {
+      modalPagoPSE.classList.remove('active');
+      modalPagoPSE.classList.add('hidden');
+    });
+    
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      procesarPagoPSE(total, orderNumber, cliente, carrito);
+    });
+  }
+  
+  // Mostrar modal
+  modalPagoPSE.classList.remove('hidden');
+  modalPagoPSE.classList.add('active');
+}
+
+// Función para procesar pago PSE
+function procesarPagoPSE(total, orderNumber, cliente, carrito) {
+  console.log('🏧 Procesando pago con PSE...');
+  
+  // Obtener el banco seleccionado
+  const bancoSelect = document.getElementById('pseBank');
+  const banco = bancoSelect.value;
+  
+  if (!banco) {
+    alert('Por favor selecciona un banco');
+    return;
+  }
+  
+  // Enviar correo con los datos del pedido
+  emailjs.send("service_owxur5f", "template_sck7rdl", {
+    nombre: cliente.nombre,
+    email: cliente.email,
+    telefono: cliente.telefono,
+    direccion: cliente.direccion,
+    referidor: cliente.referidor,
+    metodo_pago: 'PSE - ' + bancoSelect.options[bancoSelect.selectedIndex].text,
+    total: total.toFixed(2),
+    carrito: carrito
+  }, "Cqwg1EyqFLvPg7ULx")
+  .then(function(response) {
+    console.log("📧 Pedido con pago PSE enviado correctamente");
+    
+    // Cerrar modal de pago
+    const modalPagoPSE = document.getElementById('modalPagoPSE');
+    modalPagoPSE.classList.remove('active');
+    modalPagoPSE.classList.add('hidden');
+    
+    // Cerrar formulario de checkout
+    const checkoutForm = document.getElementById('checkoutForm');
+    checkoutForm.classList.remove('active');
+    checkoutForm.classList.add('hidden');
+    
+    // Redirigir a PSE (simulación con URL real)
+    let pseUrl;
+    
+    switch(banco) {
+      case 'bancolombia':
+        pseUrl = 'https://sucursalpersonas.transaccionesbancolombia.com/mua/USER';
+        break;
+      case 'davivienda':
+        pseUrl = 'https://www.davivienda.com/wps/portal/personas/nuevo';
+        break;
+      case 'bbva':
+        pseUrl = 'https://www.bbva.com.co/personas.html';
+        break;
+      case 'bogota':
+        pseUrl = 'https://www.bancodebogota.com/wps/portal/banco-de-bogota/bogota';
+        break;
+      default:
+        pseUrl = 'https://www.pse.com.co/persona';
+    }
+    
+    // Redirigir al usuario
+    window.location.href = pseUrl;
+  })
+  .catch(function(error) {
+    console.error("❌ Error al enviar correo:", error);
+    alert("Hubo un error al procesar el pago. Por favor, intenta nuevamente.");
+  });
+}
+
+// Función para mostrar modal de pago Nequi
+function mostrarModalPagoNequi(total, orderNumber, cliente, carrito) {
+  // Crear modal de pago Nequi si no existe
+  let modalPagoNequi = document.getElementById('modalPagoNequi');
+  
+  if (!modalPagoNequi) {
+    modalPagoNequi = document.createElement('div');
+    modalPagoNequi.id = 'modalPagoNequi';
+    modalPagoNequi.className = 'modal hidden';
+    modalPagoNequi.setAttribute('role', 'dialog');
+    modalPagoNequi.setAttribute('aria-modal', 'true');
+    
+    modalPagoNequi.innerHTML = `
+      <div class="modal-content payment-modal">
+        <button class="close-modal" aria-label="Cerrar">&times;</button>
+        <h2>Pago con Nequi</h2>
+        <div class="payment-info">
+          <p>Total a pagar: <strong>$${total.toLocaleString()}</strong></p>
+          <p>Número de pedido: <strong>${orderNumber}</strong></p>
+          
+          <div class="qr-payment">
+            <p>Escanea el código QR con tu app de Nequi:</p>
+            <img src="/assets/qr-placeholder.png" alt="Código QR para pago" class="qr-code">
+          </div>
+          
+          <div class="manual-payment">
+            <p>O realiza una transferencia a:</p>
+            <p><strong>Número Nequi:</strong> 320 492 9202</p>
+            <p><strong>Nombre:</strong> Beauty Line</p>
+          </div>
+          
+          <form id="formPagoNequi" class="payment-form">
+            <div class="form-group">
+              <label for="nequiPhone">Tu número de teléfono Nequi</label>
+              <input type="tel" id="nequiPhone" placeholder="320 492 9202" required>
+            </div>
+            <button type="submit" class="btn-submit-payment">Confirmar Pago</button>
+          </form>
+        </div>
+      </div>
+    `;
+    
+    document.body.appendChild(modalPagoNequi);
+    
+    // Configurar eventos
+    const closeBtn = modalPagoNequi.querySelector('.close-modal');
+    const form = modalPagoNequi.querySelector('#formPagoNequi');
+    
+    closeBtn.addEventListener('click', () => {
+      modalPagoNequi.classList.remove('active');
+      modalPagoNequi.classList.add('hidden');
+    });
+    
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      procesarPagoNequi(total, orderNumber, cliente, carrito);
+    });
+  }
+  
+  // Mostrar modal
+  modalPagoNequi.classList.remove('hidden');
+  modalPagoNequi.classList.add('active');
+}
+
+// Función para procesar pago Nequi
+function procesarPagoNequi(total, orderNumber, cliente, carrito) {
+  console.log('📱 Procesando pago con Nequi...');
+  
+  // Enviar correo con los datos del pedido
+  emailjs.send("service_owxur5f", "template_sck7rdl", {
+    nombre: cliente.nombre,
+    email: cliente.email,
+    telefono: cliente.telefono,
+    direccion: cliente.direccion,
+    referidor: cliente.referidor,
+    metodo_pago: 'Nequi',
+    total: total.toFixed(2),
+    carrito: carrito
+  }, "Cqwg1EyqFLvPg7ULx")
+  .then(function(response) {
+    console.log("📧 Pedido con pago Nequi enviado correctamente");
+    
+    // Cerrar modal de pago
+    const modalPagoNequi = document.getElementById('modalPagoNequi');
+    modalPagoNequi.classList.remove('active');
+    modalPagoNequi.classList.add('hidden');
+    
+    // Cerrar formulario de checkout
+    const checkoutForm = document.getElementById('checkoutForm');
+    checkoutForm.classList.remove('active');
+    checkoutForm.classList.add('hidden');
+    
+    // Intentar abrir la app de Nequi con deep linking
+    const nequiPhone = document.getElementById('nequiPhone').value.replace(/\s+/g, '');
+    const nequiUrl = `nequi://send?phone=3204929202&amount=${total}&comment=Pedido%20${orderNumber}`;
+    
+    // Intentar abrir la app de Nequi
+    window.location.href = nequiUrl;
+    
+    // Como respaldo, después de un breve retraso, redirigir a la web de Nequi
+    setTimeout(() => {
+      window.location.href = 'https://recarga.nequi.com.co/';
+    }, 1500);
+  })
+  .catch(function(error) {
+    console.error("❌ Error al enviar correo:", error);
+    alert("Hubo un error al procesar el pago. Por favor, intenta nuevamente.");
+  });
+}
+
+// Función para mostrar modal de pago Daviplata
+function mostrarModalPagoDaviplata(total, orderNumber, cliente, carrito) {
+  // Crear modal de pago Daviplata si no existe
+  let modalPagoDaviplata = document.getElementById('modalPagoDaviplata');
+  
+  if (!modalPagoDaviplata) {
+    modalPagoDaviplata = document.createElement('div');
+    modalPagoDaviplata.id = 'modalPagoDaviplata';
+    modalPagoDaviplata.className = 'modal hidden';
+    modalPagoDaviplata.setAttribute('role', 'dialog');
+    modalPagoDaviplata.setAttribute('aria-modal', 'true');
+    
+    modalPagoDaviplata.innerHTML = `
+      <div class="modal-content payment-modal">
+        <button class="close-modal" aria-label="Cerrar">&times;</button>
+        <h2>Pago con Daviplata</h2>
+        <div class="payment-info">
+          <p>Total a pagar: <strong>$${total.toLocaleString()}</strong></p>
+          <p>Número de pedido: <strong>${orderNumber}</strong></p>
+          
+          <div class="manual-payment">
+            <p>Realiza una transferencia a:</p>
+            <p><strong>Número Daviplata:</strong> 320 492 9202</p>
+            <p><strong>Nombre:</strong> Beauty Line</p>
+          </div>
+          
+          <form id="formPagoDaviplata" class="payment-form">
+            <div class="form-group">
+              <label for="daviplataPhone">Tu número de teléfono Daviplata</label>
+              <input type="tel" id="daviplataPhone" placeholder="320 492 9202" required>
+            </div>
+            <button type="submit" class="btn-submit-payment">Confirmar Pago</button>
+          </form>
+        </div>
+      </div>
+    `;
+    
+    document.body.appendChild(modalPagoDaviplata);
+    
+    // Configurar eventos
+    const closeBtn = modalPagoDaviplata.querySelector('.close-modal');
+    const form = modalPagoDaviplata.querySelector('#formPagoDaviplata');
+    
+    closeBtn.addEventListener('click', () => {
+      modalPagoDaviplata.classList.remove('active');
+      modalPagoDaviplata.classList.add('hidden');
+    });
+    
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      procesarPagoDaviplata(total, orderNumber, cliente, carrito);
+    });
+  }
+  
+  // Mostrar modal
+  modalPagoDaviplata.classList.remove('hidden');
+  modalPagoDaviplata.classList.add('active');
+}
+
+// Función para procesar pago Daviplata
+function procesarPagoDaviplata(total, orderNumber, cliente, carrito) {
+  console.log('📱 Procesando pago con Daviplata...');
+  
+  // Enviar correo con los datos del pedido
+  emailjs.send("service_owxur5f", "template_sck7rdl", {
+    nombre: cliente.nombre,
+    email: cliente.email,
+    telefono: cliente.telefono,
+    direccion: cliente.direccion,
+    referidor: cliente.referidor,
+    metodo_pago: 'Daviplata',
+    total: total.toFixed(2),
+    carrito: carrito
+  }, "Cqwg1EyqFLvPg7ULx")
+  .then(function(response) {
+    console.log("📧 Pedido con pago Daviplata enviado correctamente");
+    
+    // Cerrar modal de pago
+    const modalPagoDaviplata = document.getElementById('modalPagoDaviplata');
+    modalPagoDaviplata.classList.remove('active');
+    modalPagoDaviplata.classList.add('hidden');
+    
+    // Cerrar formulario de checkout
+    const checkoutForm = document.getElementById('checkoutForm');
+    checkoutForm.classList.remove('active');
+    checkoutForm.classList.add('hidden');
+    
+    // Intentar abrir la app de Daviplata con deep linking
+    const daviplataUrl = `daviplata://app/send?phone=3204929202&amount=${total}&comment=Pedido%20${orderNumber}`;
+    
+    // Intentar abrir la app de Daviplata
+    window.location.href = daviplataUrl;
+    
+    // Como respaldo, después de un breve retraso, redirigir a la web de Daviplata
+    setTimeout(() => {
+      window.location.href = 'https://daviplata.com/';
+    }, 1500);
+  })
+  .catch(function(error) {
+    console.error("❌ Error al enviar correo:", error);
+    alert("Hubo un error al procesar el pago. Por favor, intenta nuevamente.");
+  });
+}
+
+// Función para mostrar modal de pago Bancolombia
+function mostrarModalPagoBancolombia(total, orderNumber, cliente, carrito) {
+  // Crear modal de pago Bancolombia si no existe
+  let modalPagoBancolombia = document.getElementById('modalPagoBancolombia');
+  
+  if (!modalPagoBancolombia) {
+    modalPagoBancolombia = document.createElement('div');
+    modalPagoBancolombia.id = 'modalPagoBancolombia';
+    modalPagoBancolombia.className = 'modal hidden';
+    modalPagoBancolombia.setAttribute('role', 'dialog');
+    modalPagoBancolombia.setAttribute('aria-modal', 'true');
+    
+    modalPagoBancolombia.innerHTML = `
+      <div class="modal-content payment-modal">
+        <button class="close-modal" aria-label="Cerrar">&times;</button>
+        <h2>Pago con Bancolombia</h2>
+        <div class="payment-info">
+          <p>Total a pagar: <strong>$${total.toLocaleString()}</strong></p>
+          <p>Número de pedido: <strong>${orderNumber}</strong></p>
+          
+          <div class="qr-payment">
+            <p>Escanea el código QR con tu app de Bancolombia:</p>
+            <img src="/assets/qr-placeholder.png" alt="Código QR para pago" class="qr-code">
+          </div>
+          
+          <div class="manual-payment">
+            <p>O realiza una transferencia a:</p>
+            <p><strong>Cuenta de Ahorros:</strong> 123-456789-00</p>
+            <p><strong>Nombre:</strong> Beauty Line</p>
+            <p><strong>Teléfono:</strong> 320 492 9202</p>
+          </div>
+          
+          <form id="formPagoBancolombia" class="payment-form">
+            <div class="form-group">
+              <label for="comprobante">Comprobante de pago (opcional)</label>
+              <input type="file" id="comprobante" accept="image/*">
+            </div>
+            <button type="submit" class="btn-submit-payment">Confirmar Pago</button>
+          </form>
+        </div>
+      </div>
+    `;
+    
+    document.body.appendChild(modalPagoBancolombia);
+    
+    // Configurar eventos
+    const closeBtn = modalPagoBancolombia.querySelector('.close-modal');
+    const form = modalPagoBancolombia.querySelector('#formPagoBancolombia');
+    
+    closeBtn.addEventListener('click', () => {
+      modalPagoBancolombia.classList.remove('active');
+      modalPagoBancolombia.classList.add('hidden');
+    });
+    
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      procesarPagoBancolombia(total, orderNumber, cliente, carrito);
+    });
+  }
+  
+  // Mostrar modal
+  modalPagoBancolombia.classList.remove('hidden');
+  modalPagoBancolombia.classList.add('active');
+}
+
+// Función para procesar pago Bancolombia
+function procesarPagoBancolombia(total, orderNumber, cliente, carrito) {
+  console.log('🏦 Procesando pago con Bancolombia...');
+  
+  // Enviar correo con los datos del pedido
+  emailjs.send("service_owxur5f", "template_sck7rdl", {
+    nombre: cliente.nombre,
+    email: cliente.email,
+    telefono: cliente.telefono,
+    direccion: cliente.direccion,
+    referidor: cliente.referidor,
+    metodo_pago: 'Bancolombia',
+    total: total.toFixed(2),
+    carrito: carrito
+  }, "Cqwg1EyqFLvPg7ULx")
+  .then(function(response) {
+    console.log("📧 Pedido con pago Bancolombia enviado correctamente");
+    
+    // Cerrar modal de pago
+    const modalPagoBancolombia = document.getElementById('modalPagoBancolombia');
+    modalPagoBancolombia.classList.remove('active');
+    modalPagoBancolombia.classList.add('hidden');
+    
+    // Cerrar formulario de checkout
+    const checkoutForm = document.getElementById('checkoutForm');
+    checkoutForm.classList.remove('active');
+    checkoutForm.classList.add('hidden');
+    
+    // Intentar abrir la app de Bancolombia con deep linking
+    const bancolombiaUrl = `bancolombia://app/payments/send?account=123456789&amount=${total}&description=Pedido%20${orderNumber}`;
+    
+    // Intentar abrir la app de Bancolombia
+    window.location.href = bancolombiaUrl;
+    
+    // Como respaldo, después de un breve retraso, redirigir a la web de Bancolombia
+    setTimeout(() => {
+      window.location.href = 'https://www.bancolombia.com/personas';
+    }, 1500);
+  })
+  .catch(function(error) {
+    console.error("❌ Error al enviar correo:", error);
+    alert("Hubo un error al procesar el pago. Por favor, intenta nuevamente.");
+  });
+}
+
+// Función para mostrar modal de transferencia bancaria
+function mostrarModalTransferencia(total, orderNumber, cliente, carrito) {
+  // Crear modal de transferencia si no existe
+  let modalTransferencia = document.getElementById('modalTransferencia');
+  
+  if (!modalTransferencia) {
+    modalTransferencia = document.createElement('div');
+    modalTransferencia.id = 'modalTransferencia';
+    modalTransferencia.className = 'modal hidden';
+    modalTransferencia.setAttribute('role', 'dialog');
+    modalTransferencia.setAttribute('aria-modal', 'true');
+    
+    modalTransferencia.innerHTML = `
+      <div class="modal-content payment-modal">
+        <button class="close-modal" aria-label="Cerrar">&times;</button>
+        <h2>Transferencia Bancaria</h2>
+        <div class="payment-info">
+          <p>Total a pagar: <strong>$${total.toLocaleString()}</strong></p>
+          <p>Número de pedido: <strong>${orderNumber}</strong></p>
+          
+          <div class="bank-details">
+            <p>Por favor realiza una transferencia a la siguiente cuenta:</p>
+            <ul>
+              <li><strong>Banco:</strong> Banco de Bogotá</li>
+              <li><strong>Tipo de cuenta:</strong> Ahorros</li>
+              <li><strong>Número de cuenta:</strong> 123456789</li>
+              <li><strong>Titular:</strong> Beauty Line SAS</li>
+              <li><strong>Teléfono:</strong> 320 492 9202</li>
+            </ul>
+          </div>
+          
+          <form id="formTransferencia" class="payment-form">
+            <div class="form-group">
+              <label for="comprobanteTrans">Comprobante de transferencia (opcional)</label>
+              <input type="file" id="comprobanteTrans" accept="image/*">
+            </div>
+            <button type="submit" class="btn-submit-payment">Confirmar Transferencia</button>
+          </form>
+        </div>
+      </div>
+    `;
+    
+    document.body.appendChild(modalTransferencia);
+    
+    // Configurar eventos
+    const closeBtn = modalTransferencia.querySelector('.close-modal');
+    const form = modalTransferencia.querySelector('#formTransferencia');
+    
+    closeBtn.addEventListener('click', () => {
+      modalTransferencia.classList.remove('active');
+      modalTransferencia.classList.add('hidden');
+    });
+    
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      procesarTransferencia(total, orderNumber, cliente, carrito);
+    });
+  }
+  
+  // Mostrar modal
+  modalTransferencia.classList.remove('hidden');
+  modalTransferencia.classList.add('active');
+}
+
+// Función para procesar transferencia bancaria
+function procesarTransferencia(total, orderNumber, cliente, carrito) {
+  console.log('🏦 Procesando transferencia bancaria...');
+  
+  // Enviar correo con los datos del pedido
+  emailjs.send("service_owxur5f", "template_sck7rdl", {
+    nombre: cliente.nombre,
+    email: cliente.email,
+    telefono: cliente.telefono,
+    direccion: cliente.direccion,
+    referidor: cliente.referidor,
+    metodo_pago: 'Transferencia bancaria',
+    total: total.toFixed(2),
+    carrito: carrito
+  }, "Cqwg1EyqFLvPg7ULx")
+  .then(function(response) {
+    console.log("📧 Pedido con transferencia bancaria enviado correctamente");
+    
+    // Cerrar modal de transferencia
+    const modalTransferencia = document.getElementById('modalTransferencia');
+    modalTransferencia.classList.remove('active');
+    modalTransferencia.classList.add('hidden');
+    
+    // Cerrar formulario de checkout
+    const checkoutForm = document.getElementById('checkoutForm');
+    checkoutForm.classList.remove('active');
+    checkoutForm.classList.add('hidden');
+    
+    // Crear un elemento para mostrar la información de transferencia
+    const infoTransferencia = document.createElement('div');
+    infoTransferencia.className = 'transferencia-info';
+    infoTransferencia.innerHTML = `
+      <div class="modal active" id="infoTransferenciaModal">
+        <div class="modal-content payment-modal">
+          <button class="close-modal" aria-label="Cerrar">&times;</button>
+          <h2>Información para Transferencia</h2>
+          <div class="payment-info">
+            <p>Por favor realiza la transferencia a la siguiente cuenta:</p>
+            <div class="bank-details">
+              <ul>
+                <li><strong>Banco:</strong> Banco de Bogotá</li>
+                <li><strong>Tipo de cuenta:</strong> Ahorros</li>
+                <li><strong>Número de cuenta:</strong> 123456789</li>
+                <li><strong>Titular:</strong> Beauty Line SAS</li>
+                <li><strong>Teléfono:</strong> 320 492 9202</li>
+                <li><strong>Valor a transferir:</strong> $${total.toLocaleString()}</li>
+                <li><strong>Referencia:</strong> ${orderNumber}</li>
+              </ul>
+            </div>
+            <p>Una vez realizada la transferencia, envía el comprobante al WhatsApp 320 492 9202 indicando tu número de pedido.</p>
+            <div class="form-actions">
+              <button id="btnContinuarCompra" class="btn-submit-order">Continuar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+    
+    document.body.appendChild(infoTransferencia);
+    
+    // Configurar el botón de continuar
+    document.getElementById('btnContinuarCompra').addEventListener('click', () => {
+      document.getElementById('infoTransferenciaModal').remove();
+      mostrarConfirmacionPedido(orderNumber);
+      
+      // Limpiar carrito
+      appState.cart.clear();
+      actualizarContadorCarrito();
+    });
+    
+    // Configurar el botón de cerrar
+    infoTransferencia.querySelector('.close-modal').addEventListener('click', () => {
+      document.getElementById('infoTransferenciaModal').remove();
+      mostrarConfirmacionPedido(orderNumber);
+      
+      // Limpiar carrito
+      appState.cart.clear();
+      actualizarContadorCarrito();
+    });
+  })
+  .catch(function(error) {
+    console.error("❌ Error al enviar correo:", error);
+    alert("Hubo un error al procesar el pago. Por favor, intenta nuevamente.");
+  });
+}
+
+// Función para enviar correo con los datos del pedido
+function enviarOrdenPorCorreo(cliente, productos, total) {
+  // Esta función ya no es necesaria ya que enviamos el correo directamente
+  // desde la función procesarPedido, pero la mantenemos por compatibilidad
+  console.log('Usando método directo de envío de correo');
+}
+
+// Inicialización cuando el DOM está listo
+document.addEventListener('DOMContentLoaded', () => {
+  console.log('🚀 Inicializando aplicación...');
+  cargarProductos();
+  configurarCarrito();
+  
+  // Verificar que EmailJS esté disponible
+  if (typeof emailjs === 'undefined') {
+    console.log('📧 EmailJS no está disponible, cargando desde CDN...');
+    const script = document.createElement('script');
+    script.src = 'https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js';
+    script.onload = () => {
+      emailjs.init("Cqwg1EyqFLvPg7ULx");
+      console.log('✅ EmailJS cargado correctamente');
+    };
+    document.head.appendChild(script);
+  } else {
+    console.log('✅ EmailJS ya está disponible');
+  }
+  
+  // Añadir campo de referidor si no existe
+  const columna = document.querySelector(".form-column");
+  if (columna && !document.getElementById('referidor')) {
+    columna.insertAdjacentHTML("beforeend", `
+      <div class="form-group">
+        <label for="referidor">Nombre del Referidor</label>
+        <input type="text" id="referidor" name="referidor" autocomplete="off">
+      </div>
+    `);
+  }
+  
+  // Configurar eventos para cerrar modales con Escape
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      cerrarCarrito();
+      const checkoutForm = document.getElementById('checkoutForm');
+      const confirmationModal = document.getElementById('confirmationModal');
+      
+      if (checkoutForm && checkoutForm.classList.contains('active')) {
+        checkoutForm.classList.remove('active');
+        checkoutForm.classList.add('hidden');
+      }
+      
+      if (confirmationModal && confirmationModal.classList.contains('active')) {
+        confirmationModal.classList.remove('active');
+        confirmationModal.classList.add('hidden');
+      }
+    }
+  });
+});
