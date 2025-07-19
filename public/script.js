@@ -1,4 +1,4 @@
-
+// 📦 script.js cargado con defer
 console.log("📦 script.js cargado con defer");
 
 // 1. Estado global
@@ -125,18 +125,32 @@ function actualizarContadorCarrito() {
 
 async function cargarProductos() {
   try {
+    console.log('🔄 Cargando productos...');
     const response = await fetch('/api/products');
-    if (!response.ok) throw new Error('Error en la respuesta');
+    console.log('📊 Estado de respuesta:', response.status);
+    
+    if (!response.ok) {
+      console.error('❌ Error en la respuesta:', response.status, response.statusText);
+      throw new Error(`Error en la respuesta: ${response.status}`);
+    }
+    
     const productos = await response.json();
-    if (!Array.isArray(productos)) throw new Error('Formato inválido');
+    console.log('📦 Productos recibidos:', productos.length || 'No es un array');
+    
+    if (!Array.isArray(productos)) {
+      console.error('❌ Formato inválido, no es un array:', productos);
+      throw new Error('Formato inválido');
+    }
+    
     appState.productos = productos;
+    console.log('✅ Productos guardados en estado:', appState.productos.length);
     renderizarProductos(productos);
     setupFilters();
   } catch (error) {
-    console.error("Error al cargar productos:", error);
+    console.error("❌ Error al cargar productos:", error);
     const contenedor = document.getElementById('product-list');
     if (contenedor) {
-      contenedor.innerHTML = "<p class='error-message'>No se pudieron cargar los productos.</p>";
+      contenedor.innerHTML = "<p class='error-message'>No se pudieron cargar los productos. Error: " + error.message + "</p>";
     }
   }
 }
@@ -247,23 +261,6 @@ document.addEventListener("DOMContentLoaded", () => {
         nombre,
         email,
         telefono,
-        direccion,
-        ciudad,
-        referidor,
-        metodo_pago,
-        total: total.toFixed(2),
-        carrito
-      }, "Cqwg1EyqFLvPg7ULx")
-      .then(function(response) {
-        console.log("📧 Pedido enviado:", response.status, response.text);
-        redirigirAWompi(total, nombre);
-      }, function(error) {
-        console.error("❌ Error al enviar correo:", error);
-        alert("Hubo un error al enviar tu pedido. Por favor, intenta nuevamente.");
-      });
-    });
-  }
-});
         direccion,
         ciudad,
         referidor,
