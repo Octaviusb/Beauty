@@ -548,9 +548,8 @@ function mostrarModalPagoTarjeta(total, orderNumber, cliente, carrito) {
   modalPagoTarjeta.classList.add('active');
 }
 
-// Función para procesar pago con tarjeta
+// Función para procesar pago con tarjeta usando Wompi
 function procesarPagoTarjeta(total, orderNumber, cliente, carrito) {
-  // Simular procesamiento de pago
   console.log('💳 Procesando pago con tarjeta...');
   
   // Enviar correo con los datos del pedido
@@ -560,9 +559,10 @@ function procesarPagoTarjeta(total, orderNumber, cliente, carrito) {
     telefono: cliente.telefono,
     direccion: cliente.direccion,
     referidor: cliente.referidor,
-    metodo_pago: 'Tarjeta de crédito/débito',
+    metodo_pago: 'Tarjeta de crédito/débito (Wompi)',
     total: total.toFixed(2),
-    carrito: carrito
+    carrito: carrito,
+    referencia: orderNumber
   }, "Cqwg1EyqFLvPg7ULx")
   .then(function(response) {
     console.log("📧 Pedido con pago de tarjeta enviado correctamente");
@@ -577,12 +577,45 @@ function procesarPagoTarjeta(total, orderNumber, cliente, carrito) {
     checkoutForm.classList.remove('active');
     checkoutForm.classList.add('hidden');
     
-    // Mostrar confirmación
-    mostrarConfirmacionPedido(orderNumber);
+    // Crear un modal con instrucciones para Wompi
+    const wompiModal = document.createElement('div');
+    wompiModal.className = 'modal active';
+    wompiModal.id = 'wompiModal';
+    wompiModal.innerHTML = `
+      <div class="modal-content payment-modal">
+        <button class="close-modal" aria-label="Cerrar">&times;</button>
+        <h2>Pago con Wompi</h2>
+        <div class="payment-info">
+          <p>A continuación serás redirigido a Wompi para completar tu pago.</p>
+          <div class="payment-details">
+            <p><strong>Monto a pagar:</strong> $${total.toLocaleString()}</p>
+            <p><strong>Número de pedido:</strong> ${orderNumber}</p>
+            <p class="important-note">IMPORTANTE: Por favor ingresa exactamente el monto indicado arriba.</p>
+          </div>
+          <div class="form-actions">
+            <button id="btnIrAWompi" class="btn-submit-order">Ir a Wompi</button>
+          </div>
+        </div>
+      </div>
+    `;
     
-    // Limpiar carrito
-    appState.cart.clear();
-    actualizarContadorCarrito();
+    document.body.appendChild(wompiModal);
+    
+    // Configurar el botón para ir a Wompi
+    document.getElementById('btnIrAWompi').addEventListener('click', () => {
+      // Enlace de Wompi proporcionado
+      window.location.href = 'https://checkout.wompi.co/l/VPOS_nJo3xk';
+    });
+    
+    // Configurar el botón de cerrar
+    wompiModal.querySelector('.close-modal').addEventListener('click', () => {
+      document.getElementById('wompiModal').remove();
+      mostrarConfirmacionPedido(orderNumber);
+      
+      // Limpiar carrito
+      appState.cart.clear();
+      actualizarContadorCarrito();
+    });
   })
   .catch(function(error) {
     console.error("❌ Error al enviar correo:", error);
@@ -663,8 +696,16 @@ function mostrarModalPagoPSE(total, orderNumber, cliente, carrito) {
 
 // Función para procesar pago PSE
 function procesarPagoPSE(total, orderNumber, cliente, carrito) {
-  // Simular procesamiento de pago
   console.log('🏧 Procesando pago con PSE...');
+  
+  // Obtener el banco seleccionado
+  const bancoSelect = document.getElementById('pseBank');
+  const banco = bancoSelect.value;
+  
+  if (!banco) {
+    alert('Por favor selecciona un banco');
+    return;
+  }
   
   // Enviar correo con los datos del pedido
   emailjs.send("service_owxur5f", "template_sck7rdl", {
@@ -673,7 +714,7 @@ function procesarPagoPSE(total, orderNumber, cliente, carrito) {
     telefono: cliente.telefono,
     direccion: cliente.direccion,
     referidor: cliente.referidor,
-    metodo_pago: 'PSE',
+    metodo_pago: 'PSE - ' + bancoSelect.options[bancoSelect.selectedIndex].text,
     total: total.toFixed(2),
     carrito: carrito
   }, "Cqwg1EyqFLvPg7ULx")
@@ -690,12 +731,28 @@ function procesarPagoPSE(total, orderNumber, cliente, carrito) {
     checkoutForm.classList.remove('active');
     checkoutForm.classList.add('hidden');
     
-    // Mostrar confirmación
-    mostrarConfirmacionPedido(orderNumber);
+    // Redirigir a PSE (simulación con URL real)
+    let pseUrl;
     
-    // Limpiar carrito
-    appState.cart.clear();
-    actualizarContadorCarrito();
+    switch(banco) {
+      case 'bancolombia':
+        pseUrl = 'https://sucursalpersonas.transaccionesbancolombia.com/mua/USER';
+        break;
+      case 'davivienda':
+        pseUrl = 'https://www.davivienda.com/wps/portal/personas/nuevo';
+        break;
+      case 'bbva':
+        pseUrl = 'https://www.bbva.com.co/personas.html';
+        break;
+      case 'bogota':
+        pseUrl = 'https://www.bancodebogota.com/wps/portal/banco-de-bogota/bogota';
+        break;
+      default:
+        pseUrl = 'https://www.pse.com.co/persona';
+    }
+    
+    // Redirigir al usuario
+    window.location.href = pseUrl;
   })
   .catch(function(error) {
     console.error("❌ Error al enviar correo:", error);
@@ -769,7 +826,6 @@ function mostrarModalPagoNequi(total, orderNumber, cliente, carrito) {
 
 // Función para procesar pago Nequi
 function procesarPagoNequi(total, orderNumber, cliente, carrito) {
-  // Simular procesamiento de pago
   console.log('📱 Procesando pago con Nequi...');
   
   // Enviar correo con los datos del pedido
@@ -796,12 +852,17 @@ function procesarPagoNequi(total, orderNumber, cliente, carrito) {
     checkoutForm.classList.remove('active');
     checkoutForm.classList.add('hidden');
     
-    // Mostrar confirmación
-    mostrarConfirmacionPedido(orderNumber);
+    // Intentar abrir la app de Nequi con deep linking
+    const nequiPhone = document.getElementById('nequiPhone').value.replace(/\s+/g, '');
+    const nequiUrl = `nequi://send?phone=3204929202&amount=${total}&comment=Pedido%20${orderNumber}`;
     
-    // Limpiar carrito
-    appState.cart.clear();
-    actualizarContadorCarrito();
+    // Intentar abrir la app de Nequi
+    window.location.href = nequiUrl;
+    
+    // Como respaldo, después de un breve retraso, redirigir a la web de Nequi
+    setTimeout(() => {
+      window.location.href = 'https://recarga.nequi.com.co/';
+    }, 1500);
   })
   .catch(function(error) {
     console.error("❌ Error al enviar correo:", error);
@@ -870,7 +931,6 @@ function mostrarModalPagoDaviplata(total, orderNumber, cliente, carrito) {
 
 // Función para procesar pago Daviplata
 function procesarPagoDaviplata(total, orderNumber, cliente, carrito) {
-  // Simular procesamiento de pago
   console.log('📱 Procesando pago con Daviplata...');
   
   // Enviar correo con los datos del pedido
@@ -897,12 +957,16 @@ function procesarPagoDaviplata(total, orderNumber, cliente, carrito) {
     checkoutForm.classList.remove('active');
     checkoutForm.classList.add('hidden');
     
-    // Mostrar confirmación
-    mostrarConfirmacionPedido(orderNumber);
+    // Intentar abrir la app de Daviplata con deep linking
+    const daviplataUrl = `daviplata://app/send?phone=3204929202&amount=${total}&comment=Pedido%20${orderNumber}`;
     
-    // Limpiar carrito
-    appState.cart.clear();
-    actualizarContadorCarrito();
+    // Intentar abrir la app de Daviplata
+    window.location.href = daviplataUrl;
+    
+    // Como respaldo, después de un breve retraso, redirigir a la web de Daviplata
+    setTimeout(() => {
+      window.location.href = 'https://daviplata.com/';
+    }, 1500);
   })
   .catch(function(error) {
     console.error("❌ Error al enviar correo:", error);
@@ -977,7 +1041,6 @@ function mostrarModalPagoBancolombia(total, orderNumber, cliente, carrito) {
 
 // Función para procesar pago Bancolombia
 function procesarPagoBancolombia(total, orderNumber, cliente, carrito) {
-  // Simular procesamiento de pago
   console.log('🏦 Procesando pago con Bancolombia...');
   
   // Enviar correo con los datos del pedido
@@ -1004,12 +1067,16 @@ function procesarPagoBancolombia(total, orderNumber, cliente, carrito) {
     checkoutForm.classList.remove('active');
     checkoutForm.classList.add('hidden');
     
-    // Mostrar confirmación
-    mostrarConfirmacionPedido(orderNumber);
+    // Intentar abrir la app de Bancolombia con deep linking
+    const bancolombiaUrl = `bancolombia://app/payments/send?account=123456789&amount=${total}&description=Pedido%20${orderNumber}`;
     
-    // Limpiar carrito
-    appState.cart.clear();
-    actualizarContadorCarrito();
+    // Intentar abrir la app de Bancolombia
+    window.location.href = bancolombiaUrl;
+    
+    // Como respaldo, después de un breve retraso, redirigir a la web de Bancolombia
+    setTimeout(() => {
+      window.location.href = 'https://www.bancolombia.com/personas';
+    }, 1500);
   })
   .catch(function(error) {
     console.error("❌ Error al enviar correo:", error);
@@ -1083,7 +1150,6 @@ function mostrarModalTransferencia(total, orderNumber, cliente, carrito) {
 
 // Función para procesar transferencia bancaria
 function procesarTransferencia(total, orderNumber, cliente, carrito) {
-  // Simular procesamiento de transferencia
   console.log('🏦 Procesando transferencia bancaria...');
   
   // Enviar correo con los datos del pedido
@@ -1110,12 +1176,57 @@ function procesarTransferencia(total, orderNumber, cliente, carrito) {
     checkoutForm.classList.remove('active');
     checkoutForm.classList.add('hidden');
     
-    // Mostrar confirmación
-    mostrarConfirmacionPedido(orderNumber);
+    // Crear un elemento para mostrar la información de transferencia
+    const infoTransferencia = document.createElement('div');
+    infoTransferencia.className = 'transferencia-info';
+    infoTransferencia.innerHTML = `
+      <div class="modal active" id="infoTransferenciaModal">
+        <div class="modal-content payment-modal">
+          <button class="close-modal" aria-label="Cerrar">&times;</button>
+          <h2>Información para Transferencia</h2>
+          <div class="payment-info">
+            <p>Por favor realiza la transferencia a la siguiente cuenta:</p>
+            <div class="bank-details">
+              <ul>
+                <li><strong>Banco:</strong> Banco de Bogotá</li>
+                <li><strong>Tipo de cuenta:</strong> Ahorros</li>
+                <li><strong>Número de cuenta:</strong> 123456789</li>
+                <li><strong>Titular:</strong> Beauty Line SAS</li>
+                <li><strong>Teléfono:</strong> 320 492 9202</li>
+                <li><strong>Valor a transferir:</strong> $${total.toLocaleString()}</li>
+                <li><strong>Referencia:</strong> ${orderNumber}</li>
+              </ul>
+            </div>
+            <p>Una vez realizada la transferencia, envía el comprobante al WhatsApp 320 492 9202 indicando tu número de pedido.</p>
+            <div class="form-actions">
+              <button id="btnContinuarCompra" class="btn-submit-order">Continuar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
     
-    // Limpiar carrito
-    appState.cart.clear();
-    actualizarContadorCarrito();
+    document.body.appendChild(infoTransferencia);
+    
+    // Configurar el botón de continuar
+    document.getElementById('btnContinuarCompra').addEventListener('click', () => {
+      document.getElementById('infoTransferenciaModal').remove();
+      mostrarConfirmacionPedido(orderNumber);
+      
+      // Limpiar carrito
+      appState.cart.clear();
+      actualizarContadorCarrito();
+    });
+    
+    // Configurar el botón de cerrar
+    infoTransferencia.querySelector('.close-modal').addEventListener('click', () => {
+      document.getElementById('infoTransferenciaModal').remove();
+      mostrarConfirmacionPedido(orderNumber);
+      
+      // Limpiar carrito
+      appState.cart.clear();
+      actualizarContadorCarrito();
+    });
   })
   .catch(function(error) {
     console.error("❌ Error al enviar correo:", error);
