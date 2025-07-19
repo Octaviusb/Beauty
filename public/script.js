@@ -1093,6 +1093,33 @@ function mostrarConfirmacionPedido(orderNumber) {
 // Inicialización
 document.addEventListener('DOMContentLoaded', () => {
   console.log('🚀 Inicializando aplicación...');
+  
+  // Agregar botón para limpiar caché (solo visible en desarrollo)
+  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+    const limpiarBtn = document.createElement('button');
+    limpiarBtn.textContent = 'Limpiar Caché';
+    limpiarBtn.style.position = 'fixed';
+    limpiarBtn.style.bottom = '10px';
+    limpiarBtn.style.right = '10px';
+    limpiarBtn.style.zIndex = '9999';
+    limpiarBtn.style.padding = '5px 10px';
+    limpiarBtn.style.backgroundColor = '#d63384';
+    limpiarBtn.style.color = 'white';
+    limpiarBtn.style.border = 'none';
+    limpiarBtn.style.borderRadius = '4px';
+    limpiarBtn.style.cursor = 'pointer';
+    limpiarBtn.style.fontSize = '12px';
+    
+    limpiarBtn.addEventListener('click', () => {
+      localStorage.removeItem('productos');
+      localStorage.removeItem('productosCache');
+      localStorage.removeItem('lastUpdate');
+      window.location.reload(true);
+    });
+    
+    document.body.appendChild(limpiarBtn);
+  }
+  
   // Cargar productos completos directamente sin intentar usar la API
   cargarProductosCompletos();
   configurarCarrito();
