@@ -180,8 +180,9 @@ async function cargarProductosCompletos() {
   console.log('🔄 Cargando productos completos...');
   
   try {
-    // Intentar cargar desde el archivo JSON
-    const response = await fetch('/productos.json');
+    // Forzar recarga del JSON para evitar caché
+    const timestamp = new Date().getTime();
+    const response = await fetch(`/productos.json?t=${timestamp}`);
     if (response.ok) {
       const productos = await response.json();
       if (productos && productos.length > 0) {
