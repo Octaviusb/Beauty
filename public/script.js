@@ -76,6 +76,7 @@ function renderizarProductos(productos) {
       "</div>"
     )).join('');
 
+
     console.log('✅ HTML de productos generado correctamente');
 
     document.querySelectorAll('.add-to-cart').forEach(btn => {
