@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Debug BeautyLine</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+    button { padding: 10px 20px; background: #4CAF50; color: white; border: none; cursor: pointer; margin: 10px 0; }
+    pre { background: #f5f5f5; padding: 10px; border-radius: 5px; overflow: auto; max-height: 300px; }
+    .error { color: red; }
+    .success { color: green; }
+    .section { margin-bottom: 30px; border-bottom: 1px solid #ddd; padding-bottom: 20px; }
+  </style>
+</head>
+<body>
+  <h1>Debug BeautyLine</h1>
+  
+  <div class="section">
+    <h2>1. Diagnóstico de Productos</h2>
+    <button id="testProducts">Probar API de Productos</button>
+    <div id="productsResult"></div>
+  </div>
+  
+  <div class="section">
+    <h2>2. Diagnóstico de Wompi</h2>
+    <button id="testWompi">Probar Redirección a Wompi</button>
+    <div id="wompiResult"></div>
+  </div>
+  
+  <div class="section">
+    <h2>3. Diagnóstico de Renderizado</h2>
+    <button id="testRender">Probar Renderizado de Productos</button>
+    <div id="renderResult"></div>
+  </div>
+  
+  <script>
+    // Función para mostrar resultados
+    function showResult(containerId, message, isError = false) {
+      const container = document.getElementById(containerId);
+      const pre = document.createElement('pre');
+      pre.className = isError ? 'error' : 'success';
+      
+      if (typeof message === 'object') {
+        pre.textContent = JSON.stringify(message, null, 2);
+      } else {
+        pre.textContent = message;
+      }
+      
+      container.appendChild(pre);
+    }
+    
+    // Test de API de productos
+    document.getElementById('testProducts').addEventListener('click', async () => {
+      const container = document.getElementById('productsResult');
+      container.innerHTML = '';
+      
+      try {
+        showResult('productsResult', 'Probando API de productos...');
+        
+        const response = await fetch('/api/products');
+        showResult('productsResult', `Estado de respuesta: ${response.status} ${response.statusText}`);
+        
+        if (!response.ok) {
+          throw new Error(`Error en la respuesta: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        showResult('productsResult', `Productos recibidos: ${Array.isArray(data) ? data.length : 'No es un array'}`);
+        
+        if (Array.isArray(data) && data.length > 0) {
+          showResult('productsResult', `Primer producto: ${JSON.stringify(data[0])}`);
+        }
+      } catch (error) {
+        showResult('productsResult', `Error: ${error.message}`, true);
+      }
+    });
+    
+    // Test de Wompi
+    document.getElementById('testWompi').addEventListener('click', async () => {
+      const container = document.getElementById('wompiResult');
+      container.innerHTML = '';
+      
+      try {
+        showResult('wompiResult', 'Probando redirección a Wompi...');
+        
+        const publicKey = "pub_prod_XApVcADEVCLGJnnghUT1V8G3oEwrF7ZW";
+        const montoEnCentavos = 1000000; // $10.000 COP
+        const referencia = `test_${Date.now()}`;
+        
+        showResult('wompiResult', `Preparando datos para Wompi:
+- Public Key: ${publicKey}
+- Monto: ${montoEnCentavos} centavos
+- Referencia: ${referencia}`);
+        
+        // Crear URL directa al checkout de Wompi
+        const checkoutUrl = `https://checkout.wompi.co/p/?public-key=${publicKey}&currency=COP&amount-in-cents=${montoEnCentavos}&reference=${referencia}&redirect-url=${window.location.origin}/confirmation.html`;
+        
+        showResult('wompiResult', `URL de checkout generada: ${checkoutUrl}`);
+        
+        // Crear botón para ir a la URL
+        const btn = document.createElement('button');
+        btn.textContent = 'Ir a Wompi (URL directa)';
+        btn.onclick = () => window.open(checkoutUrl, '_blank');
+        container.appendChild(btn);
+        
+      } catch (error) {
+        showResult('wompiResult', `Error: ${error.message}`, true);
+      }
+    });
+    
+    // Test de renderizado
+    document.getElementById('testRender').addEventListener('click', async () => {
+      const container = document.getElementById('renderResult');
+      container.innerHTML = '';
+      
+      try {
+        showResult('renderResult', 'Probando renderizado de productos...');
+        
+        const response = await fetch('/api/products');
+        if (!response.ok) {
+          throw new Error(`Error en la respuesta: ${response.status}`);
+        }
+        
+        const productos = await response.json();
+        if (!Array.isArray(productos)) {
+          throw new Error('Formato inválido, no es un array');
+        }
+        
+        showResult('renderResult', `Productos recibidos: ${productos.length}`);
+        
+        // Crear un contenedor de prueba
+        const testContainer = document.createElement('div');
+        testContainer.style.display = 'grid';
+        testContainer.style.gridTemplateColumns = 'repeat(auto-fill, minmax(250px, 1fr))';
+        testContainer.style.gap = '20px';
+        
+        // Renderizar solo los primeros 3 productos
+        const productosMuestra = productos.slice(0, 3);
+        
+        productosMuestra.forEach(producto => {
+          const card = document.createElement('div');
+          card.style.border = '1px solid #ddd';
+          card.style.borderRadius = '5px';
+          card.style.padding = '10px';
+          
+          card.innerHTML = `
+            <img src="${producto.image}" alt="${producto.name}" style="width: 100%; height: 150px; object-fit: cover;">
+            <h3>${producto.name}</h3>
+            <p>${producto.description || ''}</p>
+            <div>$${producto.price.toFixed(2)}</div>
+          `;
+          
+          testContainer.appendChild(card);
+        });
+        
+        container.appendChild(testContainer);
+        showResult('renderResult', '✅ Renderizado de prueba completado');
+        
+      } catch (error) {
+        showResult('renderResult', `Error: ${error.message}`, true);
+      }
+    });
+  </script>
+</body>
+</html>
