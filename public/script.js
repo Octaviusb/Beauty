@@ -178,7 +178,25 @@ async function redirigirAWompi(monto, nombreCliente) {
   try {
     const montoEnCentavos = Math.round(monto * 100);
     const referencia = `pedido_${Date.now()}`;
-
+    
+    // Usar directamente el widget de Wompi en lugar de la redirección
+    if (typeof window.WompiCheckout === 'function') {
+      const checkout = new window.WompiCheckout({
+        currency: 'COP',
+        amountInCents: montoEnCentavos,
+        reference: referencia,
+        publicKey: publicKey,
+        redirectUrl: 'https://beauty-mocha-ten.vercel.app/pedido-confirmado.html'
+      });
+      
+      console.log("✅ Abriendo widget de Wompi");
+      checkout.open();
+      return;
+    }
+    
+    // Fallback a la API si el widget no está disponible
+    console.log("⚠️ Widget de Wompi no disponible, usando API fallback");
+    
     const payload = {
       amountInCents: montoEnCentavos,
       currency: "COP",
