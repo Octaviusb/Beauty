@@ -176,10 +176,27 @@ function cargarProductos() {
 }
 
 // Cargar productos completos directamente
-function cargarProductosCompletos() {
+async function cargarProductosCompletos() {
   console.log('🔄 Cargando productos completos...');
   
-  // Lista completa de productos
+  try {
+    // Intentar cargar desde el archivo JSON
+    const response = await fetch('/productos.json');
+    if (response.ok) {
+      const productos = await response.json();
+      if (productos && productos.length > 0) {
+        appState.productos = productos;
+        console.log('✅ Productos cargados desde JSON:', productos.length);
+        renderizarProductos(productos);
+        setupFilters();
+        return;
+      }
+    }
+  } catch (error) {
+    console.error('Error al cargar productos desde JSON:', error);
+  }
+  
+  // Si no se pudo cargar desde JSON, usar la lista de respaldo
   const productosCompletos = [
     {
       id: "1",
