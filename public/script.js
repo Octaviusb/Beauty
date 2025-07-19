@@ -355,72 +355,84 @@ function procesarPedido(event) {
   event.preventDefault();
   console.log('🛒 Procesando pedido...');
   
-  // Obtener datos del formulario
-  const formulario = document.getElementById('formularioCompra');
-  const nombre = formulario.querySelector('#nombre').value;
-  const email = formulario.querySelector('#email').value;
-  const telefono = formulario.querySelector('#telefono').value;
-  const direccion = formulario.querySelector('#direccion').value;
-  const ciudad = formulario.querySelector('#ciudad').value;
-  const referidor = formulario.querySelector('#referidor')?.value || '';
-  const metodoPago = formulario.querySelector('input[name="payment-method"]:checked').value;
-  
-  // Validar datos básicos
-  if (!nombre || !email || !telefono || !direccion || !ciudad) {
-    alert('Por favor completa todos los campos obligatorios.');
-    return;
+  try {
+    // Obtener datos del formulario
+    const formulario = document.getElementById('formularioCompra');
+    const nombre = formulario.querySelector('#nombre').value;
+    const email = formulario.querySelector('#email').value;
+    const telefono = formulario.querySelector('#telefono').value;
+    const direccion = formulario.querySelector('#direccion').value;
+    const ciudad = formulario.querySelector('#ciudad').value;
+    const referidor = formulario.querySelector('#referidor')?.value || '';
+    const metodoPago = formulario.querySelector('input[name="payment-method"]:checked').value;
+    
+    // Validar datos básicos
+    if (!nombre || !email || !telefono || !direccion || !ciudad) {
+      alert('Por favor completa todos los campos obligatorios.');
+      return;
+    }
+    
+    // Crear objeto con datos del cliente
+    const cliente = {
+      nombre,
+      email,
+      telefono,
+      direccion: `${direccion}, ${ciudad}`,
+      referidor
+    };
+    
+    // Calcular totales
+    const subtotal = appState.cart.getTotal();
+    const shipping = subtotal > 200000 ? 0 : 12000;
+    const total = subtotal + shipping;
+    
+    // Generar número de pedido
+    const orderNumber = `BL-${Date.now().toString().slice(-6)}`;
+    
+    // Preparar datos del carrito para el correo
+    const carrito = appState.cart.items.map(item => `${item.quantity}x ${item.name} ($${item.price})`).join(", ");
+    
+    // Verificar que EmailJS esté disponible
+    if (typeof emailjs === 'undefined') {
+      console.error('❌ EmailJS no está disponible');
+      alert("Error al procesar el pedido: El servicio de correo no está disponible. Por favor, intenta nuevamente.");
+      return;
+    }
+    
+    // Enviar correo con los datos del pedido
+    emailjs.send("service_owxur5f", "template_sck7rdl", {
+      nombre,
+      email,
+      telefono,
+      direccion: `${direccion}, ${ciudad}`,
+      referidor,
+      metodo_pago: metodoPago,
+      total: total.toFixed(2),
+      carrito
+    }, "Cqwg1EyqFLvPg7ULx")
+    .then(function(response) {
+      console.log("📧 Pedido enviado correctamente");
+      
+      // Mostrar confirmación
+      mostrarConfirmacionPedido(orderNumber);
+      
+      // Limpiar carrito
+      appState.cart.clear();
+      actualizarContadorCarrito();
+      
+      // Cerrar formulario
+      const checkoutForm = document.getElementById('checkoutForm');
+      checkoutForm.classList.remove('active');
+      checkoutForm.classList.add('hidden');
+    })
+    .catch(function(error) {
+      console.error("❌ Error al enviar correo:", error);
+      alert("Hubo un error al enviar tu pedido. Por favor, intenta nuevamente.");
+    });
+  } catch (error) {
+    console.error('❌ Error en procesarPedido:', error);
+    alert("Ocurrió un error inesperado. Por favor, intenta nuevamente.");
   }
-  
-  // Crear objeto con datos del cliente
-  const cliente = {
-    nombre,
-    email,
-    telefono,
-    direccion: `${direccion}, ${ciudad}`,
-    referidor
-  };
-  
-  // Calcular totales
-  const subtotal = appState.cart.getTotal();
-  const shipping = subtotal > 200000 ? 0 : 12000;
-  const total = subtotal + shipping;
-  
-  // Generar número de pedido
-  const orderNumber = `BL-${Date.now().toString().slice(-6)}`;
-  
-  // Preparar datos del carrito para el correo
-  const carrito = appState.cart.items.map(item => `${item.quantity}x ${item.name} ($${item.price})`).join(", ");
-  
-  // Enviar correo con los datos del pedido
-  emailjs.send("service_owxur5f", "template_sck7rdl", {
-    nombre,
-    email,
-    telefono,
-    direccion: `${direccion}, ${ciudad}`,
-    referidor,
-    metodo_pago: metodoPago,
-    total: total.toFixed(2),
-    carrito
-  }, "Cqwg1EyqFLvPg7ULx")
-  .then(function(response) {
-    console.log("📧 Pedido enviado:", response.status, response.text);
-    
-    // Mostrar confirmación
-    mostrarConfirmacionPedido(orderNumber);
-    
-    // Limpiar carrito
-    appState.cart.clear();
-    actualizarContadorCarrito();
-    
-    // Cerrar formulario
-    const checkoutForm = document.getElementById('checkoutForm');
-    checkoutForm.classList.remove('active');
-    checkoutForm.classList.add('hidden');
-  })
-  .catch(function(error) {
-    console.error("❌ Error al enviar correo:", error);
-    alert("Hubo un error al enviar tu pedido. Por favor, intenta nuevamente.");
-  });
 }
 
 // Mostrar modal de confirmación de pedido
@@ -447,15 +459,22 @@ function mostrarConfirmacionPedido(orderNumber) {
   }
 }
 
+// Función para enviar correo con los datos del pedido
+function enviarOrdenPorCorreo(cliente, productos, total) {
+  // Esta función ya no es necesaria ya que enviamos el correo directamente
+  // desde la función procesarPedido, pero la mantenemos por compatibilidad
+  console.log('Usando método directo de envío de correo');
+}
+
 // Inicialización cuando el DOM está listo
 document.addEventListener('DOMContentLoaded', () => {
   console.log('🚀 Inicializando aplicación...');
   cargarProductos();
   configurarCarrito();
   
-  // Cargar script de EmailJS si no está ya cargado
+  // Verificar que EmailJS esté disponible
   if (typeof emailjs === 'undefined') {
-    console.log('📧 Cargando EmailJS...');
+    console.log('📧 EmailJS no está disponible, cargando desde CDN...');
     const script = document.createElement('script');
     script.src = 'https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js';
     script.onload = () => {
@@ -463,6 +482,8 @@ document.addEventListener('DOMContentLoaded', () => {
       console.log('✅ EmailJS cargado correctamente');
     };
     document.head.appendChild(script);
+  } else {
+    console.log('✅ EmailJS ya está disponible');
   }
   
   // Añadir campo de referidor si no existe
@@ -494,86 +515,4 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
   });
-});
-    
-    console.log('✅ Redirigiendo a Wompi:', checkoutUrl);
-    window.location.href = checkoutUrl;
-  } catch (error) {
-    console.error('❌ Error al redirigir a Wompi:', error);
-    alert("Ocurrió un error al procesar el pago. Por favor intenta de nuevo.");
-  }
-}on.href = checkoutUrl;
-    
-  } catch (error) {
-    console.error('🚫 Error de redirección:', error);
-    alert("Ocurrió un error inesperado al procesar el pago. Por favor, intenta nuevamente.");
-  }
-}
-
-// DOMContentLoaded
-document.addEventListener("DOMContentLoaded", () => {
-  appState.cart.items = [];
-  actualizarContadorCarrito();
-  configurarCarrito();
-  cargarProductos();
-
-  const columna = document.querySelector(".form-column");
-  if (columna) {
-    columna.insertAdjacentHTML("beforeend", `
-      <div class="form-group">
-        <label for="referidor">Nombre del Referidor*</label>
-        <input type="text" id="referidor" name="referidor" required autocomplete="off">
-      </div>
-    `);
-  }
-
-  const finalizarBtn = document.getElementById('finalizarCompra');
-  if (finalizarBtn) {
-    finalizarBtn.addEventListener('click', () => {
-      const modalCarrito = document.getElementById('carrito-modal');
-      const formulario = document.getElementById('checkoutForm');
-
-      modalCarrito.classList.remove('active');
-      modalCarrito.classList.add('hidden');
-
-      formulario.classList.remove('hidden');
-      formulario.classList.add('active');
-    });
-  }
-
-  const formulario = document.getElementById('formularioCompra');
-  if (formulario) {
-    formulario.addEventListener('submit', function(e) {
-      e.preventDefault();
-
-      const nombre = document.getElementById('nombre').value;
-      const email = document.getElementById('email').value;
-      const telefono = document.getElementById('telefono').value;
-      const direccion = document.getElementById('direccion').value;
-      const ciudad = document.getElementById('ciudad').value;
-      const referidor = document.getElementById('referidor').value;
-      const metodo_pago = document.querySelector('input[name="payment-method"]:checked').value;
-      const carrito = appState.cart.items.map(item => `${item.quantity}x ${item.name} ($${item.price})`).join(", ");
-      const total = appState.cart.getTotal();
-
-      emailjs.send("service_owxur5f", "template_sck7rdl", {
-        nombre,
-        email,
-        telefono,
-        direccion,
-        ciudad,
-        referidor,
-        metodo_pago,
-        total: total.toFixed(2),
-        carrito
-      }, "Cqwg1EyqFLvPg7ULx")
-      .then(function(response) {
-        console.log("📧 Pedido enviado:", response.status, response.text);
-        redirigirAWompi(total, nombre);
-      }, function(error) {
-        console.error("❌ Error al enviar correo:", error);
-        alert("Hubo un error al enviar tu pedido. Por favor, intenta nuevamente.");
-      });
-    });
-  }
 });
