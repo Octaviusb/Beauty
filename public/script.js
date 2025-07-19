@@ -380,6 +380,150 @@ function cargarProductosCompletos() {
       badge: ""
     },
     {
+      id: "23",
+      name: "Esmalte 9",
+      category: "esmaltes",
+      price: 7000,
+      description: "Color y brillo intenso",
+      image: "images/esmaltes/img9.jpg",
+      badge: ""
+    },
+    {
+      id: "24",
+      name: "Esmalte 10",
+      category: "esmaltes",
+      price: 7000,
+      description: "Color y brillo intenso",
+      image: "images/esmaltes/img10.jpg",
+      badge: ""
+    },
+    {
+      id: "25",
+      name: "Esmalte 11",
+      category: "esmaltes",
+      price: 7000,
+      description: "Color y brillo intenso",
+      image: "images/esmaltes/img11.jpg",
+      badge: ""
+    },
+    {
+      id: "26",
+      name: "Esmalte 12",
+      category: "esmaltes",
+      price: 7000,
+      description: "Color y brillo intenso",
+      image: "images/esmaltes/img12.jpg",
+      badge: ""
+    },
+    {
+      id: "27",
+      name: "Esmalte 13",
+      category: "esmaltes",
+      price: 7000,
+      description: "Color y brillo intenso",
+      image: "images/esmaltes/img13.jpg",
+      badge: ""
+    },
+    {
+      id: "28",
+      name: "Esmalte 14",
+      category: "esmaltes",
+      price: 7000,
+      description: "Color y brillo intenso",
+      image: "images/esmaltes/img14.jpg",
+      badge: ""
+    },
+    {
+      id: "29",
+      name: "Esmalte 15",
+      category: "esmaltes",
+      price: 7000,
+      description: "Color y brillo intenso",
+      image: "images/esmaltes/img15.jpg",
+      badge: ""
+    },
+    {
+      id: "30",
+      name: "Esmalte 16",
+      category: "esmaltes",
+      price: 7000,
+      description: "Color y brillo intenso",
+      image: "images/esmaltes/img16.jpg",
+      badge: ""
+    },
+    {
+      id: "31",
+      name: "Esmalte 17",
+      category: "esmaltes",
+      price: 7000,
+      description: "Color y brillo intenso",
+      image: "images/esmaltes/img17.jpg",
+      badge: ""
+    },
+    {
+      id: "32",
+      name: "Esmalte 18",
+      category: "esmaltes",
+      price: 7000,
+      description: "Color y brillo intenso",
+      image: "images/esmaltes/img18.jpg",
+      badge: ""
+    },
+    {
+      id: "33",
+      name: "Esmalte 19",
+      category: "esmaltes",
+      price: 7000,
+      description: "Color y brillo intenso",
+      image: "images/esmaltes/img19.jpg",
+      badge: ""
+    },
+    {
+      id: "34",
+      name: "Esmalte 20",
+      category: "esmaltes",
+      price: 7000,
+      description: "Color y brillo intenso",
+      image: "images/esmaltes/img20.jpg",
+      badge: ""
+    },
+    {
+      id: "35",
+      name: "Esmalte 21",
+      category: "esmaltes",
+      price: 7000,
+      description: "Color y brillo intenso",
+      image: "images/esmaltes/img21.jpg",
+      badge: ""
+    },
+    {
+      id: "36",
+      name: "Esmalte 22",
+      category: "esmaltes",
+      price: 7000,
+      description: "Color y brillo intenso",
+      image: "images/esmaltes/img22.jpg",
+      badge: ""
+    },
+    {
+      id: "37",
+      name: "Esmalte 23",
+      category: "esmaltes",
+      price: 7000,
+      description: "Color y brillo intenso",
+      image: "images/esmaltes/img23.jpg",
+      badge: ""
+    },
+    {
+      id: "38",
+      name: "Esmalte 24",
+      category: "esmaltes",
+      price: 7000,
+      description: "Color y brillo intenso",
+      image: "images/esmaltes/img24.jpg",
+      badge: ""
+    },
+    {
       id: "39",
       name: "Gel de Baño",
       category: "higiene",
@@ -422,6 +566,168 @@ function cargarProductosCompletos() {
       price: 39200,
       description: "Limpieza sin enjuague",
       image: "images/skincare/agua-micelar.jpg",
+      badge: ""
+    },
+    {
+      id: "44",
+      name: "Ampollas Reafirmantes",
+      category: "skincare",
+      price: 75000,
+      description: "Tratamiento intensivo para piel madura",
+      image: "images/skincare/ampollas-reafirmantes.jpg",
+      badge: ""
+    },
+    {
+      id: "45",
+      name: "Contorno de Ojos",
+      category: "skincare",
+      price: 48000,
+      description: "Reduce ojeras y líneas de expresión",
+      image: "images/skincare/contorno-de-ojos.jpg",
+      badge: ""
+    },
+    {
+      id: "46",
+      name: "Crema Antiarrugas",
+      category: "skincare",
+      price: 68000,
+      description: "Combate los signos de la edad",
+      image: "images/skincare/crema-antiarrugas.jpg",
+      badge: ""
+    },
+    {
+      id: "47",
+      name: "Crema de Día",
+      category: "skincare",
+      price: 45000,
+      description: "Hidratación diaria para todo tipo de piel",
+      image: "images/skincare/crema-de-da.jpg",
+      badge: ""
+    },
+    {
+      id: "48",
+      name: "Crema de Noche",
+      category: "skincare",
+      price: 52000,
+      description: "Regeneración nocturna intensiva",
+      image: "images/skincare/crema-de-noche.jpg",
+      badge: ""
+    },
+    {
+      id: "49",
+      name: "Crema Nutritiva",
+      category: "skincare",
+      price: 49000,
+      description: "Nutrición profunda para piel seca",
+      image: "images/skincare/crema-nutritiva.jpg",
+      badge: ""
+    },
+    {
+      id: "50",
+      name: "Exfoliante Facial",
+      category: "skincare",
+      price: 42000,
+      description: "Elimina células muertas",
+      image: "images/skincare/exfoliante-facial.jpg",
+      badge: ""
+    },
+    {
+      id: "51",
+      name: "Mascarilla Purificante",
+      category: "skincare",
+      price: 38000,
+      description: "Limpieza profunda de poros",
+      image: "images/skincare/mascarilla-purificante.jpg",
+      badge: ""
+    },
+    {
+      id: "52",
+      name: "Protector Solar",
+      category: "skincare",
+      price: 55000,
+      description: "SPF 50+ para uso diario",
+      image: "images/skincare/protector-solar.jpg",
+      badge: "Popular"
+    },
+    {
+      id: "53",
+      name: "Serum Antioxidante",
+      category: "skincare",
+      price: 65000,
+      description: "Con vitamina C para luminosidad",
+      image: "images/skincare/serum-antioxidante.jpg",
+      badge: ""
+    },
+    {
+      id: "54",
+      name: "Serum Hidratante",
+      category: "skincare",
+      price: 58000,
+      description: "Con ácido hialurónico",
+      image: "images/skincare/serum-hidratante.jpg",
+      badge: ""
+    },
+    {
+      id: "55",
+      name: "Tónico Facial",
+      category: "skincare",
+      price: 32000,
+      description: "Equilibra el pH de la piel",
+      image: "images/skincare/tnico-facial.jpg",
+      badge: ""
+    },
+    {
+      id: "56",
+      name: "Kit de Uñas 1",
+      category: "uñas",
+      price: 28000,
+      description: "Kit completo para manicura",
+      image: "images/uñas/img194.jpg",
+      badge: ""
+    },
+    {
+      id: "57",
+      name: "Kit de Uñas 2",
+      category: "uñas",
+      price: 32000,
+      description: "Kit profesional para uñas",
+      image: "images/uñas/img195.jpg",
+      badge: ""
+    },
+    {
+      id: "58",
+      name: "Kit de Uñas 3",
+      category: "uñas",
+      price: 35000,
+      description: "Kit completo para uñas acrílicas",
+      image: "images/uñas/img196.jpg",
+      badge: ""
+    },
+    {
+      id: "59",
+      name: "Kit de Uñas 4",
+      category: "uñas",
+      price: 42000,
+      description: "Kit profesional para uñas de gel",
+      image: "images/uñas/img197.jpg",
+      badge: "Nuevo"
+    },
+    {
+      id: "60",
+      name: "Kit de Uñas 5",
+      category: "uñas",
+      price: 38000,
+      description: "Kit completo para nail art",
+      image: "images/uñas/img203.jpg",
+      badge: ""
+    },
+    {
+      id: "61",
+      name: "Kit de Uñas 6",
+      category: "uñas",
+      price: 45000,
+      description: "Kit profesional para decoración de uñas",
+      image: "images/uñas/img204.jpg",
       badge: ""
     }
   ];
