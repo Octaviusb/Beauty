@@ -768,7 +768,8 @@ function mostrarConfirmacionPedido(orderNumber) {
 // Inicialización
 document.addEventListener('DOMContentLoaded', () => {
   console.log('🚀 Inicializando aplicación...');
-  cargarProductos();
+  // Cargar productos completos directamente sin intentar usar la API
+  cargarProductosCompletos();
   configurarCarrito();
   actualizarContadorCarrito();
   
