@@ -1,5 +1,5 @@
-// Estado global de la aplicación
-const appState = {
+// Estado global de la aplicación (expuesto globalmente para el filtro)
+window.appState = {
   cart: {
     items: [],
 
@@ -37,8 +37,8 @@ const appState = {
   currentFilter: 'all'
 };
 
-// Renderizar productos
-function renderizarProductos(productos) {
+// Renderizar productos (expuesto globalmente para el filtro)
+window.renderizarProductos = function renderizarProductos(productos) {
   console.log('📊 Renderizando productos:', productos?.length || 0);
   const contenedor = document.getElementById('product-list');
   if (!contenedor) {
@@ -279,15 +279,6 @@ async function cargarProductosCompletos() {
       price: 84000,
       description: "Lámpara para secado de uñas",
       image: "images/accesorios/img226.jpg",
-      badge: ""
-    },
-    {
-      id: "10",
-      name: "Lima de Uñas Eléctrica",
-      category: "accesorios",
-      price: 39200,
-      description: "Multivelocidad",
-      image: "images/accesorios/lima-de-uñas-eléctrica.jpg",
       badge: ""
     },
     {
@@ -552,15 +543,6 @@ async function cargarProductosCompletos() {
       badge: ""
     },
     {
-      id: "40",
-      name: "Jabón Antibacterial",
-      category: "higiene",
-      price: 21000,
-      description: "Elimina el 99.9% de bacterias",
-      image: "images/higiene/jabn-antibacterial.jpg",
-      badge: ""
-    },
-    {
       id: "41",
       name: "Maquillaje 1",
       category: "maquillaje",
@@ -630,15 +612,6 @@ async function cargarProductosCompletos() {
       price: 52000,
       description: "Regeneración nocturna intensiva",
       image: "images/skincare/crema-de-noche.jpg",
-      badge: ""
-    },
-    {
-      id: "49",
-      name: "Crema Nutritiva",
-      category: "skincare",
-      price: 49000,
-      description: "Nutrición profunda para piel seca",
-      image: "images/skincare/crema-nutritiva.jpg",
       badge: ""
     },
     {
@@ -1101,6 +1074,33 @@ document.addEventListener('DOMContentLoaded', () => {
     limpiarBtn.style.position = 'fixed';
     limpiarBtn.style.bottom = '10px';
     limpiarBtn.style.right = '10px';
+    limpiarBtn.style.zIndex = '9999';
+    limpiarBtn.style.padding = '5px 10px';
+    limpiarBtn.style.backgroundColor = '#d63384';
+    limpiarBtn.style.color = 'white';
+    limpiarBtn.style.border = 'none';
+    limpiarBtn.style.borderRadius = '4px';
+    limpiarBtn.style.cursor = 'pointer';
+    limpiarBtn.style.fontSize = '12px';
+    
+    limpiarBtn.addEventListener('click', () => {
+      localStorage.removeItem('productos');
+      localStorage.removeItem('productosCache');
+      localStorage.removeItem('lastUpdate');
+      window.location.reload(true);
+    });
+    
+    document.body.appendChild(limpiarBtn);
+  }
+  
+  // Cargar productos completos directamente sin intentar usar la API
+  cargarProductosCompletos();
+  configurarCarrito();
+  actualizarContadorCarrito();
+  
+  // Actualizar año en el footer
+  document.getElementById('current-year').textContent = new Date().getFullYear();
+});
     limpiarBtn.style.zIndex = '9999';
     limpiarBtn.style.padding = '5px 10px';
     limpiarBtn.style.backgroundColor = '#d63384';
