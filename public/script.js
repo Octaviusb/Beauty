@@ -730,14 +730,14 @@ function mostrarModalPagoNequi(total, orderNumber, cliente, carrito) {
           
           <div class="manual-payment">
             <p>O realiza una transferencia a:</p>
-            <p><strong>Número Nequi:</strong> 300 123 4567</p>
+            <p><strong>Número Nequi:</strong> 320 492 9202</p>
             <p><strong>Nombre:</strong> Beauty Line</p>
           </div>
           
           <form id="formPagoNequi" class="payment-form">
             <div class="form-group">
               <label for="nequiPhone">Tu número de teléfono Nequi</label>
-              <input type="tel" id="nequiPhone" placeholder="300 123 4567" required>
+              <input type="tel" id="nequiPhone" placeholder="320 492 9202" required>
             </div>
             <button type="submit" class="btn-submit-payment">Confirmar Pago</button>
           </form>
@@ -831,14 +831,14 @@ function mostrarModalPagoDaviplata(total, orderNumber, cliente, carrito) {
           
           <div class="manual-payment">
             <p>Realiza una transferencia a:</p>
-            <p><strong>Número Daviplata:</strong> 300 987 6543</p>
+            <p><strong>Número Daviplata:</strong> 320 492 9202</p>
             <p><strong>Nombre:</strong> Beauty Line</p>
           </div>
           
           <form id="formPagoDaviplata" class="payment-form">
             <div class="form-group">
               <label for="daviplataPhone">Tu número de teléfono Daviplata</label>
-              <input type="tel" id="daviplataPhone" placeholder="300 987 6543" required>
+              <input type="tel" id="daviplataPhone" placeholder="320 492 9202" required>
             </div>
             <button type="submit" class="btn-submit-payment">Confirmar Pago</button>
           </form>
@@ -939,7 +939,7 @@ function mostrarModalPagoBancolombia(total, orderNumber, cliente, carrito) {
             <p>O realiza una transferencia a:</p>
             <p><strong>Cuenta de Ahorros:</strong> 123-456789-00</p>
             <p><strong>Nombre:</strong> Beauty Line</p>
-            <p><strong>NIT:</strong> 900.123.456-7</p>
+            <p><strong>Teléfono:</strong> 320 492 9202</p>
           </div>
           
           <form id="formPagoBancolombia" class="payment-form">
@@ -1044,7 +1044,7 @@ function mostrarModalTransferencia(total, orderNumber, cliente, carrito) {
               <li><strong>Tipo de cuenta:</strong> Ahorros</li>
               <li><strong>Número de cuenta:</strong> 123456789</li>
               <li><strong>Titular:</strong> Beauty Line SAS</li>
-              <li><strong>NIT:</strong> 900.123.456-7</li>
+              <li><strong>Teléfono:</strong> 320 492 9202</li>
             </ul>
           </div>
           
