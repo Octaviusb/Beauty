@@ -151,7 +151,14 @@ function cargarProductos() {
   console.log('🔄 Cargando productos...');
   
   // Usar directamente los productos de respaldo primero
-  cargarProductosRespaldo();
+  if (window.productosRespaldo && window.productosRespaldo.length > 0) {
+    appState.productos = window.productosRespaldo;
+    console.log('✅ Productos de respaldo cargados:', window.productosRespaldo.length);
+    renderizarProductos(window.productosRespaldo);
+    setupFilters();
+  } else {
+    cargarProductosRespaldo();
+  }
   
   // Intentar cargar productos desde la API en segundo plano
   fetch('/api/products')
