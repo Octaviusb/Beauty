@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Procesando pago - Beauty Line">
+  <title>Procesando Pago - Beauty Line</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="icon" href="./assets/favicon.ico" type="image/x-icon">
+  <style>
+    .payment-page {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 40px 20px;
+      text-align: center;
+    }
+    
+    .loading-icon {
+      display: inline-block;
+      width: 80px;
+      height: 80px;
+      margin-bottom: 20px;
+    }
+    
+    .loading-icon:after {
+      content: " ";
+      display: block;
+      width: 64px;
+      height: 64px;
+      margin: 8px;
+      border-radius: 50%;
+      border: 6px solid #4CAF50;
+      border-color: #4CAF50 transparent #4CAF50 transparent;
+      animation: loading-icon 1.2s linear infinite;
+    }
+    
+    @keyframes loading-icon {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    .payment-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 28px;
+      margin-bottom: 20px;
+    }
+    
+    .payment-message {
+      font-size: 16px;
+      margin-bottom: 30px;
+      line-height: 1.6;
+    }
+    
+    .payment-details {
+      background-color: #f9f9f9;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 30px;
+      text-align: left;
+    }
+    
+    .detail-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    
+    .detail-label {
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <header class="main-header" role="banner">
+    <div class="header-container">
+      <h1 class="logo">
+        <a href="/" aria-label="Beauty Line - Inicio">Beauty<span>Line</span></a>
+      </h1>
+    </div>
+  </header>
+
+  <main class="payment-page">
+    <div class="loading-icon"></div>
+    
+    <h1 class="payment-title">Procesando tu pago</h1>
+    
+    <p class="payment-message">
+      Estamos preparando tu pago con Wompi. Serás redirigido automáticamente en unos segundos...
+    </p>
+    
+    <div class="payment-details">
+      <div class="detail-row">
+        <span class="detail-label">Total a pagar:</span>
+        <span id="payment-amount">$0.00</span>
+      </div>
+      
+      <div class="detail-row">
+        <span class="detail-label">Referencia:</span>
+        <span id="payment-reference">-</span>
+      </div>
+    </div>
+    
+    <p>
+      Si no eres redirigido automáticamente, haz clic en el botón de abajo.
+    </p>
+    
+    <button id="redirect-button" class="checkout-btn" style="margin-top: 20px;">
+      Continuar al pago
+    </button>
+  </main>
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Obtener parámetros de la URL
+      const urlParams = new URLSearchParams(window.location.search);
+      const monto = urlParams.get('monto');
+      const nombre = urlParams.get('nombre');
+      
+      if (!monto) {
+        window.location.href = '/';
+        return;
+      }
+      
+      // Mostrar detalles del pago
+      document.getElementById('payment-amount').textContent = `$${parseFloat(monto).toLocaleString()}`;
+      
+      // Crear referencia única
+      const referencia = `pedido_${Date.now()}`;
+      document.getElementById('payment-reference').textContent = referencia;
+      
+      // Crear URL de Wompi
+      const publicKey = "pub_prod_XApVcADEVCLGJnnghUT1V8G3oEwrF7ZW";
+      const montoEnCentavos = Math.round(parseFloat(monto) * 100);
+      const checkoutUrl = `https://checkout.wompi.co/p/?public-key=${publicKey}&currency=COP&amount-in-cents=${montoEnCentavos}&reference=${referencia}&redirect-url=${window.location.origin}/pedido-confirmado.html`;
+      
+      // Configurar botón de redirección
+      const redirectButton = document.getElementById('redirect-button');
+      redirectButton.addEventListener('click', () => {
+        window.location.href = checkoutUrl;
+      });
+      
+      // Redireccionar automáticamente después de 3 segundos
+      setTimeout(() => {
+        window.location.href = checkoutUrl;
+      }, 3000);
+    });
+  </script>
+</body>
+</html>
