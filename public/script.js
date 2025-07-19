@@ -42,38 +42,59 @@ const appState = {
 
 // 2. Renderizar productos
 function renderizarProductos(productos) {
+  console.log('📊 Renderizando productos:', productos?.length || 0);
   const contenedor = document.getElementById('product-list');
-  if (!contenedor) return;
+  if (!contenedor) {
+    console.error('❌ Contenedor de productos no encontrado');
+    return;
+  }
+
+  if (!productos || productos.length === 0) {
+    console.warn('⚠️ No hay productos para mostrar');
+    contenedor.innerHTML = "<p class='info-message'>No hay productos disponibles en este momento.</p>";
+    return;
+  }
 
   const productosFiltrados = appState.currentFilter === 'all' 
     ? productos 
     : productos.filter(p => p.category === appState.currentFilter);
+  
+  console.log('🔍 Productos filtrados:', productosFiltrados.length, 'Filtro actual:', appState.currentFilter);
 
-  contenedor.innerHTML = productosFiltrados.map(producto => (
-    "<div class='product-card'>" +
-      "<div class='product-image-container'>" +
-        "<img src='" + producto.image + "' alt='" + producto.name + "' class='product-image' loading='lazy'>" +
-      "</div>" +
-      "<div class='product-info'>" +
-        "<h3 class='product-title'>" + producto.name + "</h3>" +
-        (producto.description ? "<p class='product-description'>" + producto.description + "</p>" : "") +
-        "<div class='product-price'>$" + producto.price.toFixed(2) + "</div>" +
-        "<button class='add-to-cart' data-id='" + producto.id + "' data-name='" + producto.name + "' data-price='" + producto.price + "'>Agregar al carrito</button>" +
-      "</div>" +
-    "</div>"
-  )).join('');
+  try {
+    contenedor.innerHTML = productosFiltrados.map(producto => (
+      "<div class='product-card'>" +
+        "<div class='product-image-container'>" +
+          "<img src='" + producto.image + "' alt='" + producto.name + "' class='product-image' loading='lazy'>" +
+        "</div>" +
+        "<div class='product-info'>" +
+          "<h3 class='product-title'>" + producto.name + "</h3>" +
+          (producto.description ? "<p class='product-description'>" + producto.description + "</p>" : "") +
+          "<div class='product-price'>$" + producto.price.toFixed(2) + "</div>" +
+          "<button class='add-to-cart' data-id='" + producto.id + "' data-name='" + producto.name + "' data-price='" + producto.price + "'>Agregar al carrito</button>" +
+        "</div>" +
+      "</div>"
+    )).join('');
 
-  document.querySelectorAll('.add-to-cart').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const productData = {
-        id: btn.dataset.id,
-        name: btn.dataset.name,
-        price: Number(btn.dataset.price)
-      };
-      appState.cart.addItem(productData);
-      actualizarContadorCarrito();
+    console.log('✅ HTML de productos generado correctamente');
+
+    document.querySelectorAll('.add-to-cart').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const productData = {
+          id: btn.dataset.id,
+          name: btn.dataset.name,
+          price: Number(btn.dataset.price)
+        };
+        appState.cart.addItem(productData);
+        actualizarContadorCarrito();
+      });
     });
-  });
+    
+    console.log('✅ Eventos de botones configurados');
+  } catch (error) {
+    console.error('❌ Error al renderizar productos:', error);
+    contenedor.innerHTML = "<p class='error-message'>Error al mostrar los productos: " + error.message + "</p>";
+  }
 }
 
 function mostrarCarrito() {
@@ -180,29 +201,52 @@ function configurarCarrito() {
 
 // 💳 Redirección a Wompi
 async function redirigirAWompi(monto, nombreCliente) {
-  const publicKey = "pub_prod_XApVcADEVCLGJnnghUT1V8G3oEwrF7ZW";
-  console.log("🟢 Public Key actual:", publicKey);
+  console.log('💳 Iniciando proceso de pago con Wompi');
+  console.log('💰 Monto:', monto);
 
-  if (!monto || !publicKey) {
-    console.error("❌ Faltan datos para generar la redirección.");
+  if (!monto) {
+    console.error('❌ Falta el monto para el pago');
     alert("No se pudo iniciar el pago: datos incompletos.");
     return;
   }
 
   try {
-    // Crear URL directa al checkout de Wompi
+    const publicKey = "pub_prod_XApVcADEVCLGJnnghUT1V8G3oEwrF7ZW";
     const montoEnCentavos = Math.round(monto * 100);
     const referencia = `pedido_${Date.now()}`;
     
-    // URL directa al checkout de Wompi sin usar el widget
-    const checkoutUrl = `https://checkout.wompi.co/p/?public-key=${publicKey}&currency=COP&amount-in-cents=${montoEnCentavos}&reference=${referencia}&redirect-url=https://beauty-mocha-ten.vercel.app/pedido-confirmado.html`;
+    console.log('📨 Enviando solicitud a /api/wompi-link');
     
-    console.log("✅ Redirigiendo a Wompi:", checkoutUrl);
-    window.location.href = checkoutUrl;
+    // Usar el endpoint existente para generar la URL
+    const respuesta = await fetch('/api/wompi-link', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        amountInCents: montoEnCentavos,
+        currency: "COP",
+        reference: referencia,
+        publicKey: publicKey
+      })
+    });
     
+    console.log('💯 Respuesta recibida, status:', respuesta.status);
+    
+    if (!respuesta.ok) {
+      throw new Error(`Error en la respuesta: ${respuesta.status}`);
+    }
+    
+    const data = await respuesta.json();
+    console.log('📥 Datos recibidos:', data);
+    
+    if (data.checkoutUrl) {
+      console.log('✅ Redirigiendo a Wompi:', data.checkoutUrl);
+      window.location.href = data.checkoutUrl;
+    } else {
+      throw new Error('No se recibió URL de checkout');
+    }
   } catch (error) {
-    console.error("🚫 Error de redirección a Wompi:", error);
-    alert("Ocurrió un error inesperado al procesar el pago.");
+    console.error('🚫 Error de redirección a Wompi:', error);
+    alert("Ocurrió un error inesperado al procesar el pago. Por favor, intenta nuevamente.");
   }
 }
 
