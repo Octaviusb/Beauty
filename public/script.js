@@ -399,36 +399,58 @@ function procesarPedido(event) {
       return;
     }
     
-    // Enviar correo con los datos del pedido
-    emailjs.send("service_owxur5f", "template_sck7rdl", {
-      nombre,
-      email,
-      telefono,
-      direccion: `${direccion}, ${ciudad}`,
-      referidor,
-      metodo_pago: metodoPago,
-      total: total.toFixed(2),
-      carrito
-    }, "Cqwg1EyqFLvPg7ULx")
-    .then(function(response) {
-      console.log("📧 Pedido enviado correctamente");
-      
-      // Mostrar confirmación
-      mostrarConfirmacionPedido(orderNumber);
-      
-      // Limpiar carrito
-      appState.cart.clear();
-      actualizarContadorCarrito();
-      
-      // Cerrar formulario
-      const checkoutForm = document.getElementById('checkoutForm');
-      checkoutForm.classList.remove('active');
-      checkoutForm.classList.add('hidden');
-    })
-    .catch(function(error) {
-      console.error("❌ Error al enviar correo:", error);
-      alert("Hubo un error al enviar tu pedido. Por favor, intenta nuevamente.");
-    });
+    // Procesar según el método de pago seleccionado
+    switch(metodoPago) {
+      case 'tarjeta':
+        mostrarModalPagoTarjeta(total, orderNumber, cliente, carrito);
+        break;
+      case 'pse':
+        mostrarModalPagoPSE(total, orderNumber, cliente, carrito);
+        break;
+      case 'nequi':
+        mostrarModalPagoNequi(total, orderNumber, cliente, carrito);
+        break;
+      case 'daviplata':
+        mostrarModalPagoDaviplata(total, orderNumber, cliente, carrito);
+        break;
+      case 'bancolombia':
+        mostrarModalPagoBancolombia(total, orderNumber, cliente, carrito);
+        break;
+      case 'transferencia':
+        mostrarModalTransferencia(total, orderNumber, cliente, carrito);
+        break;
+      default: // Efectivo o contraentrega
+        // Enviar correo con los datos del pedido
+        emailjs.send("service_owxur5f", "template_sck7rdl", {
+          nombre,
+          email,
+          telefono,
+          direccion: `${direccion}, ${ciudad}`,
+          referidor,
+          metodo_pago: metodoPago,
+          total: total.toFixed(2),
+          carrito
+        }, "Cqwg1EyqFLvPg7ULx")
+        .then(function(response) {
+          console.log("📧 Pedido enviado correctamente");
+          
+          // Mostrar confirmación
+          mostrarConfirmacionPedido(orderNumber);
+          
+          // Limpiar carrito
+          appState.cart.clear();
+          actualizarContadorCarrito();
+          
+          // Cerrar formulario
+          const checkoutForm = document.getElementById('checkoutForm');
+          checkoutForm.classList.remove('active');
+          checkoutForm.classList.add('hidden');
+        })
+        .catch(function(error) {
+          console.error("❌ Error al enviar correo:", error);
+          alert("Hubo un error al enviar tu pedido. Por favor, intenta nuevamente.");
+        });
+    }
   } catch (error) {
     console.error('❌ Error en procesarPedido:', error);
     alert("Ocurrió un error inesperado. Por favor, intenta nuevamente.");
@@ -457,6 +479,648 @@ function mostrarConfirmacionPedido(orderNumber) {
       confirmationModal.classList.add('hidden');
     });
   }
+}
+
+// Función para mostrar modal de pago con tarjeta
+function mostrarModalPagoTarjeta(total, orderNumber, cliente, carrito) {
+  // Crear modal de pago con tarjeta si no existe
+  let modalPagoTarjeta = document.getElementById('modalPagoTarjeta');
+  
+  if (!modalPagoTarjeta) {
+    modalPagoTarjeta = document.createElement('div');
+    modalPagoTarjeta.id = 'modalPagoTarjeta';
+    modalPagoTarjeta.className = 'modal hidden';
+    modalPagoTarjeta.setAttribute('role', 'dialog');
+    modalPagoTarjeta.setAttribute('aria-modal', 'true');
+    
+    modalPagoTarjeta.innerHTML = `
+      <div class="modal-content payment-modal">
+        <button class="close-modal" aria-label="Cerrar">&times;</button>
+        <h2>Pago con Tarjeta</h2>
+        <div class="payment-info">
+          <p>Total a pagar: <strong>$${total.toLocaleString()}</strong></p>
+          <p>Número de pedido: <strong>${orderNumber}</strong></p>
+          
+          <form id="formPagoTarjeta" class="payment-form">
+            <div class="form-group">
+              <label for="cardNumber">Número de Tarjeta</label>
+              <input type="text" id="cardNumber" placeholder="1234 5678 9012 3456" required>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="cardExpiry">Fecha de Expiración</label>
+                <input type="text" id="cardExpiry" placeholder="MM/AA" required>
+              </div>
+              <div class="form-group">
+                <label for="cardCVC">CVC</label>
+                <input type="text" id="cardCVC" placeholder="123" required>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="cardName">Nombre en la Tarjeta</label>
+              <input type="text" id="cardName" placeholder="NOMBRE APELLIDO" required>
+            </div>
+            <button type="submit" class="btn-submit-payment">Pagar Ahora</button>
+          </form>
+        </div>
+      </div>
+    `;
+    
+    document.body.appendChild(modalPagoTarjeta);
+    
+    // Configurar eventos
+    const closeBtn = modalPagoTarjeta.querySelector('.close-modal');
+    const form = modalPagoTarjeta.querySelector('#formPagoTarjeta');
+    
+    closeBtn.addEventListener('click', () => {
+      modalPagoTarjeta.classList.remove('active');
+      modalPagoTarjeta.classList.add('hidden');
+    });
+    
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      procesarPagoTarjeta(total, orderNumber, cliente, carrito);
+    });
+  }
+  
+  // Mostrar modal
+  modalPagoTarjeta.classList.remove('hidden');
+  modalPagoTarjeta.classList.add('active');
+}
+
+// Función para procesar pago con tarjeta
+function procesarPagoTarjeta(total, orderNumber, cliente, carrito) {
+  // Simular procesamiento de pago
+  console.log('💳 Procesando pago con tarjeta...');
+  
+  // Enviar correo con los datos del pedido
+  emailjs.send("service_owxur5f", "template_sck7rdl", {
+    nombre: cliente.nombre,
+    email: cliente.email,
+    telefono: cliente.telefono,
+    direccion: cliente.direccion,
+    referidor: cliente.referidor,
+    metodo_pago: 'Tarjeta de crédito/débito',
+    total: total.toFixed(2),
+    carrito: carrito
+  }, "Cqwg1EyqFLvPg7ULx")
+  .then(function(response) {
+    console.log("📧 Pedido con pago de tarjeta enviado correctamente");
+    
+    // Cerrar modal de pago
+    const modalPagoTarjeta = document.getElementById('modalPagoTarjeta');
+    modalPagoTarjeta.classList.remove('active');
+    modalPagoTarjeta.classList.add('hidden');
+    
+    // Cerrar formulario de checkout
+    const checkoutForm = document.getElementById('checkoutForm');
+    checkoutForm.classList.remove('active');
+    checkoutForm.classList.add('hidden');
+    
+    // Mostrar confirmación
+    mostrarConfirmacionPedido(orderNumber);
+    
+    // Limpiar carrito
+    appState.cart.clear();
+    actualizarContadorCarrito();
+  })
+  .catch(function(error) {
+    console.error("❌ Error al enviar correo:", error);
+    alert("Hubo un error al procesar el pago. Por favor, intenta nuevamente.");
+  });
+}
+
+// Función para mostrar modal de pago PSE
+function mostrarModalPagoPSE(total, orderNumber, cliente, carrito) {
+  // Crear modal de pago PSE si no existe
+  let modalPagoPSE = document.getElementById('modalPagoPSE');
+  
+  if (!modalPagoPSE) {
+    modalPagoPSE = document.createElement('div');
+    modalPagoPSE.id = 'modalPagoPSE';
+    modalPagoPSE.className = 'modal hidden';
+    modalPagoPSE.setAttribute('role', 'dialog');
+    modalPagoPSE.setAttribute('aria-modal', 'true');
+    
+    modalPagoPSE.innerHTML = `
+      <div class="modal-content payment-modal">
+        <button class="close-modal" aria-label="Cerrar">&times;</button>
+        <h2>Pago con PSE</h2>
+        <div class="payment-info">
+          <p>Total a pagar: <strong>$${total.toLocaleString()}</strong></p>
+          <p>Número de pedido: <strong>${orderNumber}</strong></p>
+          
+          <form id="formPagoPSE" class="payment-form">
+            <div class="form-group">
+              <label for="pseBank">Selecciona tu banco</label>
+              <select id="pseBank" required>
+                <option value="">Selecciona un banco</option>
+                <option value="bancolombia">Bancolombia</option>
+                <option value="davivienda">Davivienda</option>
+                <option value="bbva">BBVA</option>
+                <option value="bogota">Banco de Bogotá</option>
+                <option value="popular">Banco Popular</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="pseType">Tipo de persona</label>
+              <select id="pseType" required>
+                <option value="natural">Persona Natural</option>
+                <option value="juridica">Persona Jurídica</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="pseDocument">Número de documento</label>
+              <input type="text" id="pseDocument" required>
+            </div>
+            <button type="submit" class="btn-submit-payment">Continuar al Banco</button>
+          </form>
+        </div>
+      </div>
+    `;
+    
+    document.body.appendChild(modalPagoPSE);
+    
+    // Configurar eventos
+    const closeBtn = modalPagoPSE.querySelector('.close-modal');
+    const form = modalPagoPSE.querySelector('#formPagoPSE');
+    
+    closeBtn.addEventListener('click', () => {
+      modalPagoPSE.classList.remove('active');
+      modalPagoPSE.classList.add('hidden');
+    });
+    
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      procesarPagoPSE(total, orderNumber, cliente, carrito);
+    });
+  }
+  
+  // Mostrar modal
+  modalPagoPSE.classList.remove('hidden');
+  modalPagoPSE.classList.add('active');
+}
+
+// Función para procesar pago PSE
+function procesarPagoPSE(total, orderNumber, cliente, carrito) {
+  // Simular procesamiento de pago
+  console.log('🏧 Procesando pago con PSE...');
+  
+  // Enviar correo con los datos del pedido
+  emailjs.send("service_owxur5f", "template_sck7rdl", {
+    nombre: cliente.nombre,
+    email: cliente.email,
+    telefono: cliente.telefono,
+    direccion: cliente.direccion,
+    referidor: cliente.referidor,
+    metodo_pago: 'PSE',
+    total: total.toFixed(2),
+    carrito: carrito
+  }, "Cqwg1EyqFLvPg7ULx")
+  .then(function(response) {
+    console.log("📧 Pedido con pago PSE enviado correctamente");
+    
+    // Cerrar modal de pago
+    const modalPagoPSE = document.getElementById('modalPagoPSE');
+    modalPagoPSE.classList.remove('active');
+    modalPagoPSE.classList.add('hidden');
+    
+    // Cerrar formulario de checkout
+    const checkoutForm = document.getElementById('checkoutForm');
+    checkoutForm.classList.remove('active');
+    checkoutForm.classList.add('hidden');
+    
+    // Mostrar confirmación
+    mostrarConfirmacionPedido(orderNumber);
+    
+    // Limpiar carrito
+    appState.cart.clear();
+    actualizarContadorCarrito();
+  })
+  .catch(function(error) {
+    console.error("❌ Error al enviar correo:", error);
+    alert("Hubo un error al procesar el pago. Por favor, intenta nuevamente.");
+  });
+}
+
+// Función para mostrar modal de pago Nequi
+function mostrarModalPagoNequi(total, orderNumber, cliente, carrito) {
+  // Crear modal de pago Nequi si no existe
+  let modalPagoNequi = document.getElementById('modalPagoNequi');
+  
+  if (!modalPagoNequi) {
+    modalPagoNequi = document.createElement('div');
+    modalPagoNequi.id = 'modalPagoNequi';
+    modalPagoNequi.className = 'modal hidden';
+    modalPagoNequi.setAttribute('role', 'dialog');
+    modalPagoNequi.setAttribute('aria-modal', 'true');
+    
+    modalPagoNequi.innerHTML = `
+      <div class="modal-content payment-modal">
+        <button class="close-modal" aria-label="Cerrar">&times;</button>
+        <h2>Pago con Nequi</h2>
+        <div class="payment-info">
+          <p>Total a pagar: <strong>$${total.toLocaleString()}</strong></p>
+          <p>Número de pedido: <strong>${orderNumber}</strong></p>
+          
+          <div class="qr-payment">
+            <p>Escanea el código QR con tu app de Nequi:</p>
+            <img src="/assets/qr-placeholder.png" alt="Código QR para pago" class="qr-code">
+          </div>
+          
+          <div class="manual-payment">
+            <p>O realiza una transferencia a:</p>
+            <p><strong>Número Nequi:</strong> 300 123 4567</p>
+            <p><strong>Nombre:</strong> Beauty Line</p>
+          </div>
+          
+          <form id="formPagoNequi" class="payment-form">
+            <div class="form-group">
+              <label for="nequiPhone">Tu número de teléfono Nequi</label>
+              <input type="tel" id="nequiPhone" placeholder="300 123 4567" required>
+            </div>
+            <button type="submit" class="btn-submit-payment">Confirmar Pago</button>
+          </form>
+        </div>
+      </div>
+    `;
+    
+    document.body.appendChild(modalPagoNequi);
+    
+    // Configurar eventos
+    const closeBtn = modalPagoNequi.querySelector('.close-modal');
+    const form = modalPagoNequi.querySelector('#formPagoNequi');
+    
+    closeBtn.addEventListener('click', () => {
+      modalPagoNequi.classList.remove('active');
+      modalPagoNequi.classList.add('hidden');
+    });
+    
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      procesarPagoNequi(total, orderNumber, cliente, carrito);
+    });
+  }
+  
+  // Mostrar modal
+  modalPagoNequi.classList.remove('hidden');
+  modalPagoNequi.classList.add('active');
+}
+
+// Función para procesar pago Nequi
+function procesarPagoNequi(total, orderNumber, cliente, carrito) {
+  // Simular procesamiento de pago
+  console.log('📱 Procesando pago con Nequi...');
+  
+  // Enviar correo con los datos del pedido
+  emailjs.send("service_owxur5f", "template_sck7rdl", {
+    nombre: cliente.nombre,
+    email: cliente.email,
+    telefono: cliente.telefono,
+    direccion: cliente.direccion,
+    referidor: cliente.referidor,
+    metodo_pago: 'Nequi',
+    total: total.toFixed(2),
+    carrito: carrito
+  }, "Cqwg1EyqFLvPg7ULx")
+  .then(function(response) {
+    console.log("📧 Pedido con pago Nequi enviado correctamente");
+    
+    // Cerrar modal de pago
+    const modalPagoNequi = document.getElementById('modalPagoNequi');
+    modalPagoNequi.classList.remove('active');
+    modalPagoNequi.classList.add('hidden');
+    
+    // Cerrar formulario de checkout
+    const checkoutForm = document.getElementById('checkoutForm');
+    checkoutForm.classList.remove('active');
+    checkoutForm.classList.add('hidden');
+    
+    // Mostrar confirmación
+    mostrarConfirmacionPedido(orderNumber);
+    
+    // Limpiar carrito
+    appState.cart.clear();
+    actualizarContadorCarrito();
+  })
+  .catch(function(error) {
+    console.error("❌ Error al enviar correo:", error);
+    alert("Hubo un error al procesar el pago. Por favor, intenta nuevamente.");
+  });
+}
+
+// Función para mostrar modal de pago Daviplata
+function mostrarModalPagoDaviplata(total, orderNumber, cliente, carrito) {
+  // Crear modal de pago Daviplata si no existe
+  let modalPagoDaviplata = document.getElementById('modalPagoDaviplata');
+  
+  if (!modalPagoDaviplata) {
+    modalPagoDaviplata = document.createElement('div');
+    modalPagoDaviplata.id = 'modalPagoDaviplata';
+    modalPagoDaviplata.className = 'modal hidden';
+    modalPagoDaviplata.setAttribute('role', 'dialog');
+    modalPagoDaviplata.setAttribute('aria-modal', 'true');
+    
+    modalPagoDaviplata.innerHTML = `
+      <div class="modal-content payment-modal">
+        <button class="close-modal" aria-label="Cerrar">&times;</button>
+        <h2>Pago con Daviplata</h2>
+        <div class="payment-info">
+          <p>Total a pagar: <strong>$${total.toLocaleString()}</strong></p>
+          <p>Número de pedido: <strong>${orderNumber}</strong></p>
+          
+          <div class="manual-payment">
+            <p>Realiza una transferencia a:</p>
+            <p><strong>Número Daviplata:</strong> 300 987 6543</p>
+            <p><strong>Nombre:</strong> Beauty Line</p>
+          </div>
+          
+          <form id="formPagoDaviplata" class="payment-form">
+            <div class="form-group">
+              <label for="daviplataPhone">Tu número de teléfono Daviplata</label>
+              <input type="tel" id="daviplataPhone" placeholder="300 987 6543" required>
+            </div>
+            <button type="submit" class="btn-submit-payment">Confirmar Pago</button>
+          </form>
+        </div>
+      </div>
+    `;
+    
+    document.body.appendChild(modalPagoDaviplata);
+    
+    // Configurar eventos
+    const closeBtn = modalPagoDaviplata.querySelector('.close-modal');
+    const form = modalPagoDaviplata.querySelector('#formPagoDaviplata');
+    
+    closeBtn.addEventListener('click', () => {
+      modalPagoDaviplata.classList.remove('active');
+      modalPagoDaviplata.classList.add('hidden');
+    });
+    
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      procesarPagoDaviplata(total, orderNumber, cliente, carrito);
+    });
+  }
+  
+  // Mostrar modal
+  modalPagoDaviplata.classList.remove('hidden');
+  modalPagoDaviplata.classList.add('active');
+}
+
+// Función para procesar pago Daviplata
+function procesarPagoDaviplata(total, orderNumber, cliente, carrito) {
+  // Simular procesamiento de pago
+  console.log('📱 Procesando pago con Daviplata...');
+  
+  // Enviar correo con los datos del pedido
+  emailjs.send("service_owxur5f", "template_sck7rdl", {
+    nombre: cliente.nombre,
+    email: cliente.email,
+    telefono: cliente.telefono,
+    direccion: cliente.direccion,
+    referidor: cliente.referidor,
+    metodo_pago: 'Daviplata',
+    total: total.toFixed(2),
+    carrito: carrito
+  }, "Cqwg1EyqFLvPg7ULx")
+  .then(function(response) {
+    console.log("📧 Pedido con pago Daviplata enviado correctamente");
+    
+    // Cerrar modal de pago
+    const modalPagoDaviplata = document.getElementById('modalPagoDaviplata');
+    modalPagoDaviplata.classList.remove('active');
+    modalPagoDaviplata.classList.add('hidden');
+    
+    // Cerrar formulario de checkout
+    const checkoutForm = document.getElementById('checkoutForm');
+    checkoutForm.classList.remove('active');
+    checkoutForm.classList.add('hidden');
+    
+    // Mostrar confirmación
+    mostrarConfirmacionPedido(orderNumber);
+    
+    // Limpiar carrito
+    appState.cart.clear();
+    actualizarContadorCarrito();
+  })
+  .catch(function(error) {
+    console.error("❌ Error al enviar correo:", error);
+    alert("Hubo un error al procesar el pago. Por favor, intenta nuevamente.");
+  });
+}
+
+// Función para mostrar modal de pago Bancolombia
+function mostrarModalPagoBancolombia(total, orderNumber, cliente, carrito) {
+  // Crear modal de pago Bancolombia si no existe
+  let modalPagoBancolombia = document.getElementById('modalPagoBancolombia');
+  
+  if (!modalPagoBancolombia) {
+    modalPagoBancolombia = document.createElement('div');
+    modalPagoBancolombia.id = 'modalPagoBancolombia';
+    modalPagoBancolombia.className = 'modal hidden';
+    modalPagoBancolombia.setAttribute('role', 'dialog');
+    modalPagoBancolombia.setAttribute('aria-modal', 'true');
+    
+    modalPagoBancolombia.innerHTML = `
+      <div class="modal-content payment-modal">
+        <button class="close-modal" aria-label="Cerrar">&times;</button>
+        <h2>Pago con Bancolombia</h2>
+        <div class="payment-info">
+          <p>Total a pagar: <strong>$${total.toLocaleString()}</strong></p>
+          <p>Número de pedido: <strong>${orderNumber}</strong></p>
+          
+          <div class="qr-payment">
+            <p>Escanea el código QR con tu app de Bancolombia:</p>
+            <img src="/assets/qr-placeholder.png" alt="Código QR para pago" class="qr-code">
+          </div>
+          
+          <div class="manual-payment">
+            <p>O realiza una transferencia a:</p>
+            <p><strong>Cuenta de Ahorros:</strong> 123-456789-00</p>
+            <p><strong>Nombre:</strong> Beauty Line</p>
+            <p><strong>NIT:</strong> 900.123.456-7</p>
+          </div>
+          
+          <form id="formPagoBancolombia" class="payment-form">
+            <div class="form-group">
+              <label for="comprobante">Comprobante de pago (opcional)</label>
+              <input type="file" id="comprobante" accept="image/*">
+            </div>
+            <button type="submit" class="btn-submit-payment">Confirmar Pago</button>
+          </form>
+        </div>
+      </div>
+    `;
+    
+    document.body.appendChild(modalPagoBancolombia);
+    
+    // Configurar eventos
+    const closeBtn = modalPagoBancolombia.querySelector('.close-modal');
+    const form = modalPagoBancolombia.querySelector('#formPagoBancolombia');
+    
+    closeBtn.addEventListener('click', () => {
+      modalPagoBancolombia.classList.remove('active');
+      modalPagoBancolombia.classList.add('hidden');
+    });
+    
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      procesarPagoBancolombia(total, orderNumber, cliente, carrito);
+    });
+  }
+  
+  // Mostrar modal
+  modalPagoBancolombia.classList.remove('hidden');
+  modalPagoBancolombia.classList.add('active');
+}
+
+// Función para procesar pago Bancolombia
+function procesarPagoBancolombia(total, orderNumber, cliente, carrito) {
+  // Simular procesamiento de pago
+  console.log('🏦 Procesando pago con Bancolombia...');
+  
+  // Enviar correo con los datos del pedido
+  emailjs.send("service_owxur5f", "template_sck7rdl", {
+    nombre: cliente.nombre,
+    email: cliente.email,
+    telefono: cliente.telefono,
+    direccion: cliente.direccion,
+    referidor: cliente.referidor,
+    metodo_pago: 'Bancolombia',
+    total: total.toFixed(2),
+    carrito: carrito
+  }, "Cqwg1EyqFLvPg7ULx")
+  .then(function(response) {
+    console.log("📧 Pedido con pago Bancolombia enviado correctamente");
+    
+    // Cerrar modal de pago
+    const modalPagoBancolombia = document.getElementById('modalPagoBancolombia');
+    modalPagoBancolombia.classList.remove('active');
+    modalPagoBancolombia.classList.add('hidden');
+    
+    // Cerrar formulario de checkout
+    const checkoutForm = document.getElementById('checkoutForm');
+    checkoutForm.classList.remove('active');
+    checkoutForm.classList.add('hidden');
+    
+    // Mostrar confirmación
+    mostrarConfirmacionPedido(orderNumber);
+    
+    // Limpiar carrito
+    appState.cart.clear();
+    actualizarContadorCarrito();
+  })
+  .catch(function(error) {
+    console.error("❌ Error al enviar correo:", error);
+    alert("Hubo un error al procesar el pago. Por favor, intenta nuevamente.");
+  });
+}
+
+// Función para mostrar modal de transferencia bancaria
+function mostrarModalTransferencia(total, orderNumber, cliente, carrito) {
+  // Crear modal de transferencia si no existe
+  let modalTransferencia = document.getElementById('modalTransferencia');
+  
+  if (!modalTransferencia) {
+    modalTransferencia = document.createElement('div');
+    modalTransferencia.id = 'modalTransferencia';
+    modalTransferencia.className = 'modal hidden';
+    modalTransferencia.setAttribute('role', 'dialog');
+    modalTransferencia.setAttribute('aria-modal', 'true');
+    
+    modalTransferencia.innerHTML = `
+      <div class="modal-content payment-modal">
+        <button class="close-modal" aria-label="Cerrar">&times;</button>
+        <h2>Transferencia Bancaria</h2>
+        <div class="payment-info">
+          <p>Total a pagar: <strong>$${total.toLocaleString()}</strong></p>
+          <p>Número de pedido: <strong>${orderNumber}</strong></p>
+          
+          <div class="bank-details">
+            <p>Por favor realiza una transferencia a la siguiente cuenta:</p>
+            <ul>
+              <li><strong>Banco:</strong> Banco de Bogotá</li>
+              <li><strong>Tipo de cuenta:</strong> Ahorros</li>
+              <li><strong>Número de cuenta:</strong> 123456789</li>
+              <li><strong>Titular:</strong> Beauty Line SAS</li>
+              <li><strong>NIT:</strong> 900.123.456-7</li>
+            </ul>
+          </div>
+          
+          <form id="formTransferencia" class="payment-form">
+            <div class="form-group">
+              <label for="comprobanteTrans">Comprobante de transferencia (opcional)</label>
+              <input type="file" id="comprobanteTrans" accept="image/*">
+            </div>
+            <button type="submit" class="btn-submit-payment">Confirmar Transferencia</button>
+          </form>
+        </div>
+      </div>
+    `;
+    
+    document.body.appendChild(modalTransferencia);
+    
+    // Configurar eventos
+    const closeBtn = modalTransferencia.querySelector('.close-modal');
+    const form = modalTransferencia.querySelector('#formTransferencia');
+    
+    closeBtn.addEventListener('click', () => {
+      modalTransferencia.classList.remove('active');
+      modalTransferencia.classList.add('hidden');
+    });
+    
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      procesarTransferencia(total, orderNumber, cliente, carrito);
+    });
+  }
+  
+  // Mostrar modal
+  modalTransferencia.classList.remove('hidden');
+  modalTransferencia.classList.add('active');
+}
+
+// Función para procesar transferencia bancaria
+function procesarTransferencia(total, orderNumber, cliente, carrito) {
+  // Simular procesamiento de transferencia
+  console.log('🏦 Procesando transferencia bancaria...');
+  
+  // Enviar correo con los datos del pedido
+  emailjs.send("service_owxur5f", "template_sck7rdl", {
+    nombre: cliente.nombre,
+    email: cliente.email,
+    telefono: cliente.telefono,
+    direccion: cliente.direccion,
+    referidor: cliente.referidor,
+    metodo_pago: 'Transferencia bancaria',
+    total: total.toFixed(2),
+    carrito: carrito
+  }, "Cqwg1EyqFLvPg7ULx")
+  .then(function(response) {
+    console.log("📧 Pedido con transferencia bancaria enviado correctamente");
+    
+    // Cerrar modal de transferencia
+    const modalTransferencia = document.getElementById('modalTransferencia');
+    modalTransferencia.classList.remove('active');
+    modalTransferencia.classList.add('hidden');
+    
+    // Cerrar formulario de checkout
+    const checkoutForm = document.getElementById('checkoutForm');
+    checkoutForm.classList.remove('active');
+    checkoutForm.classList.add('hidden');
+    
+    // Mostrar confirmación
+    mostrarConfirmacionPedido(orderNumber);
+    
+    // Limpiar carrito
+    appState.cart.clear();
+    actualizarContadorCarrito();
+  })
+  .catch(function(error) {
+    console.error("❌ Error al enviar correo:", error);
+    alert("Hubo un error al procesar el pago. Por favor, intenta nuevamente.");
+  });
 }
 
 // Función para enviar correo con los datos del pedido
