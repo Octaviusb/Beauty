@@ -20,6 +20,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
   
   <!-- Scripts -->
+  <script src="productos.js"></script>
   <script src="script.js" defer></script>
   <script>
     if(window.location.hostname === "localhost") {
@@ -218,12 +219,16 @@
               <h4>Método de Pago</h4>
               <div class="payment-options">
                 <label class="payment-option">
-                  <input type="radio" name="payment-method" value="wompi" checked>
-                  <span>Pago con Tarjeta (Wompi)</span>
+                  <input type="radio" name="payment-method" value="tarjeta" checked>
+                  <span>Pago con Tarjeta</span>
                 </label>
                 <label class="payment-option">
                   <input type="radio" name="payment-method" value="transferencia">
                   <span>Transferencia Bancaria</span>
+                </label>
+                <label class="payment-option">
+                  <input type="radio" name="payment-method" value="efectivo">
+                  <span>Pago en Efectivo (contraentrega)</span>
                 </label>
               </div>
             </div>
@@ -265,7 +270,5 @@
     emailjs.init("Cqwg1EyqFLvPg7ULx");
     document.getElementById('current-year').textContent = new Date().getFullYear();
   </script>
-</body>
-</html>
 </body>
 </html>
