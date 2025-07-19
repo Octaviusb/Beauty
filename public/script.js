@@ -147,6 +147,8 @@ function actualizarContadorCarrito() {
 async function cargarProductos() {
   try {
     console.log('🔄 Cargando productos...');
+    
+    // Intentar cargar productos desde la API
     const response = await fetch('/api/products');
     console.log('📊 Estado de respuesta:', response.status);
     
@@ -156,11 +158,15 @@ async function cargarProductos() {
     }
     
     const productos = await response.json();
-    console.log('📦 Productos recibidos:', productos.length || 'No es un array');
+    console.log('📦 Productos recibidos:', productos ? (productos.length || 'No es un array') : 'null');
     
-    if (!Array.isArray(productos)) {
+    if (!productos || !Array.isArray(productos)) {
       console.error('❌ Formato inválido, no es un array:', productos);
       throw new Error('Formato inválido');
+    }
+    
+    if (productos.length === 0) {
+      console.warn('⚠️ No hay productos en la respuesta');
     }
     
     appState.productos = productos;
@@ -173,7 +179,72 @@ async function cargarProductos() {
     if (contenedor) {
       contenedor.innerHTML = "<p class='error-message'>No se pudieron cargar los productos. Error: " + error.message + "</p>";
     }
+    
+    // Cargar productos de respaldo si la API falla
+    cargarProductosRespaldo();
   }
+}
+
+// Función de respaldo para cargar productos
+function cargarProductosRespaldo() {
+  console.log('🚨 Cargando productos de respaldo...');
+  
+  // Datos de productos de respaldo
+  const productosRespaldo = [
+    {
+      id: "1",
+      name: "Crema Hidratante",
+      price: 45000,
+      description: "Crema hidratante para todo tipo de piel",
+      category: "skincare",
+      image: "/images/skincare/crema-de-da.jpg"
+    },
+    {
+      id: "2",
+      name: "Serum Facial",
+      price: 65000,
+      description: "Serum antioxidante con vitamina C",
+      category: "skincare",
+      image: "/images/skincare/serum-antioxidante.jpg"
+    },
+    {
+      id: "3",
+      name: "Esmalte de Uñas",
+      price: 18000,
+      description: "Esmalte de larga duración",
+      category: "esmaltes",
+      image: "/images/esmaltes/img1.jpg"
+    },
+    {
+      id: "4",
+      name: "Set de Brochas",
+      price: 85000,
+      description: "Set de 10 brochas profesionales",
+      category: "accesorios",
+      image: "/images/accesorios/set-de-brochas-10-piezas.jpg"
+    },
+    {
+      id: "5",
+      name: "Gel de Baño",
+      price: 28000,
+      description: "Gel de baño con aroma a lavanda",
+      category: "higiene",
+      image: "/images/higiene/gel-de-bao.jpg"
+    },
+    {
+      id: "6",
+      name: "Base de Maquillaje",
+      price: 55000,
+      description: "Base de maquillaje de larga duración",
+      category: "maquillaje",
+      image: "/images/maquillaje/img70.jpg"
+    }
+  ];
+  
+  appState.productos = productosRespaldo;
+  console.log('✅ Productos de respaldo cargados:', appState.productos.length);
+  renderizarProductos(productosRespaldo);
+  setupFilters();
 }
 
 function setupFilters() {
@@ -278,28 +349,6 @@ document.addEventListener("DOMContentLoaded", () => {
       const metodo_pago = document.querySelector('input[name="payment-method"]:checked').value;
       const carrito = appState.cart.items.map(item => `${item.quantity}x ${item.name} ($${item.price})`).join(", ");
       const total = appState.cart.getTotal();
-
-      emailjs.send("service_owxur5f", "template_sck7rdl", {
-        nombre,
-        email,
-        telefono,
-        direccion,
-        ciudad,
-        referidor,
-        metodo_pago,
-        total: total.toFixed(2),
-        carrito
-      }, "Cqwg1EyqFLvPg7ULx")
-      .then(function(response) {
-        console.log("📧 Pedido enviado:", response.status, response.text);
-        redirigirAWompi(total, nombre);
-      }, function(error) {
-        console.error("❌ Error al enviar correo:", error);
-        alert("Hubo un error al enviar tu pedido. Por favor, intenta nuevamente.");
-      });
-    });
-  }
-});
 
       emailjs.send("service_owxur5f", "template_sck7rdl", {
         nombre,
