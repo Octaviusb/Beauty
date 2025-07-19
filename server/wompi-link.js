@@ -1,24 +1,27 @@
-const crypto = require("crypto");
+// Redirección directa a Wompi sin usar el widget
 
 module.exports = async (req, res) => {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Método no permitido" });
   }
 
-  const { amountInCents, currency, reference, publicKey } = req.body;
-
-  if (!amountInCents || !currency || !reference || !publicKey) {
-    return res.status(400).json({ error: "Faltan datos para la firma" });
+  try {
+    const { monto, nombreCliente } = req.body;
+    
+    if (!monto) {
+      return res.status(400).json({ error: "Falta el monto del pedido" });
+    }
+    
+    const publicKey = "pub_prod_XApVcADEVCLGJnnghUT1V8G3oEwrF7ZW";
+    const montoEnCentavos = Math.round(monto * 100);
+    const referencia = `pedido_${Date.now()}`;
+    
+    // URL directa al checkout de Wompi
+    const checkoutUrl = `https://checkout.wompi.co/p/?public-key=${publicKey}&currency=COP&amount-in-cents=${montoEnCentavos}&reference=${referencia}&redirect-url=https://beauty-mocha-ten.vercel.app/pedido-confirmado.html`;
+    
+    return res.status(200).json({ checkoutUrl });
+  } catch (error) {
+    console.error("Error al generar URL de Wompi:", error);
+    return res.status(500).json({ error: "Error al generar URL de pago" });
   }
-
-  const privateKey = process.env.WOMPI_PRIVATE_KEY;
-
-  const stringToSign = `${amountInCents}${currency}${reference}${publicKey}`;
-  const hmac = crypto.createHmac("sha256", privateKey);
-  hmac.update(stringToSign);
-  const signature = hmac.digest("hex");
-
-  const checkoutUrl = `https://checkout.wompi.co/p/?public-key=${publicKey}&currency=${currency}&amount-in-cents=${amountInCents}&reference=${reference}&signature=${signature}&redirect-url=https://beauty-mocha-ten.vercel.app/pedido-confirmado.html`;
-
-  return res.status(200).json({ checkoutUrl });
 };
