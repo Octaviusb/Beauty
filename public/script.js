@@ -126,6 +126,7 @@ function mostrarCarrito() {
 
   modal.classList.remove('hidden');
   modal.classList.add('active');
+  modal.setAttribute('aria-modal', 'true');
 }
 
 function cerrarCarrito() {
@@ -133,6 +134,7 @@ function cerrarCarrito() {
   if (modal) {
     modal.classList.remove('active');
     modal.classList.add('hidden');
+    modal.setAttribute('aria-modal', 'false');
   }
 }
 
@@ -170,6 +172,49 @@ function cargarProductos() {
       console.error('❌ Error al cargar productos de API:', error);
     });
 }
+
+// Inicialización cuando el DOM está listo
+document.addEventListener('DOMContentLoaded', () => {
+  console.log('🚀 Inicializando aplicación...');
+  cargarProductos();
+  configurarCarrito();
+  
+  // Cargar script de EmailJS si no está ya cargado
+  if (typeof emailjs === 'undefined') {
+    console.log('📧 Cargando EmailJS...');
+    const script = document.createElement('script');
+    script.src = 'https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js';
+    script.onload = () => {
+      emailjs.init("Cqwg1EyqFLvPg7ULx");
+      console.log('✅ EmailJS cargado correctamente');
+    };
+    document.head.appendChild(script);
+  }
+  
+  // Cargar script de email.js para la funcionalidad de envío de correos
+  const emailScript = document.createElement('script');
+  emailScript.src = 'email.js';
+  document.body.appendChild(emailScript);
+  
+  // Configurar eventos para cerrar modales con Escape
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      cerrarCarrito();
+      const checkoutForm = document.getElementById('checkoutForm');
+      const confirmationModal = document.getElementById('confirmationModal');
+      
+      if (checkoutForm && checkoutForm.classList.contains('active')) {
+        checkoutForm.classList.remove('active');
+        checkoutForm.classList.add('hidden');
+      }
+      
+      if (confirmationModal && confirmationModal.classList.contains('active')) {
+        confirmationModal.classList.remove('active');
+        confirmationModal.classList.add('hidden');
+      }
+    }
+  });
+});
 
 // Función de respaldo para cargar productos
 function cargarProductosRespaldo() {
@@ -245,14 +290,189 @@ function setupFilters() {
   });
 }
 
+// Función para mostrar el formulario de pedido
+function mostrarFormularioPedido() {
+  console.log('🧾 Mostrando formulario de pedido');
+  const checkoutForm = document.getElementById('checkoutForm');
+  const summaryItems = checkoutForm.querySelector('.summary-items');
+  const subtotalElement = checkoutForm.querySelector('.subtotal-amount');
+  const shippingElement = checkoutForm.querySelector('.shipping-amount');
+  const totalElement = checkoutForm.querySelector('.total-amount');
+  
+  // Cerrar el modal del carrito
+  cerrarCarrito();
+  
+  // Llenar el resumen del pedido
+  summaryItems.innerHTML = '';
+  appState.cart.items.forEach(item => {
+    const itemDiv = document.createElement('div');
+    itemDiv.className = 'summary-item';
+    itemDiv.innerHTML = `
+      <span class="item-name">${item.name} x${item.quantity}</span>
+      <span class="item-price">$${(item.price * item.quantity).toLocaleString()}</span>
+    `;
+    summaryItems.appendChild(itemDiv);
+  });
+  
+  // Calcular totales
+  const subtotal = appState.cart.getTotal();
+  const shipping = subtotal > 200000 ? 0 : 12000; // Envío gratis para compras mayores a $200,000
+  const total = subtotal + shipping;
+  
+  // Actualizar montos en el formulario
+  subtotalElement.textContent = `$${subtotal.toLocaleString()}`;
+  shippingElement.textContent = shipping === 0 ? 'Gratis' : `$${shipping.toLocaleString()}`;
+  totalElement.textContent = `$${total.toLocaleString()}`;
+  
+  // Mostrar el formulario
+  checkoutForm.classList.remove('hidden');
+  checkoutForm.classList.add('active');
+  checkoutForm.setAttribute('aria-modal', 'true');
+  
+  // Configurar eventos del formulario
+  configurarFormularioPedido();
+}
+
+// Configurar eventos del formulario de pedido
+function configurarFormularioPedido() {
+  const checkoutForm = document.getElementById('checkoutForm');
+  const closeFormBtn = checkoutForm.querySelector('.close-form');
+  const backToCartBtn = checkoutForm.querySelector('.btn-back-to-cart');
+  const formulario = document.getElementById('formularioCompra');
+  
+  // Cerrar formulario
+  if (closeFormBtn) {
+    closeFormBtn.addEventListener('click', () => {
+      checkoutForm.classList.remove('active');
+      checkoutForm.classList.add('hidden');
+      checkoutForm.setAttribute('aria-modal', 'false');
+    });
+  }
+  
+  // Volver al carrito
+  if (backToCartBtn) {
+    backToCartBtn.addEventListener('click', () => {
+      checkoutForm.classList.remove('active');
+      checkoutForm.classList.add('hidden');
+      mostrarCarrito();
+    });
+  }
+  
+  // Enviar formulario
+  if (formulario) {
+    formulario.addEventListener('submit', procesarPedido);
+  }
+}
+
+// Procesar el pedido cuando se envía el formulario
+function procesarPedido(event) {
+  event.preventDefault();
+  console.log('🛒 Procesando pedido...');
+  
+  // Obtener datos del formulario
+  const formulario = document.getElementById('formularioCompra');
+  const nombre = formulario.querySelector('#nombre').value;
+  const email = formulario.querySelector('#email').value;
+  const telefono = formulario.querySelector('#telefono').value;
+  const direccion = formulario.querySelector('#direccion').value;
+  const ciudad = formulario.querySelector('#ciudad').value;
+  const metodoPago = formulario.querySelector('input[name="payment-method"]:checked').value;
+  
+  // Validar datos básicos
+  if (!nombre || !email || !telefono || !direccion || !ciudad) {
+    alert('Por favor completa todos los campos obligatorios.');
+    return;
+  }
+  
+  // Crear objeto con datos del cliente
+  const cliente = {
+    nombre,
+    email,
+    telefono,
+    direccion: `${direccion}, ${ciudad}`
+  };
+  
+  // Calcular totales
+  const subtotal = appState.cart.getTotal();
+  const shipping = subtotal > 200000 ? 0 : 12000;
+  const total = subtotal + shipping;
+  
+  // Generar número de pedido
+  const orderNumber = `BL-${Date.now().toString().slice(-6)}`;
+  
+  // Enviar correo con los datos del pedido
+  enviarOrdenPorCorreo(cliente, appState.cart.items, total);
+  
+  // Mostrar confirmación según método de pago
+  if (metodoPago === 'wompi') {
+    // Redirigir a Wompi para pago con tarjeta
+    redirigirAWompi(total, nombre);
+  } else {
+    // Mostrar modal de confirmación para transferencia bancaria
+    mostrarConfirmacionPedido(orderNumber);
+  }
+  
+  // Limpiar carrito
+  appState.cart.clear();
+  actualizarContadorCarrito();
+  
+  // Cerrar formulario
+  const checkoutForm = document.getElementById('checkoutForm');
+  checkoutForm.classList.remove('active');
+  checkoutForm.classList.add('hidden');
+}
+
+// Mostrar modal de confirmación de pedido
+function mostrarConfirmacionPedido(orderNumber) {
+  const confirmationModal = document.getElementById('confirmationModal');
+  const orderNumberElement = document.getElementById('order-number');
+  const continuarComprandoBtn = document.getElementById('btn-continue-shopping');
+  
+  // Actualizar número de pedido
+  if (orderNumberElement) {
+    orderNumberElement.textContent = orderNumber;
+  }
+  
+  // Mostrar modal
+  confirmationModal.classList.remove('hidden');
+  confirmationModal.classList.add('active');
+  
+  // Configurar botón para continuar comprando
+  if (continuarComprandoBtn) {
+    continuarComprandoBtn.addEventListener('click', () => {
+      confirmationModal.classList.remove('active');
+      confirmationModal.classList.add('hidden');
+    });
+  }
+}
+
 function configurarCarrito() {
   const cartButton = document.getElementById('cartButton');
   const cartModal = document.getElementById('carrito-modal');
+  const finalizarCompraBtn = document.getElementById('finalizarCompra');
+  const limpiarCarritoBtn = document.getElementById('limpiarCarrito');
+  const closeCartBtn = document.querySelector('.close-cart');
 
   if (cartButton) {
     cartButton.addEventListener('click', () => {
       mostrarCarrito();
     });
+  }
+
+  if (closeCartBtn) {
+    closeCartBtn.addEventListener('click', cerrarCarrito);
+  }
+
+  if (limpiarCarritoBtn) {
+    limpiarCarritoBtn.addEventListener('click', () => {
+      appState.cart.clear();
+      actualizarContadorCarrito();
+      mostrarCarrito();
+    });
+  }
+
+  if (finalizarCompraBtn) {
+    finalizarCompraBtn.addEventListener('click', mostrarFormularioPedido);
   }
 }
 
@@ -278,6 +498,11 @@ function redirigirAWompi(monto, nombreCliente) {
     
     console.log('✅ Redirigiendo a Wompi:', checkoutUrl);
     window.location.href = checkoutUrl;
+  } catch (error) {
+    console.error('❌ Error al redirigir a Wompi:', error);
+    alert("Ocurrió un error al procesar el pago. Por favor intenta de nuevo.");
+  }
+}on.href = checkoutUrl;
     
   } catch (error) {
     console.error('🚫 Error de redirección:', error);
