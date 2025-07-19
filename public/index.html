@@ -146,6 +146,101 @@
     </div>
   </div>
 
+  <!-- Modal de Checkout - FORMULARIO COMPLETO -->
+  <div id="checkoutForm" class="modal hidden" role="dialog" aria-modal="false" aria-labelledby="checkout-title">
+    <div class="modal-content checkout-content">
+      <button class="close-form" aria-label="Cerrar formulario">&times;</button>
+      <h2 id="checkout-title">Finalizar Compra</h2>
+      
+      <form id="formularioCompra" class="checkout-form">
+        <div class="form-grid">
+          <!-- Columna de información del cliente -->
+          <div class="form-column">
+            <h3>Información Personal</h3>
+            
+            <div class="form-group">
+              <label for="nombre">Nombre completo*</label>
+              <input type="text" id="nombre" name="nombre" required autocomplete="name">
+            </div>
+            
+            <div class="form-group">
+              <label for="email">Correo electrónico*</label>
+              <input type="email" id="email" name="email" required autocomplete="email">
+            </div>
+            
+            <div class="form-group">
+              <label for="telefono">Teléfono*</label>
+              <input type="tel" id="telefono" name="telefono" required autocomplete="tel">
+            </div>
+            
+            <div class="form-group">
+              <label for="direccion">Dirección completa*</label>
+              <textarea id="direccion" name="direccion" required autocomplete="street-address"></textarea>
+            </div>
+            
+            <div class="form-group">
+              <label for="ciudad">Ciudad*</label>
+              <input type="text" id="ciudad" name="ciudad" required autocomplete="address-level2">
+            </div>
+
+            <div class="form-group">
+              <label for="referidor">Nombre del Referidor</label>
+              <input type="text" id="referidor" name="referidor" autocomplete="off">
+            </div>
+          </div>
+          
+          <!-- Columna de resumen del pedido -->
+          <div class="order-summary">
+            <h3>Tu Pedido</h3>
+            <div class="summary-items">
+              <!-- Los productos se agregarán dinámicamente aquí -->
+            </div>
+            <div class="summary-totals">
+              <div class="summary-row">
+                <span>Subtotal:</span>
+                <span class="subtotal-amount">$0.00</span>
+              </div>
+              <div class="summary-row">
+                <span>Envío:</span>
+                <span class="shipping-amount">$0.00</span>
+              </div>
+              <div class="summary-row total-row">
+                <strong>Total:</strong>
+                <strong class="total-amount">$0.00</strong>
+              </div>
+            </div>
+            
+            <div class="form-notas">
+              <p><strong>Nota importante:</strong> El envío será despachado en un plazo máximo de 3 días hábiles después de confirmado el pago.</p>
+              <p>Envío gratuito para compras superiores a $200.000</p>
+              <p class="warning-note"><strong>Por favor, tome nota del valor exacto de su pedido, cualquier inconsistencia impedirá que el pedido sea despachado.</strong></p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="form-actions">
+          <button type="button" class="btn-back-to-cart">Volver al Carrito</button>
+          <button type="submit" class="btn-submit-order">Realizar Pedido</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal de Confirmación -->
+  <div id="confirmationModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="confirmation-title">
+    <div class="modal-content confirmation-content">
+      <div class="confirmation-icon">
+        <i class="fas fa-check-circle"></i>
+      </div>
+      <h2 id="confirmation-title">¡Pedido Recibido!</h2>
+      <p class="confirmation-message">Hemos recibido tu pedido correctamente. En breve recibirás un correo electrónico con los detalles.</p>
+      <p class="confirmation-number">Número de pedido: <span id="order-number">BL-0000</span></p>
+      <div class="confirmation-actions">
+        <button id="btn-continue-shopping" class="btn-primary">Seguir Comprando</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     document.getElementById('current-year').textContent = new Date().getFullYear();
   </script>
