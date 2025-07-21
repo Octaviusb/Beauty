@@ -1,5 +1,5 @@
 {
-  "name": "beautyline-api",
+  "name": "beautyclub-api",
   "version": "1.0.0",
   "description": "API serverless para productos desde Supabase",
   "main": "server/index.js",
