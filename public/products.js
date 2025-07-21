@@ -1,0 +1,551 @@
+const productos = [
+  {
+    "id": 1,
+    "name": "Ventilador de Mano YS2257",
+    "category": "accesorios",
+    "price": 23800,
+    "description": "Compacto y recargable vía USB, el YS2257 incluye un soporte de mesa",
+    "image": "/assets/images/accesorios/ventilador-de-mano-YS2257.jpg",
+    "badge": ""
+  },
+  {
+    "id": 2,
+    "name": "Ventilador de Mano YM88196",
+    "category": "accesorios",
+    "price": 22500,
+    "description": "Ventilador portátil recargable con diseño compacto y ligero",
+    "image": "/assets/images/accesorios/ventilador-de-mano-YM88196.jpg",
+    "badge": ""
+  },
+  {
+    "id": 3,
+    "name": "Ventilador de Mano FS16",
+    "category": "accesorios",
+    "price": 21000,
+    "description": "Ventilador portátil con batería recargable y 3 velocidades",
+    "image": "/assets/images/accesorios/ventilador-de-mano-FS16.jpg",
+    "badge": ""
+  },
+  {
+    "id": 4,
+    "name": "Lámpara LED/UV 168W Sun 6",
+    "category": "accesorios",
+    "price": 84000,
+    "description": "Lámpara profesional para secado de uñas con 168W de potencia",
+    "image": "/assets/images/accesorios/lampara-led-uv-168W-sun-6.jpg",
+    "badge": "Popular"
+  },
+  {
+    "id": 5,
+    "name": "Lámpara LED/UV 168W Z7",
+    "category": "accesorios",
+    "price": 86000,
+    "description": "Lámpara profesional para secado de uñas con tecnología Z7",
+    "image": "/assets/images/accesorios/lampara-led-uv-168w-z7.jpg",
+    "badge": ""
+  },
+  {
+    "id": 6,
+    "name": "Lámpara LED/UV 228W L1 Pro",
+    "category": "accesorios",
+    "price": 95000,
+    "description": "Lámpara profesional de alta potencia para secado rápido",
+    "image": "/assets/images/accesorios/lampara-led-uv-228w-l1-pro.jpg",
+    "badge": "Nuevo"
+  },
+  {
+    "id": 7,
+    "name": "Lámpara LED/UV 228W Sun QY-8",
+    "category": "accesorios",
+    "price": 92000,
+    "description": "Lámpara profesional con sensor automático y temporizador",
+    "image": "/assets/images/accesorios/lampara-led-uv-228w-sun-qy-8.jpg",
+    "badge": ""
+  },
+  {
+    "id": 8,
+    "name": "Lámpara LED/UV 288W Sun Y0 Pro",
+    "category": "accesorios",
+    "price": 110000,
+    "description": "Lámpara profesional de alta gama con 288W de potencia",
+    "image": "/assets/images/accesorios/lampara-led-uv-288W-sun-y0-pro.jpg",
+    "badge": "Premium"
+  },
+  {
+    "id": 9,
+    "name": "Lámpara LED/UV 48W Sun 5",
+    "category": "accesorios",
+    "price": 65000,
+    "description": "Lámpara compacta para secado de uñas con 48W",
+    "image": "/assets/images/accesorios/lampara-led-uv-48W-sun-5.jpg",
+    "badge": ""
+  },
+  {
+    "id": 10,
+    "name": "Lámpara Press On 8W Q8 Mini",
+    "category": "accesorios",
+    "price": 39200,
+    "description": "Lámpara portátil para uñas press-on de 8W",
+    "image": "/assets/images/accesorios/lampara-press-on-8w-q8-mini.jpg",
+    "badge": ""
+  },
+  {
+    "id": 11,
+    "name": "Pulidor Inalámbrico BQ-110",
+    "category": "accesorios",
+    "price": 49000,
+    "description": "Pulidor eléctrico para uñas con accesorios intercambiables",
+    "image": "/assets/images/accesorios/pulidor-inalambrico-bq-110.jpg",
+    "badge": ""
+  },
+  {
+    "id": 12,
+    "name": "Pulidor Inalámbrico SG-707",
+    "category": "accesorios",
+    "price": 52000,
+    "description": "Pulidor profesional con múltiples velocidades",
+    "image": "/assets/images/accesorios/pulidor-inalambrico-sg-707.jpg",
+    "badge": ""
+  },
+  {
+    "id": 13,
+    "name": "Pulidor Inalámbrico BQ109",
+    "category": "accesorios",
+    "price": 48000,
+    "description": "Pulidor eléctrico recargable para manicura profesional",
+    "image": "/assets/images/accesorios/pulidor.inalambrico-bq109.jpg",
+    "badge": ""
+  },
+  {
+    "id": 14,
+    "name": "Esmalte 1",
+    "category": "esmaltes",
+    "price": 7000,
+    "description": "Color y brillo intenso",
+    "image": "/assets/images/esmaltes/img1.jpg",
+    "badge": ""
+  },
+  {
+    "id": 15,
+    "name": "Esmalte 2",
+    "category": "esmaltes",
+    "price": 7000,
+    "description": "Color y brillo intenso",
+    "image": "/assets/images/esmaltes/img2.jpg",
+    "badge": ""
+  },
+  {
+    "id": 16,
+    "name": "Esmalte 3",
+    "category": "esmaltes",
+    "price": 7000,
+    "description": "Color y brillo intenso",
+    "image": "/assets/images/esmaltes/img3.jpg",
+    "badge": ""
+  },
+  {
+    "id": 17,
+    "name": "Esmalte 4",
+    "category": "esmaltes",
+    "price": 7000,
+    "description": "Color y brillo intenso",
+    "image": "/assets/images/esmaltes/img4.jpg",
+    "badge": ""
+  },
+  {
+    "id": 18,
+    "name": "Esmalte 5",
+    "category": "esmaltes",
+    "price": 7000,
+    "description": "Color y brillo intenso",
+    "image": "/assets/images/esmaltes/img5.jpg",
+    "badge": ""
+  },
+  {
+    "id": 19,
+    "name": "Esmalte 6",
+    "category": "esmaltes",
+    "price": 7000,
+    "description": "Color y brillo intenso",
+    "image": "/assets/images/esmaltes/img6.jpg",
+    "badge": ""
+  },
+  {
+    "id": 20,
+    "name": "Esmalte 7",
+    "category": "esmaltes",
+    "price": 7000,
+    "description": "Color y brillo intenso",
+    "image": "/assets/images/esmaltes/img7.jpg",
+    "badge": ""
+  },
+  {
+    "id": 21,
+    "name": "Esmalte 8",
+    "category": "esmaltes",
+    "price": 7000,
+    "description": "Color y brillo intenso",
+    "image": "/assets/images/esmaltes/img8.jpg",
+    "badge": ""
+  },
+  {
+    "id": 22,
+    "name": "Esmalte 9",
+    "category": "esmaltes",
+    "price": 7000,
+    "description": "Color y brillo intenso",
+    "image": "/assets/images/esmaltes/img9.jpg",
+    "badge": ""
+  },
+  {
+    "id": 23,
+    "name": "Esmalte 10",
+    "category": "esmaltes",
+    "price": 7000,
+    "description": "Color y brillo intenso",
+    "image": "/assets/images/esmaltes/img10.jpg",
+    "badge": ""
+  },
+  {
+    "id": 24,
+    "name": "Esmalte 11",
+    "category": "esmaltes",
+    "price": 7000,
+    "description": "Color y brillo intenso",
+    "image": "/assets/images/esmaltes/img11.jpg",
+    "badge": ""
+  },
+  {
+    "id": 25,
+    "name": "Esmalte 12",
+    "category": "esmaltes",
+    "price": 7000,
+    "description": "Color y brillo intenso",
+    "image": "/assets/images/esmaltes/img12.jpg",
+    "badge": ""
+  },
+  {
+    "id": 26,
+    "name": "Esmalte 13",
+    "category": "esmaltes",
+    "price": 7000,
+    "description": "Color y brillo intenso",
+    "image": "/assets/images/esmaltes/img13.jpg",
+    "badge": ""
+  },
+  {
+    "id": 27,
+    "name": "Esmalte 14",
+    "category": "esmaltes",
+    "price": 7000,
+    "description": "Color y brillo intenso",
+    "image": "/assets/images/esmaltes/img14.jpg",
+    "badge": ""
+  },
+  {
+    "id": 28,
+    "name": "Esmalte 15",
+    "category": "esmaltes",
+    "price": 7000,
+    "description": "Color y brillo intenso",
+    "image": "/assets/images/esmaltes/img15.jpg",
+    "badge": ""
+  },
+  {
+    "id": 29,
+    "name": "Esmalte 16",
+    "category": "esmaltes",
+    "price": 7000,
+    "description": "Color y brillo intenso",
+    "image": "/assets/images/esmaltes/img16.jpg",
+    "badge": ""
+  },
+  {
+    "id": 30,
+    "name": "Esmalte 17",
+    "category": "esmaltes",
+    "price": 7000,
+    "description": "Color y brillo intenso",
+    "image": "/assets/images/esmaltes/img17.jpg",
+    "badge": ""
+  },
+  {
+    "id": 31,
+    "name": "Esmalte 18",
+    "category": "esmaltes",
+    "price": 7000,
+    "description": "Color y brillo intenso",
+    "image": "/assets/images/esmaltes/img18.jpg",
+    "badge": ""
+  },
+  {
+    "id": 32,
+    "name": "Esmalte 19",
+    "category": "esmaltes",
+    "price": 7000,
+    "description": "Color y brillo intenso",
+    "image": "/assets/images/esmaltes/img19.jpg",
+    "badge": ""
+  },
+  {
+    "id": 33,
+    "name": "Esmalte 20",
+    "category": "esmaltes",
+    "price": 7000,
+    "description": "Color y brillo intenso",
+    "image": "/assets/images/esmaltes/img20.jpg",
+    "badge": ""
+  },
+  {
+    "id": 34,
+    "name": "Esmalte 21",
+    "category": "esmaltes",
+    "price": 7000,
+    "description": "Color y brillo intenso",
+    "image": "/assets/images/esmaltes/img21.jpg",
+    "badge": ""
+  },
+  {
+    "id": 35,
+    "name": "Esmalte 22",
+    "category": "esmaltes",
+    "price": 7000,
+    "description": "Color y brillo intenso",
+    "image": "/assets/images/esmaltes/img22.jpg",
+    "badge": ""
+  },
+  {
+    "id": 36,
+    "name": "Esmalte 23",
+    "category": "esmaltes",
+    "price": 7000,
+    "description": "Color y brillo intenso",
+    "image": "/assets/images/esmaltes/img23.jpg",
+    "badge": ""
+  },
+  {
+    "id": 37,
+    "name": "Esmalte 24",
+    "category": "esmaltes",
+    "price": 7000,
+    "description": "Color y brillo intenso",
+    "image": "/assets/images/esmaltes/img24.jpg",
+    "badge": ""
+  },
+  {
+    "id": 38,
+    "name": "Lámpara Press On 18W Rose",
+    "category": "higiene",
+    "price": 45000,
+    "description": "Lámpara para uñas press-on con tecnología Rose de 18W",
+    "image": "/assets/images/higiene/lampara-press-on-18w-rose.jpg",
+    "badge": ""
+  },
+  {
+    "id": 39,
+    "name": "Masajeador Facial",
+    "category": "higiene",
+    "price": 38000,
+    "description": "Masajeador facial para limpieza profunda y relajación",
+    "image": "/assets/images/higiene/MasajeadorFacial.jpg",
+    "badge": ""
+  },
+  {
+    "id": 40,
+    "name": "Maquillaje 1",
+    "category": "maquillaje",
+    "price": 35000,
+    "description": "Producto de maquillaje profesional",
+    "image": "/assets/images/maquillaje/img70.jpg",
+    "badge": ""
+  },
+  {
+    "id": 41,
+    "name": "Maquillaje 2",
+    "category": "maquillaje",
+    "price": 35000,
+    "description": "Producto de maquillaje de alta calidad",
+    "image": "/assets/images/maquillaje/img71.jpg",
+    "badge": ""
+  },
+  {
+    "id": 42,
+    "name": "Cera Hair Wax Stick",
+    "category": "skincare",
+    "price": 28000,
+    "description": "Cera en barra para peinado y fijación",
+    "image": "/assets/images/skincare/cera-hair-wax-stick.jpg",
+    "badge": ""
+  },
+  {
+    "id": 43,
+    "name": "Cera Roll On",
+    "category": "skincare",
+    "price": 32000,
+    "description": "Cera depilatoria en formato roll-on",
+    "image": "/assets/images/skincare/cera-roll-on.jpg",
+    "badge": ""
+  },
+  {
+    "id": 44,
+    "name": "Crema de Día",
+    "category": "skincare",
+    "price": 43400,
+    "description": "Protección e hidratación para el día",
+    "image": "/assets/images/skincare/crema-de-da.jpg",
+    "badge": ""
+  },
+  {
+    "id": 45,
+    "name": "Decoraciones 6D",
+    "category": "skincare",
+    "price": 18000,
+    "description": "Decoraciones para uñas con efecto 6D",
+    "image": "/assets/images/skincare/decoraciones-6-d.jpg",
+    "badge": ""
+  },
+  {
+    "id": 46,
+    "name": "Decoraciones 6D Premium",
+    "category": "skincare",
+    "price": 19500,
+    "description": "Decoraciones premium para uñas con efecto 6D",
+    "image": "/assets/images/skincare/decoraciones-6d.jpg",
+    "badge": ""
+  },
+  {
+    "id": 47,
+    "name": "Decoraciones 6D Deluxe",
+    "category": "skincare",
+    "price": 21000,
+    "description": "Decoraciones deluxe para uñas con efecto 6D",
+    "image": "/assets/images/skincare/decoraciones-6d1.jpg",
+    "badge": ""
+  },
+  {
+    "id": 48,
+    "name": "Espejo de Bolso",
+    "category": "skincare",
+    "price": 15000,
+    "description": "Espejo compacto para llevar en el bolso",
+    "image": "/assets/images/skincare/espejo-de-bolso.jpg",
+    "badge": ""
+  },
+  {
+    "id": 49,
+    "name": "Espejo de Mano",
+    "category": "skincare",
+    "price": 18000,
+    "description": "Espejo de mano con mango ergonómico",
+    "image": "/assets/images/skincare/espejo-de-mano.jpg",
+    "badge": ""
+  },
+  {
+    "id": 50,
+    "name": "Toallas Desechables",
+    "category": "skincare",
+    "price": 12000,
+    "description": "Toallas desechables para limpieza facial",
+    "image": "/assets/images/skincare/toallas-desechables.jpg",
+    "badge": ""
+  },
+  {
+    "id": 51,
+    "name": "Toallas Desechables Premium",
+    "category": "skincare",
+    "price": 14000,
+    "description": "Toallas desechables premium para limpieza facial",
+    "image": "/assets/images/skincare/toallas-desechables1.jpg",
+    "badge": ""
+  },
+  {
+    "id": 52,
+    "name": "Ventilador Astronauta Mini",
+    "category": "skincare",
+    "price": 25000,
+    "description": "Ventilador portátil con diseño de astronauta",
+    "image": "/assets/images/skincare/ventilador-astronauta-mini.jpg",
+    "badge": ""
+  },
+  {
+    "id": 53,
+    "name": "Uñas 1",
+    "category": "uñas",
+    "price": 21000,
+    "description": "Set de uñas postizas decoradas",
+    "image": "/assets/images/uñas/img194.jpg",
+    "badge": ""
+  },
+  {
+    "id": 54,
+    "name": "Uñas 2",
+    "category": "uñas",
+    "price": 21000,
+    "description": "Set de uñas postizas con diseño elegante",
+    "image": "/assets/images/uñas/img195.jpg",
+    "badge": ""
+  },
+  {
+    "id": 55,
+    "name": "Uñas 3",
+    "category": "uñas",
+    "price": 21000,
+    "description": "Set de uñas postizas con acabado brillante",
+    "image": "/assets/images/uñas/img196.jpg",
+    "badge": ""
+  },
+  {
+    "id": 56,
+    "name": "Uñas 4",
+    "category": "uñas",
+    "price": 21000,
+    "description": "Set de uñas postizas con diseño moderno",
+    "image": "/assets/images/uñas/img197.jpg",
+    "badge": ""
+  },
+  {
+    "id": 57,
+    "name": "Uñas 5",
+    "category": "uñas",
+    "price": 21000,
+    "description": "Set de uñas postizas con decoración premium",
+    "image": "/assets/images/uñas/img203.jpg",
+    "badge": ""
+  },
+  {
+    "id": 58,
+    "name": "Uñas 6",
+    "category": "uñas",
+    "price": 21000,
+    "description": "Set de uñas postizas con diseño exclusivo",
+    "image": "/assets/images/uñas/img204.jpg",
+    "badge": ""
+  },
+  {
+    "id": 59,
+    "name": "Uñas 7",
+    "category": "uñas",
+    "price": 21000,
+    "description": "Set de uñas postizas con acabado profesional",
+    "image": "/assets/images/uñas/img205.jpg",
+    "badge": ""
+  }
+];
+    "id": 61,
+    "name": "Uñas 6",
+    "category": "uñas",
+    "price": 21000,
+    "description": "Producto para uñas",
+    "image": "/assets/images/uñas/img204.jpg",
+    "badge": ""
+  },
+  {
+    "id": 62,
+    "name": "Uñas 7",
+    "category": "uñas",
+    "price": 21000,
+    "description": "Producto para uñas",
+    "image": "/assets/images/uñas/img205.jpg",
+    "badge": ""
+  }
+];
