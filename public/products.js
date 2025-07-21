@@ -5,7 +5,7 @@ const productos = [
     "category": "accesorios",
     "price": 23800,
     "description": "Compacto y recargable vía USB, el YS2257 incluye un soporte de mesa",
-    "image": "/assets/images/accesorios/ventilador-de-mano-YS2257.jpg",
+    "image": "assets/images/accesorios/ventilador-de-mano-YS2257.jpg",
     "badge": ""
   },
   {
@@ -14,7 +14,7 @@ const productos = [
     "category": "accesorios",
     "price": 22500,
     "description": "Ventilador portátil recargable con diseño compacto y ligero",
-    "image": "/assets/images/accesorios/ventilador-de-mano-YM88196.jpg",
+    "image": "assets/images/accesorios/ventilador-de-mano-YM88196.jpg",
     "badge": ""
   },
   {
@@ -23,7 +23,7 @@ const productos = [
     "category": "accesorios",
     "price": 21000,
     "description": "Ventilador portátil con batería recargable y 3 velocidades",
-    "image": "/assets/images/accesorios/ventilador-de-mano-FS16.jpg",
+    "image": "assets/images/accesorios/ventilador-de-mano-FS16.jpg",
     "badge": ""
   },
   {
@@ -32,7 +32,7 @@ const productos = [
     "category": "accesorios",
     "price": 84000,
     "description": "Lámpara profesional para secado de uñas con 168W de potencia",
-    "image": "/assets/images/accesorios/lampara-led-uv-168W-sun-6.jpg",
+    "image": "assets/images/accesorios/lampara-led-uv-168W-sun-6.jpg",
     "badge": "Popular"
   },
   {
@@ -41,7 +41,7 @@ const productos = [
     "category": "accesorios",
     "price": 86000,
     "description": "Lámpara profesional para secado de uñas con tecnología Z7",
-    "image": "/assets/images/accesorios/lampara-led-uv-168w-z7.jpg",
+    "image": "assets/images/accesorios/lampara-led-uv-168w-z7.jpg",
     "badge": ""
   },
   {
@@ -50,7 +50,7 @@ const productos = [
     "category": "accesorios",
     "price": 95000,
     "description": "Lámpara profesional de alta potencia para secado rápido",
-    "image": "/assets/images/accesorios/lampara-led-uv-228w-l1-pro.jpg",
+    "image": "assets/images/accesorios/lampara-led-uv-228w-l1-pro.jpg",
     "badge": "Nuevo"
   },
   {
@@ -59,7 +59,7 @@ const productos = [
     "category": "accesorios",
     "price": 92000,
     "description": "Lámpara profesional con sensor automático y temporizador",
-    "image": "/assets/images/accesorios/lampara-led-uv-228w-sun-qy-8.jpg",
+    "image": "assets/images/accesorios/lampara-led-uv-228w-sun-qy-8.jpg",
     "badge": ""
   },
   {
@@ -68,7 +68,7 @@ const productos = [
     "category": "accesorios",
     "price": 110000,
     "description": "Lámpara profesional de alta gama con 288W de potencia",
-    "image": "/assets/images/accesorios/lampara-led-uv-288W-sun-y0-pro.jpg",
+    "image": "assets/images/accesorios/lampara-led-uv-288W-sun-y0-pro.jpg",
     "badge": "Premium"
   },
   {
@@ -77,7 +77,7 @@ const productos = [
     "category": "accesorios",
     "price": 65000,
     "description": "Lámpara compacta para secado de uñas con 48W",
-    "image": "/assets/images/accesorios/lampara-led-uv-48W-sun-5.jpg",
+    "image": "assets/images/accesorios/lampara-led-uv-48W-sun-5.jpg",
     "badge": ""
   },
   {
@@ -86,7 +86,7 @@ const productos = [
     "category": "accesorios",
     "price": 39200,
     "description": "Lámpara portátil para uñas press-on de 8W",
-    "image": "/assets/images/accesorios/lampara-press-on-8w-q8-mini.jpg",
+    "image": "assets/images/accesorios/lampara-press-on-8w-q8-mini.jpg",
     "badge": ""
   },
   {
@@ -95,7 +95,7 @@ const productos = [
     "category": "accesorios",
     "price": 49000,
     "description": "Pulidor eléctrico para uñas con accesorios intercambiables",
-    "image": "/assets/images/accesorios/pulidor-inalambrico-bq-110.jpg",
+    "image": "assets/images/accesorios/pulidor-inalambrico-bq-110.jpg",
     "badge": ""
   },
   {
@@ -104,7 +104,7 @@ const productos = [
     "category": "accesorios",
     "price": 52000,
     "description": "Pulidor profesional con múltiples velocidades",
-    "image": "/assets/images/accesorios/pulidor-inalambrico-sg-707.jpg",
+    "image": "assets/images/accesorios/pulidor-inalambrico-sg-707.jpg",
     "badge": ""
   },
   {
@@ -113,7 +113,7 @@ const productos = [
     "category": "accesorios",
     "price": 48000,
     "description": "Pulidor eléctrico recargable para manicura profesional",
-    "image": "/assets/images/accesorios/pulidor.inalambrico-bq109.jpg",
+    "image": "assets/images/accesorios/pulidor.inalambrico-bq109.jpg",
     "badge": ""
   },
   {
@@ -122,7 +122,7 @@ const productos = [
     "category": "esmaltes",
     "price": 7000,
     "description": "Color y brillo intenso",
-    "image": "/assets/images/esmaltes/img1.jpg",
+    "image": "assets/images/esmaltes/img1.jpg",
     "badge": ""
   },
   {
@@ -131,7 +131,7 @@ const productos = [
     "category": "esmaltes",
     "price": 7000,
     "description": "Color y brillo intenso",
-    "image": "/assets/images/esmaltes/img2.jpg",
+    "image": "assets/images/esmaltes/img2.jpg",
     "badge": ""
   },
   {
@@ -140,7 +140,7 @@ const productos = [
     "category": "esmaltes",
     "price": 7000,
     "description": "Color y brillo intenso",
-    "image": "/assets/images/esmaltes/img3.jpg",
+    "image": "assets/images/esmaltes/img3.jpg",
     "badge": ""
   },
   {
@@ -149,7 +149,7 @@ const productos = [
     "category": "esmaltes",
     "price": 7000,
     "description": "Color y brillo intenso",
-    "image": "/assets/images/esmaltes/img4.jpg",
+    "image": "assets/images/esmaltes/img4.jpg",
     "badge": ""
   },
   {
@@ -158,7 +158,7 @@ const productos = [
     "category": "esmaltes",
     "price": 7000,
     "description": "Color y brillo intenso",
-    "image": "/assets/images/esmaltes/img5.jpg",
+    "image": "assets/images/esmaltes/img5.jpg",
     "badge": ""
   },
   {
@@ -167,7 +167,7 @@ const productos = [
     "category": "esmaltes",
     "price": 7000,
     "description": "Color y brillo intenso",
-    "image": "/assets/images/esmaltes/img6.jpg",
+    "image": "assets/images/esmaltes/img6.jpg",
     "badge": ""
   },
   {
@@ -176,7 +176,7 @@ const productos = [
     "category": "esmaltes",
     "price": 7000,
     "description": "Color y brillo intenso",
-    "image": "/assets/images/esmaltes/img7.jpg",
+    "image": "assets/images/esmaltes/img7.jpg",
     "badge": ""
   },
   {
@@ -185,7 +185,7 @@ const productos = [
     "category": "esmaltes",
     "price": 7000,
     "description": "Color y brillo intenso",
-    "image": "/assets/images/esmaltes/img8.jpg",
+    "image": "assets/images/esmaltes/img8.jpg",
     "badge": ""
   },
   {
@@ -194,7 +194,7 @@ const productos = [
     "category": "esmaltes",
     "price": 7000,
     "description": "Color y brillo intenso",
-    "image": "/assets/images/esmaltes/img9.jpg",
+    "image": "assets/images/esmaltes/img9.jpg",
     "badge": ""
   },
   {
@@ -203,7 +203,7 @@ const productos = [
     "category": "esmaltes",
     "price": 7000,
     "description": "Color y brillo intenso",
-    "image": "/assets/images/esmaltes/img10.jpg",
+    "image": "assets/images/esmaltes/img10.jpg",
     "badge": ""
   },
   {
@@ -212,7 +212,7 @@ const productos = [
     "category": "esmaltes",
     "price": 7000,
     "description": "Color y brillo intenso",
-    "image": "/assets/images/esmaltes/img11.jpg",
+    "image": "assets/images/esmaltes/img11.jpg",
     "badge": ""
   },
   {
@@ -221,7 +221,7 @@ const productos = [
     "category": "esmaltes",
     "price": 7000,
     "description": "Color y brillo intenso",
-    "image": "/assets/images/esmaltes/img12.jpg",
+    "image": "assets/images/esmaltes/img12.jpg",
     "badge": ""
   },
   {
@@ -230,7 +230,7 @@ const productos = [
     "category": "esmaltes",
     "price": 7000,
     "description": "Color y brillo intenso",
-    "image": "/assets/images/esmaltes/img13.jpg",
+    "image": "assets/images/esmaltes/img13.jpg",
     "badge": ""
   },
   {
@@ -239,7 +239,7 @@ const productos = [
     "category": "esmaltes",
     "price": 7000,
     "description": "Color y brillo intenso",
-    "image": "/assets/images/esmaltes/img14.jpg",
+    "image": "assets/images/esmaltes/img14.jpg",
     "badge": ""
   },
   {
@@ -248,7 +248,7 @@ const productos = [
     "category": "esmaltes",
     "price": 7000,
     "description": "Color y brillo intenso",
-    "image": "/assets/images/esmaltes/img15.jpg",
+    "image": "assets/images/esmaltes/img15.jpg",
     "badge": ""
   },
   {
@@ -257,7 +257,7 @@ const productos = [
     "category": "esmaltes",
     "price": 7000,
     "description": "Color y brillo intenso",
-    "image": "/assets/images/esmaltes/img16.jpg",
+    "image": "assets/images/esmaltes/img16.jpg",
     "badge": ""
   },
   {
@@ -266,7 +266,7 @@ const productos = [
     "category": "esmaltes",
     "price": 7000,
     "description": "Color y brillo intenso",
-    "image": "/assets/images/esmaltes/img17.jpg",
+    "image": "assets/images/esmaltes/img17.jpg",
     "badge": ""
   },
   {
@@ -275,7 +275,7 @@ const productos = [
     "category": "esmaltes",
     "price": 7000,
     "description": "Color y brillo intenso",
-    "image": "/assets/images/esmaltes/img18.jpg",
+    "image": "assets/images/esmaltes/img18.jpg",
     "badge": ""
   },
   {
@@ -284,7 +284,7 @@ const productos = [
     "category": "esmaltes",
     "price": 7000,
     "description": "Color y brillo intenso",
-    "image": "/assets/images/esmaltes/img19.jpg",
+    "image": "assets/images/esmaltes/img19.jpg",
     "badge": ""
   },
   {
@@ -293,7 +293,7 @@ const productos = [
     "category": "esmaltes",
     "price": 7000,
     "description": "Color y brillo intenso",
-    "image": "/assets/images/esmaltes/img20.jpg",
+    "image": "assets/images/esmaltes/img20.jpg",
     "badge": ""
   },
   {
@@ -302,7 +302,7 @@ const productos = [
     "category": "esmaltes",
     "price": 7000,
     "description": "Color y brillo intenso",
-    "image": "/assets/images/esmaltes/img21.jpg",
+    "image": "assets/images/esmaltes/img21.jpg",
     "badge": ""
   },
   {
@@ -311,7 +311,7 @@ const productos = [
     "category": "esmaltes",
     "price": 7000,
     "description": "Color y brillo intenso",
-    "image": "/assets/images/esmaltes/img22.jpg",
+    "image": "assets/images/esmaltes/img22.jpg",
     "badge": ""
   },
   {
@@ -320,7 +320,7 @@ const productos = [
     "category": "esmaltes",
     "price": 7000,
     "description": "Color y brillo intenso",
-    "image": "/assets/images/esmaltes/img23.jpg",
+    "image": "assets/images/esmaltes/img23.jpg",
     "badge": ""
   },
   {
@@ -329,7 +329,7 @@ const productos = [
     "category": "esmaltes",
     "price": 7000,
     "description": "Color y brillo intenso",
-    "image": "/assets/images/esmaltes/img24.jpg",
+    "image": "assets/images/esmaltes/img24.jpg",
     "badge": ""
   },
   {
@@ -338,7 +338,7 @@ const productos = [
     "category": "higiene",
     "price": 45000,
     "description": "Lámpara para uñas press-on con tecnología Rose de 18W",
-    "image": "/assets/images/higiene/lampara-press-on-18w-rose.jpg",
+    "image": "assets/images/higiene/lampara-press-on-18w-rose.jpg",
     "badge": ""
   },
   {
@@ -347,7 +347,7 @@ const productos = [
     "category": "higiene",
     "price": 38000,
     "description": "Masajeador facial para limpieza profunda y relajación",
-    "image": "/assets/images/higiene/MasajeadorFacial.jpg",
+    "image": "assets/images/higiene/MasajeadorFacial.jpg",
     "badge": ""
   },
   {
@@ -356,7 +356,7 @@ const productos = [
     "category": "maquillaje",
     "price": 35000,
     "description": "Producto de maquillaje profesional",
-    "image": "/assets/images/maquillaje/img70.jpg",
+    "image": "assets/images/maquillaje/img70.jpg",
     "badge": ""
   },
   {
@@ -365,7 +365,7 @@ const productos = [
     "category": "maquillaje",
     "price": 35000,
     "description": "Producto de maquillaje de alta calidad",
-    "image": "/assets/images/maquillaje/img71.jpg",
+    "image": "assets/images/maquillaje/img71.jpg",
     "badge": ""
   },
   {
@@ -374,7 +374,7 @@ const productos = [
     "category": "skincare",
     "price": 28000,
     "description": "Cera en barra para peinado y fijación",
-    "image": "/assets/images/skincare/cera-hair-wax-stick.jpg",
+    "image": "assets/images/skincare/cera-hair-wax-stick.jpg",
     "badge": ""
   },
   {
@@ -383,7 +383,7 @@ const productos = [
     "category": "skincare",
     "price": 32000,
     "description": "Cera depilatoria en formato roll-on",
-    "image": "/assets/images/skincare/cera-roll-on.jpg",
+    "image": "assets/images/skincare/cera-roll-on.jpg",
     "badge": ""
   },
   {
@@ -392,7 +392,7 @@ const productos = [
     "category": "skincare",
     "price": 43400,
     "description": "Protección e hidratación para el día",
-    "image": "/assets/images/skincare/crema-de-da.jpg",
+    "image": "assets/images/skincare/crema-de-da.jpg",
     "badge": ""
   },
   {
@@ -401,7 +401,7 @@ const productos = [
     "category": "skincare",
     "price": 18000,
     "description": "Decoraciones para uñas con efecto 6D",
-    "image": "/assets/images/skincare/decoraciones-6-d.jpg",
+    "image": "assets/images/skincare/decoraciones-6-d.jpg",
     "badge": ""
   },
   {
@@ -410,7 +410,7 @@ const productos = [
     "category": "skincare",
     "price": 19500,
     "description": "Decoraciones premium para uñas con efecto 6D",
-    "image": "/assets/images/skincare/decoraciones-6d.jpg",
+    "image": "assets/images/skincare/decoraciones-6d.jpg",
     "badge": ""
   },
   {
@@ -419,7 +419,7 @@ const productos = [
     "category": "skincare",
     "price": 21000,
     "description": "Decoraciones deluxe para uñas con efecto 6D",
-    "image": "/assets/images/skincare/decoraciones-6d1.jpg",
+    "image": "assets/images/skincare/decoraciones-6d1.jpg",
     "badge": ""
   },
   {
@@ -428,7 +428,7 @@ const productos = [
     "category": "skincare",
     "price": 15000,
     "description": "Espejo compacto para llevar en el bolso",
-    "image": "/assets/images/skincare/espejo-de-bolso.jpg",
+    "image": "assets/images/skincare/espejo-de-bolso.jpg",
     "badge": ""
   },
   {
@@ -437,7 +437,7 @@ const productos = [
     "category": "skincare",
     "price": 18000,
     "description": "Espejo de mano con mango ergonómico",
-    "image": "/assets/images/skincare/espejo-de-mano.jpg",
+    "image": "assets/images/skincare/espejo-de-mano.jpg",
     "badge": ""
   },
   {
@@ -446,7 +446,7 @@ const productos = [
     "category": "skincare",
     "price": 12000,
     "description": "Toallas desechables para limpieza facial",
-    "image": "/assets/images/skincare/toallas-desechables.jpg",
+    "image": "assets/images/skincare/toallas-desechables.jpg",
     "badge": ""
   },
   {
@@ -455,7 +455,7 @@ const productos = [
     "category": "skincare",
     "price": 14000,
     "description": "Toallas desechables premium para limpieza facial",
-    "image": "/assets/images/skincare/toallas-desechables1.jpg",
+    "image": "assets/images/skincare/toallas-desechables1.jpg",
     "badge": ""
   },
   {
@@ -464,7 +464,7 @@ const productos = [
     "category": "skincare",
     "price": 25000,
     "description": "Ventilador portátil con diseño de astronauta",
-    "image": "/assets/images/skincare/ventilador-astronauta-mini.jpg",
+    "image": "assets/images/skincare/ventilador-astronauta-mini.jpg",
     "badge": ""
   },
   {
@@ -473,7 +473,7 @@ const productos = [
     "category": "uñas",
     "price": 21000,
     "description": "Set de uñas postizas decoradas",
-    "image": "/assets/images/uñas/img194.jpg",
+    "image": "assets/images/uñas/img194.jpg",
     "badge": ""
   },
   {
@@ -482,7 +482,7 @@ const productos = [
     "category": "uñas",
     "price": 21000,
     "description": "Set de uñas postizas con diseño elegante",
-    "image": "/assets/images/uñas/img195.jpg",
+    "image": "assets/images/uñas/img195.jpg",
     "badge": ""
   },
   {
@@ -491,7 +491,7 @@ const productos = [
     "category": "uñas",
     "price": 21000,
     "description": "Set de uñas postizas con acabado brillante",
-    "image": "/assets/images/uñas/img196.jpg",
+    "image": "assets/images/uñas/img196.jpg",
     "badge": ""
   },
   {
@@ -500,7 +500,7 @@ const productos = [
     "category": "uñas",
     "price": 21000,
     "description": "Set de uñas postizas con diseño moderno",
-    "image": "/assets/images/uñas/img197.jpg",
+    "image": "assets/images/uñas/img197.jpg",
     "badge": ""
   },
   {
@@ -509,7 +509,7 @@ const productos = [
     "category": "uñas",
     "price": 21000,
     "description": "Set de uñas postizas con decoración premium",
-    "image": "/assets/images/uñas/img203.jpg",
+    "image": "assets/images/uñas/img203.jpg",
     "badge": ""
   },
   {
@@ -518,7 +518,7 @@ const productos = [
     "category": "uñas",
     "price": 21000,
     "description": "Set de uñas postizas con diseño exclusivo",
-    "image": "/assets/images/uñas/img204.jpg",
+    "image": "assets/images/uñas/img204.jpg",
     "badge": ""
   },
   {
@@ -527,25 +527,7 @@ const productos = [
     "category": "uñas",
     "price": 21000,
     "description": "Set de uñas postizas con acabado profesional",
-    "image": "/assets/images/uñas/img205.jpg",
-    "badge": ""
-  }
-];
-    "id": 61,
-    "name": "Uñas 6",
-    "category": "uñas",
-    "price": 21000,
-    "description": "Producto para uñas",
-    "image": "/assets/images/uñas/img204.jpg",
-    "badge": ""
-  },
-  {
-    "id": 62,
-    "name": "Uñas 7",
-    "category": "uñas",
-    "price": 21000,
-    "description": "Producto para uñas",
-    "image": "/assets/images/uñas/img205.jpg",
+    "image": "assets/images/uñas/img205.jpg",
     "badge": ""
   }
 ];
