@@ -151,7 +151,7 @@ function actualizarContadorCarrito() {
 function cargarProductos() {
   console.log('🔄 Cargando productos...');
   
-  // Usar productos de respaldo primero para mostrar algo rápido
+  // Usar productos de respaldo primero para mostrar algo rápido mientras carga
   cargarProductosRespaldo();
   
   // Intentar cargar productos desde la API
@@ -166,6 +166,8 @@ function cargarProductos() {
         console.log('✅ Productos de API cargados:', productos.length);
         renderizarProductos(productos);
         setupFilters();
+      } else {
+        throw new Error('No se recibieron productos de la API');
       }
     })
     .catch(error => {
@@ -1093,8 +1095,8 @@ document.addEventListener('DOMContentLoaded', () => {
     document.body.appendChild(limpiarBtn);
   }
   
-  // Cargar productos completos directamente sin intentar usar la API
-  cargarProductosCompletos();
+  // Cargar productos desde la API primero
+  cargarProductos();
   configurarCarrito();
   actualizarContadorCarrito();
   
