@@ -227,7 +227,7 @@ window.cargarProductosCompletos = async function cargarProductosCompletos() {
   try {
     // Forzar recarga del JSON para evitar caché
     const timestamp = new Date().getTime();
-    const response = await fetch(`/productos.json?t=${timestamp}`);
+    const response = await fetch(`/api/products?t=${timestamp}`);
     if (response.ok) {
       const productos = await response.json();
       if (productos && productos.length > 0) {
