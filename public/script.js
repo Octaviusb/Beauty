@@ -166,36 +166,32 @@ function cargarProductos() {
 
 // Cargar productos completos directamente (expuesto globalmente para el filtro)
 window.cargarProductosCompletos = async function cargarProductosCompletos() {
-  console.log('🔄 Cargando productos completos...');
-  
+  console.log('🔄 Cargando productos desde Supabase...');
+
   try {
-    // Forzar recarga del JSON para evitar caché
-    const timestamp = new Date().getTime();
-    const response = await fetch(`/productos.json?t=${timestamp}`);
-    if (response.ok) {
-      const productos = await response.json();
-      if (productos && productos.length > 0) {
-        appState.productos = productos;
-        console.log('✅ Productos cargados desde JSON:', productos.length);
-        renderizarProductos(productos);
-        setupFilters();
-        return;
-      }
+    const { data: productos, error } = await supabase
+      .from('products')
+      .select('*')
+      .order('id');
+
+    if (error) {
+      throw error;
+    }
+
+    if (productos && productos.length > 0) {
+      appState.productos = productos;
+      console.log('✅ Productos cargados desde Supabase:', productos.length);
+      renderizarProductos(productos);
+      setupFilters();
+      return;
     }
   } catch (error) {
-    console.error('Error al cargar productos desde JSON:', error);
+    console.error('❌ Error al cargar productos desde Supabase:', error);
+    const contenedor = document.getElementById('product-list');
+    if (contenedor) {
+      contenedor.innerHTML = "<p class='error-message'>Error al cargar productos desde Supabase.</p>";
+    }
   }
-  
-  // Si no se pudo cargar desde JSON, mostrar mensaje de error
-  console.error('❌ No se pudieron cargar los productos desde el JSON');
-  
-  // Usar un array vacío para evitar errores
-  const productosCompletos = [];
-  
-  appState.productos = productosCompletos;
-  console.log('✅ No hay productos de respaldo disponibles');
-  renderizarProductos(productosCompletos);
-  setupFilters();
 }
 
 // Configurar filtros
