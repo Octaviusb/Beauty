@@ -515,9 +515,9 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   
   // Cargar productos desde la API primero
-  cargarProductos();
   configurarCarrito();
   actualizarContadorCarrito();
+  cargarProductosCompletos()
   
   // Actualizar año en el footer
   document.getElementById('current-year').textContent = new Date().getFullYear();
