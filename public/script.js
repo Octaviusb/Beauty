@@ -668,92 +668,39 @@ function procesarPedido(event) {
 function mostrarModalWompi(total, orderNumber) {
   console.log('💳 Preparando pago con Wompi...');
   
-  // Verificar si el script de integración de Wompi está cargado
-  if (typeof window.wompiCheckout === 'undefined') {
-    // Cargar el script de integración de Wompi
-    const script = document.createElement('script');
-    script.src = '/wompi-integration.js';
-    script.onload = () => {
-      iniciarPagoWompi(total, orderNumber);
-    };
-    document.head.appendChild(script);
-  } else {
-    iniciarPagoWompi(total, orderNumber);
-  }
-}
-
-// Iniciar pago con Wompi
+ // Iniciar pago con Wompi (versión con redirección directa al enlace de pago)
 function iniciarPagoWompi(total, orderNumber) {
-  // Obtener datos del cliente del formulario
   const formulario = document.getElementById('formularioCompra');
   const nombre = formulario.querySelector('#nombre').value;
   const email = formulario.querySelector('#email').value;
-  
-  // Mostrar modal de carga
+
+  // Validación opcional
+  if (!email || !nombre) {
+    alert("Por favor, completa tu nombre y correo antes de continuar.");
+    return;
+  }
+
+  // Mostrar mensaje de carga opcional (puedes personalizar el modal si deseas)
   const loadingModal = document.createElement('div');
   loadingModal.className = 'modal active';
   loadingModal.id = 'loadingModal';
   loadingModal.innerHTML = `
     <div class="modal-content payment-modal">
-      <h2>Preparando pago</h2>
+      <h2>Redirigiendo a Wompi...</h2>
       <div class="payment-info">
-        <p>Estamos preparando tu pago con Wompi...</p>
+        <p>Estamos preparando tu pago con Wompi. Un momento por favor.</p>
       </div>
     </div>
   `;
   document.body.appendChild(loadingModal);
-  
-  // Iniciar el checkout de Wompi
-  window.wompiCheckout.init(
-    total, // Monto en pesos (sin centavos)
-    orderNumber, // Referencia única
-    email, // Email del cliente
-    nombre, // Nombre del cliente
-    function onSuccess(data) {
-      // Eliminar modal de carga
-      document.getElementById('loadingModal').remove();
-      
-      // Mostrar confirmación
-      mostrarConfirmacionPedido(orderNumber);
-      
-      // Limpiar carrito
-      appState.cart.clear();
-      actualizarContadorCarrito();
-    },
-    function onError(error) {
-      // Eliminar modal de carga
-      document.getElementById('loadingModal').remove();
-      
-      // Mostrar modal de error
-      const errorModal = document.createElement('div');
-      errorModal.className = 'modal active';
-      errorModal.id = 'errorModal';
-      errorModal.innerHTML = `
-        <div class="modal-content payment-modal">
-          <button class="close-modal" aria-label="Cerrar">&times;</button>
-          <h2>Error en el pago</h2>
-          <div class="payment-info">
-            <p>Ha ocurrido un error al procesar tu pago. Por favor, intenta nuevamente.</p>
-            <div class="form-actions">
-              <button id="btnReintentar" class="btn-submit-order">Reintentar pago</button>
-            </div>
-          </div>
-        </div>
-      `;
-      document.body.appendChild(errorModal);
-      
-      // Configurar botones
-      document.getElementById('btnReintentar').addEventListener('click', () => {
-        document.getElementById('errorModal').remove();
-        mostrarModalWompi(total, orderNumber);
-      });
-      
-      errorModal.querySelector('.close-modal').addEventListener('click', () => {
-        document.getElementById('errorModal').remove();
-      });
-    }
-  );
+
+  // Redirigir al checkout de Wompi
+  const urlWompi = "https://checkout.wompi.co/l/VPOS_nJo3xk";
+  setTimeout(() => {
+    window.location.href = urlWompi;
+  }, 2000); // pequeño retraso para mostrar el modal
 }
+
 
 // Mostrar confirmación de pedido
 function mostrarConfirmacionPedido(orderNumber) {
