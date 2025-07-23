@@ -151,9 +151,6 @@ function actualizarContadorCarrito() {
 function cargarProductos() {
   console.log('🔄 Cargando productos...');
   
-  // NO cargar productos de respaldo para evitar mostrar datos incorrectos
-  // cargarProductosRespaldo();
-  
   // Verificar si estamos en un entorno local o de desarrollo
   const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
   const apiUrl = isLocalhost ? '/api/products' : 'https://beauty-line-api.vercel.app/api/products';
@@ -227,7 +224,7 @@ window.cargarProductosCompletos = async function cargarProductosCompletos() {
   try {
     // Forzar recarga del JSON para evitar caché
     const timestamp = new Date().getTime();
-    const response = await fetch(`/api/products?t=${timestamp}`);
+    const response = await fetch(`/productos.json?t=${timestamp}`);
     if (response.ok) {
       const productos = await response.json();
       if (productos && productos.length > 0) {
@@ -468,15 +465,6 @@ window.cargarProductosCompletos = async function cargarProductosCompletos() {
   setupFilters();
 }
 
-// Productos de respaldo - FUNCIÓN ELIMINADA PARA EVITAR MOSTRAR PRODUCTOS INCORRECTOS
-// function cargarProductosRespaldo() {
-//   console.log('🚨 Cargando productos de respaldo...');
-//   const productosRespaldo = [];
-//   appState.productos = productosRespaldo;
-//   console.log('✅ No se cargan productos de respaldo para evitar datos incorrectos');
-//   setupFilters();
-// }
-
 // Configurar filtros
 function setupFilters() {
   const filterButtons = document.querySelectorAll('.filter-btn');
@@ -668,7 +656,47 @@ function procesarPedido(event) {
 function mostrarModalWompi(total, orderNumber) {
   console.log('💳 Preparando pago con Wompi...');
   
- // Iniciar pago con Wompi (versión con redirección directa al enlace de pago)
+  // Crear un modal con instrucciones para Wompi
+  const wompiModal = document.createElement('div');
+  wompiModal.className = 'modal active';
+  wompiModal.id = 'wompiModal';
+  wompiModal.innerHTML = `
+    <div class="modal-content payment-modal">
+      <button class="close-modal" aria-label="Cerrar">&times;</button>
+      <h2>Pago con Wompi</h2>
+      <div class="payment-info">
+        <p>A continuación serás redirigido a Wompi para completar tu pago.</p>
+        <div class="payment-details">
+          <p><strong>Monto a pagar:</strong> $${total.toLocaleString()}</p>
+          <p><strong>Número de pedido:</strong> ${orderNumber}</p>
+          <p class="important-note">IMPORTANTE: Por favor ingresa exactamente el monto indicado arriba. Cualquier inconsistencia impedirá que el pedido sea despachado.</p>
+        </div>
+        <div class="form-actions">
+          <button id="btnIrAWompi" class="btn-submit-order">Ir a Wompi</button>
+        </div>
+      </div>
+    </div>
+  `;
+  
+  document.body.appendChild(wompiModal);
+  
+  // Configurar el botón para ir a Wompi
+  document.getElementById('btnIrAWompi').addEventListener('click', () => {
+    iniciarPagoWompi(total, orderNumber);
+  });
+  
+  // Configurar el botón de cerrar
+  wompiModal.querySelector('.close-modal').addEventListener('click', () => {
+    document.getElementById('wompiModal').remove();
+    mostrarConfirmacionPedido(orderNumber);
+    
+    // Limpiar carrito
+    appState.cart.clear();
+    actualizarContadorCarrito();
+  });
+}
+
+// Iniciar pago con Wompi (versión con redirección directa al enlace de pago)
 function iniciarPagoWompi(total, orderNumber) {
   const formulario = document.getElementById('formularioCompra');
   const nombre = formulario.querySelector('#nombre').value;
@@ -694,13 +722,18 @@ function iniciarPagoWompi(total, orderNumber) {
   `;
   document.body.appendChild(loadingModal);
 
+  // Cerrar el modal de Wompi
+  const wompiModal = document.getElementById('wompiModal');
+  if (wompiModal) {
+    wompiModal.remove();
+  }
+
   // Redirigir al checkout de Wompi
   const urlWompi = "https://checkout.wompi.co/l/VPOS_nJo3xk";
   setTimeout(() => {
     window.location.href = urlWompi;
   }, 2000); // pequeño retraso para mostrar el modal
 }
-
 
 // Mostrar confirmación de pedido
 function mostrarConfirmacionPedido(orderNumber) {
