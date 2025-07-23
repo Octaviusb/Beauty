@@ -37,6 +37,12 @@ window.appState = {
   currentFilter: 'all'
 };
 
+const SUPABASE_URL = 'https://ixvn1234567890abcdef.supabase.co'; // Tu Project URL
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'; // Tu anon public key
+
+const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+
 // Renderizar productos (expuesto globalmente para el filtro)
 window.renderizarProductos = function renderizarProductos(productos) {
   console.log('📊 Renderizando productos:', productos?.length || 0);
