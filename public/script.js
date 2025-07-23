@@ -152,11 +152,11 @@ function cargarProductos() {
   console.log('🔄 Cargando productos...');
   
   // Intentar cargar desde Supabase
-  const SUPABASE_URL = 'https://ixvnfvxvbvxvxvxvxvxvxv.supabase.co'; // Reemplaza con tu URL real
-  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9'; // Reemplaza con tu clave real
+  const SUPABASE_URL = 'https://wrevwfeqxjwiasbqdjds.supabase.co'; // Reemplaza con tu URL real
+  const SUPABASE_KEY = 'sbp_f984acac0fb1c81d5414b5d7e0234174efa2aa5a'; // Reemplaza con tu clave real
   
   // Verificar si tenemos las credenciales correctas
-  if (SUPABASE_URL.includes('ixvnfvxvbvxvxvxvxvxvxv')) {
+  if (SUPABASE_URL.includes('wrevwfeqxjwiasbqdjds')) {
     console.warn('⚠️ Credenciales de Supabase no configuradas, usando JSON local');
     cargarProductosCompletos();
     return;
@@ -234,222 +234,303 @@ window.cargarProductosCompletos = async function cargarProductosCompletos() {
   // NOTA: Esta lista solo se usa como último recurso si no se puede cargar desde Supabase ni desde el JSON
   const productosCompletos = [
     {
-      id: "1",
-      name: "Brocha Kabuki",
-      category: "accesorios",
-      price: 23800,
-      description: "Ideal para polvos sueltos",
-      image: "images/accesorios/brocha-kabuki.jpg",
-      badge: ""
-    },
-    {
-      id: "2",
-      name: "Caja de Almacenamiento",
-      category: "accesorios",
-      price: 44800,
-      description: "Para cosméticos y accesorios",
-      image: "images/accesorios/caja-de-almacenamiento.jpg",
-      badge: ""
-    },
-    {
-      id: "3",
-      name: "Cepillo Facial Eléctrico",
-      category: "accesorios",
-      price: 64400,
-      description: "Limpieza profunda",
-      image: "images/accesorios/cepillo-facial-elctrico.jpg",
-      badge: ""
-    },
-    {
-      id: "4",
-      name: "Cinta para Peinar",
-      category: "accesorios",
-      price: 12600,
-      description: "Para rutina facial",
-      image: "images/accesorios/cinta-para-peinar.jpg",
-      badge: ""
-    },
-    {
-      id: "5",
-      name: "Cortaúñas Profesional",
-      category: "accesorios",
-      price: 16800,
-      description: "Acero inoxidable",
-      image: "images/accesorios/cortaas-profesional.jpg",
-      badge: ""
-    },
-    {
-      id: "6",
-      name: "Espejo con Luz LED",
-      category: "accesorios",
-      price: 58800,
-      description: "Ideal para maquillaje",
-      image: "images/accesorios/espejo-con-luz-led.jpg",
-      badge: "Popular"
-    },
-    {
-      id: "7",
-      name: "Esponjas de Maquillaje x3",
-      category: "accesorios",
-      price: 28000,
-      description: "Aplicación uniforme",
-      image: "images/accesorios/esponjas-de-maquillaje-x3.jpg",
-      badge: ""
-    },
-    {
-      id: "8",
-      name: "Guantes de Spa",
-      category: "accesorios",
-      price: 14000,
-      description: "Para manos y pies",
-      image: "images/accesorios/guantes-de-spa.jpg",
-      badge: ""
-    },
-    {
-      id: "9",
-      name: "Lámpara LED/UV",
-      category: "accesorios",
-      price: 84000,
-      description: "Lámpara para secado de uñas",
-      image: "images/accesorios/img226.jpg",
-      badge: ""
-    },
-    {
-      id: "11",
-      name: "Organizador de Maquillaje",
-      category: "accesorios",
-      price: 49000,
-      description: "Acrílico transparente",
-      image: "images/accesorios/organizador-de-maquillaje.jpg",
-      badge: ""
-    },
-    {
-      id: "12",
-      name: "Pinzas de Precisión",
-      category: "accesorios",
-      price: 21000,
-      description: "Para cejas y pestañas",
-      image: "images/accesorios/pinzas-de-precisin.jpg",
-      badge: ""
-    },
-    {
-      id: "13",
-      name: "Set de Brochas 10 piezas",
-      category: "accesorios",
-      price: 75600,
-      description: "Brochas suaves y profesionales",
-      image: "images/accesorios/set-de-brochas-10-piezas.jpg",
-      badge: "Nuevo"
-    },
-    {
-      id: "14",
-      name: "Toalla Desmaquillante",
-      category: "accesorios",
-      price: 19600,
-      description: "Reutilizable y suave",
-      image: "images/accesorios/toalla-desmaquillante.jpg",
-      badge: ""
-    },
-    {
-      id: "15",
-      name: "Esmalte 1",
-      category: "esmaltes",
-      price: 7000,
-      description: "Color y brillo intenso",
-      image: "images/esmaltes/img1.jpg",
-      badge: ""
-    },
-    {
-      id: "16",
-      name: "Esmalte 2",
-      category: "esmaltes",
-      price: 7000,
-      description: "Color y brillo intenso",
-      image: "images/esmaltes/img2.jpg",
-      badge: ""
-    },
-    {
-      id: "39",
-      name: "Gel de Baño",
-      category: "higiene",
-      price: 29400,
-      description: "Gel suave para piel sensible",
-      image: "images/higiene/gel-de-bao.jpg",
-      badge: ""
-    },
-    {
-      id: "41",
-      name: "Maquillaje 1",
-      category: "maquillaje",
-      price: 35000,
-      description: "Producto de maquillaje",
-      image: "images/maquillaje/img70.jpg",
-      badge: ""
-    },
-    {
-      id: "42",
-      name: "Maquillaje 2",
-      category: "maquillaje",
-      price: 35000,
-      description: "Producto de maquillaje",
-      image: "images/maquillaje/img71.jpg",
-      badge: ""
-    },
-    {
-      id: "43",
-      name: "Agua Micelar",
-      category: "skincare",
-      price: 39200,
-      description: "Limpieza sin enjuague",
-      image: "images/skincare/agua-micelar.jpg",
-      badge: ""
-    },
-    {
-      id: "44",
-      name: "Ampollas Reafirmantes",
-      category: "skincare",
-      price: 75000,
-      description: "Tratamiento intensivo para piel madura",
-      image: "images/skincare/ampollas-reafirmantes.jpg",
-      badge: ""
-    },
-    {
-      id: "45",
-      name: "Contorno de Ojos",
-      category: "skincare",
-      price: 48000,
-      description: "Reduce ojeras y líneas de expresión",
-      image: "images/skincare/contorno-de-ojos.jpg",
-      badge: ""
-    },
-    {
-      id: "46",
-      name: "Crema Antiarrugas",
-      category: "skincare",
-      price: 68000,
-      description: "Combate los signos de la edad",
-      image: "images/skincare/crema-antiarrugas.jpg",
-      badge: ""
-    },
-    {
-      id: "47",
-      name: "Crema de Día",
-      category: "skincare",
-      price: 45000,
-      description: "Hidratación diaria para todo tipo de piel",
-      image: "images/skincare/crema-de-da.jpg",
-      badge: ""
-    },
-    {
-      id: "48",
-      name: "Crema de Noche",
-      category: "skincare",
-      price: 52000,
-      description: "Regeneración nocturna intensiva",
-      image: "images/skincare/crema-de-noche.jpg",
-      badge: ""
-    }
-  ];
+    "id": 15,
+    "name": "Esmalte 1",
+    "category": "esmaltes",
+    "price": 7000,
+    "description": "Color y brillo intenso",
+    "image": "images/esmaltes/img1.jpg",
+    "badge": ""
+  },
+  {
+    "id": 16,
+    "name": "Esmalte 2",
+    "category": "esmaltes",
+    "price": 7000,
+    "description": "Color y brillo intenso",
+    "image": "images/esmaltes/img2.jpg",
+    "badge": ""
+  },
+  {
+    "id": 17,
+    "name": "Esmalte 3",
+    "category": "esmaltes",
+    "price": 7000,
+    "description": "Color y brillo intenso",
+    "image": "images/esmaltes/img3.jpg",
+    "badge": ""
+  },
+  {
+    "id": 18,
+    "name": "Esmalte 4",
+    "category": "esmaltes",
+    "price": 7000,
+    "description": "Color y brillo intenso",
+    "image": "images/esmaltes/img4.jpg",
+    "badge": ""
+  },
+  {
+    "id": 19,
+    "name": "Esmalte 5",
+    "category": "esmaltes",
+    "price": 7000,
+    "description": "Color y brillo intenso",
+    "image": "images/esmaltes/img5.jpg",
+    "badge": ""
+  },
+  {
+    "id": 20,
+    "name": "Esmalte 6",
+    "category": "esmaltes",
+    "price": 7000,
+    "description": "Color y brillo intenso",
+    "image": "images/esmaltes/img6.jpg",
+    "badge": ""
+  },
+  {
+    "id": 21,
+    "name": "Esmalte 7",
+    "category": "esmaltes",
+    "price": 7000,
+    "description": "Color y brillo intenso",
+    "image": "images/esmaltes/img7.jpg",
+    "badge": ""
+  },
+  {
+    "id": 22,
+    "name": "Esmalte 8",
+    "category": "esmaltes",
+    "price": 7000,
+    "description": "Color y brillo intenso",
+    "image": "images/esmaltes/img8.jpg",
+    "badge": ""
+  },
+  {
+    "id": 23,
+    "name": "Esmalte 9",
+    "category": "esmaltes",
+    "price": 7000,
+    "description": "Color y brillo intenso",
+    "image": "images/esmaltes/img9.jpg",
+    "badge": ""
+  },
+  {
+    "id": 24,
+    "name": "Esmalte 10",
+    "category": "esmaltes",
+    "price": 7000,
+    "description": "Color y brillo intenso",
+    "image": "images/esmaltes/img10.jpg",
+    "badge": ""
+  },
+  {
+    "id": 25,
+    "name": "Esmalte 11",
+    "category": "esmaltes",
+    "price": 7000,
+    "description": "Color y brillo intenso",
+    "image": "images/esmaltes/img11.jpg",
+    "badge": ""
+  },
+  {
+    "id": 26,
+    "name": "Esmalte 12",
+    "category": "esmaltes",
+    "price": 7000,
+    "description": "Color y brillo intenso",
+    "image": "images/esmaltes/img12.jpg",
+    "badge": ""
+  },
+  {
+    "id": 27,
+    "name": "Esmalte 13",
+    "category": "esmaltes",
+    "price": 7000,
+    "description": "Color y brillo intenso",
+    "image": "images/esmaltes/img13.jpg",
+    "badge": ""
+  },
+  {
+    "id": 28,
+    "name": "Esmalte 14",
+    "category": "esmaltes",
+    "price": 7000,
+    "description": "Color y brillo intenso",
+    "image": "images/esmaltes/img14.jpg",
+    "badge": ""
+  },
+  {
+    "id": 29,
+    "name": "Esmalte 15",
+    "category": "esmaltes",
+    "price": 7000,
+    "description": "Color y brillo intenso",
+    "image": "images/esmaltes/img15.jpg",
+    "badge": ""
+  },
+  {
+    "id": 30,
+    "name": "Esmalte 16",
+    "category": "esmaltes",
+    "price": 7000,
+    "description": "Color y brillo intenso",
+    "image": "images/esmaltes/img16.jpg",
+    "badge": ""
+  },
+  {
+    "id": 31,
+    "name": "Esmalte 17",
+    "category": "esmaltes",
+    "price": 7000,
+    "description": "Color y brillo intenso",
+    "image": "images/esmaltes/img17.jpg",
+    "badge": ""
+  },
+  {
+    "id": 32,
+    "name": "Esmalte 18",
+    "category": "esmaltes",
+    "price": 7000,
+    "description": "Color y brillo intenso",
+    "image": "images/esmaltes/img18.jpg",
+    "badge": ""
+  },
+  {
+    "id": 33,
+    "name": "Esmalte 19",
+    "category": "esmaltes",
+    "price": 7000,
+    "description": "Color y brillo intenso",
+    "image": "images/esmaltes/img19.jpg",
+    "badge": ""
+  },
+  {
+    "id": 34,
+    "name": "Esmalte 20",
+    "category": "esmaltes",
+    "price": 7000,
+    "description": "Color y brillo intenso",
+    "image": "images/esmaltes/img20.jpg",
+    "badge": ""
+  },
+  {
+    "id": 35,
+    "name": "Esmalte 21",
+    "category": "esmaltes",
+    "price": 7000,
+    "description": "Color y brillo intenso",
+    "image": "images/esmaltes/img21.jpg",
+    "badge": ""
+  },
+  {
+    "id": 36,
+    "name": "Esmalte 22",
+    "category": "esmaltes",
+    "price": 7000,
+    "description": "Color y brillo intenso",
+    "image": "images/esmaltes/img22.jpg",
+    "badge": ""
+  },
+  {
+    "id": 37,
+    "name": "Esmalte 23",
+    "category": "esmaltes",
+    "price": 7000,
+    "description": "Color y brillo intenso",
+    "image": "images/esmaltes/img23.jpg",
+    "badge": ""
+  },
+  {
+    "id": 38,
+    "name": "Esmalte 24",
+    "category": "esmaltes",
+    "price": 7000,
+    "description": "Color y brillo intenso",
+    "image": "images/esmaltes/img24.jpg",
+    "badge": ""
+  },
+  {
+    "id": 39,
+    "name": "Gel de Baño",
+    "category": "higiene",
+    "price": 29400,
+    "description": "Gel suave para piel sensible",
+    "image": "images/higiene/gel-de-bao.jpg",
+    "badge": ""
+  },
+  {
+    "id": 41,
+    "name": "Maquillaje 1",
+    "category": "maquillaje",
+    "price": 35000,
+    "description": "Producto de maquillaje",
+    "image": "images/maquillaje/img70.jpg",
+    "badge": ""
+  },
+  {
+    "id": 42,
+    "name": "Maquillaje 2",
+    "category": "maquillaje",
+    "price": 35000,
+    "description": "Producto de maquillaje",
+    "image": "images/maquillaje/img71.jpg",
+    "badge": ""
+  },
+  {
+    "id": 43,
+    "name": "Agua Micelar",
+    "category": "skincare",
+    "price": 39200,
+    "description": "Limpieza sin enjuague",
+    "image": "images/skincare/agua-micelar.jpg",
+    "badge": ""
+  },
+  {
+    "id": 44,
+    "name": "Ampollas Reafirmantes",
+    "category": "skincare",
+    "price": 75000,
+    "description": "Tratamiento intensivo para piel madura",
+    "image": "images/skincare/ampollas-reafirmantes.jpg",
+    "badge": ""
+  },
+  {
+    "id": 45,
+    "name": "Contorno de Ojos",
+    "category": "skincare",
+    "price": 48000,
+    "description": "Reduce ojeras y líneas de expresión",
+    "image": "images/skincare/contorno-de-ojos.jpg",
+    "badge": ""
+  },
+  {
+    "id": 46,
+    "name": "Crema Antiarrugas",
+    "category": "skincare",
+    "price": 68000,
+    "description": "Combate los signos de la edad",
+    "image": "images/skincare/crema-antiarrugas.jpg",
+    "badge": ""
+  },
+  {
+    "id": 47,
+    "name": "Crema de Día",
+    "category": "skincare",
+    "price": 45000,
+    "description": "Hidratación diaria para todo tipo de piel",
+    "image": "images/skincare/crema-de-da.jpg",
+    "badge": ""
+  },
+  {
+    "id": 48,
+    "name": "Crema de Noche",
+    "category": "skincare",
+    "price": 52000,
+    "description": "Regeneración nocturna intensiva",
+    "image": "images/skincare/crema-de-noche.jpg",
+    "badge": ""
+  },
+  ]
   
   appState.productos = productosCompletos;
   console.log('✅ Productos completos cargados:', appState.productos.length);
