@@ -203,123 +203,6 @@ window.cargarProductosCompletos = async function cargarProductosCompletos() {
   // Nota: Esta lista debe coincidir con productos.json
   const productosCompletos = [
     {
-      id: "1",
-      name: "Brocha Kabuki",
-      category: "accesorios",
-      price: 23800,
-      description: "Ideal para polvos sueltos",
-      image: "images/accesorios/brocha-kabuki.jpg",
-      badge: ""
-    },
-    {
-      id: "2",
-      name: "Caja de Almacenamiento",
-      category: "accesorios",
-      price: 44800,
-      description: "Para cosméticos y accesorios",
-      image: "images/accesorios/caja-de-almacenamiento.jpg",
-      badge: ""
-    },
-    {
-      id: "3",
-      name: "Cepillo Facial Eléctrico",
-      category: "accesorios",
-      price: 64400,
-      description: "Limpieza profunda",
-      image: "images/accesorios/cepillo-facial-elctrico.jpg",
-      badge: ""
-    },
-    {
-      id: "4",
-      name: "Cinta para Peinar",
-      category: "accesorios",
-      price: 12600,
-      description: "Para rutina facial",
-      image: "images/accesorios/cinta-para-peinar.jpg",
-      badge: ""
-    },
-    {
-      id: "5",
-      name: "Cortaúñas Profesional",
-      category: "accesorios",
-      price: 16800,
-      description: "Acero inoxidable",
-      image: "images/accesorios/cortaas-profesional.jpg",
-      badge: ""
-    },
-    {
-      id: "6",
-      name: "Espejo con Luz LED",
-      category: "accesorios",
-      price: 58800,
-      description: "Ideal para maquillaje",
-      image: "images/accesorios/espejo-con-luz-led.jpg",
-      badge: "Popular"
-    },
-    {
-      id: "7",
-      name: "Esponjas de Maquillaje x3",
-      category: "accesorios",
-      price: 28000,
-      description: "Aplicación uniforme",
-      image: "images/accesorios/esponjas-de-maquillaje-x3.jpg",
-      badge: ""
-    },
-    {
-      id: "8",
-      name: "Guantes de Spa",
-      category: "accesorios",
-      price: 14000,
-      description: "Para manos y pies",
-      image: "images/accesorios/guantes-de-spa.jpg",
-      badge: ""
-    },
-    {
-      id: "9",
-      name: "Lámpara LED/UV",
-      category: "accesorios",
-      price: 84000,
-      description: "Lámpara para secado de uñas",
-      image: "images/accesorios/img226.jpg",
-      badge: ""
-    },
-    {
-      id: "11",
-      name: "Organizador de Maquillaje",
-      category: "accesorios",
-      price: 49000,
-      description: "Acrílico transparente",
-      image: "images/accesorios/organizador-de-maquillaje.jpg",
-      badge: ""
-    },
-    {
-      id: "12",
-      name: "Pinzas de Precisión",
-      category: "accesorios",
-      price: 21000,
-      description: "Para cejas y pestañas",
-      image: "images/accesorios/pinzas-de-precisin.jpg",
-      badge: ""
-    },
-    {
-      id: "13",
-      name: "Set de Brochas 10 piezas",
-      category: "accesorios",
-      price: 75600,
-      description: "Brochas suaves y profesionales",
-      image: "images/accesorios/set-de-brochas-10-piezas.jpg",
-      badge: "Nuevo"
-    },
-    {
-      id: "14",
-      name: "Toalla Desmaquillante",
-      category: "accesorios",
-      price: 19600,
-      description: "Reutilizable y suave",
-      image: "images/accesorios/toalla-desmaquillante.jpg",
-      badge: ""
-    },
-    {
       id: "15",
       name: "Esmalte 1",
       category: "esmaltes",
@@ -739,33 +622,6 @@ function cargarProductosRespaldo() {
   // Datos de productos de respaldo
   const productosRespaldo = [
     {
-      id: "1",
-      name: "Brocha Kabuki",
-      category: "accesorios",
-      price: 23800,
-      description: "Ideal para polvos sueltos",
-      image: "images/accesorios/brocha-kabuki.jpg",
-      badge: ""
-    },
-    {
-      id: "2",
-      name: "Caja de Almacenamiento",
-      category: "accesorios",
-      price: 44800,
-      description: "Para cosméticos y accesorios",
-      image: "images/accesorios/caja-de-almacenamiento.jpg",
-      badge: ""
-    },
-    {
-      id: "3",
-      name: "Cepillo Facial Eléctrico",
-      category: "accesorios",
-      price: 64400,
-      description: "Limpieza profunda",
-      image: "images/accesorios/cepillo-facial-elctrico.jpg",
-      badge: ""
-    },
-    {
       id: "15",
       name: "Esmalte 1",
       category: "esmaltes",
@@ -930,35 +786,31 @@ function configurarFormularioPedido() {
 function procesarPedido(event) {
   event.preventDefault();
   console.log('🛒 Procesando pedido...');
-  
+
   try {
-    // Obtener datos del formulario
     const formulario = document.getElementById('formularioCompra');
-    const nombre = formulario.querySelector('#nombre').value;
-    const email = formulario.querySelector('#email').value;
-    const telefono = formulario.querySelector('#telefono').value;
-    const direccion = formulario.querySelector('#direccion').value;
-    const ciudad = formulario.querySelector('#ciudad').value;
-    const referidor = formulario.querySelector('#referidor')?.value || '';
-    
-    // Validar datos básicos
-    if (!nombre || !email || !telefono || !direccion || !ciudad) {
-      alert('Por favor completa todos los campos obligatorios.');
+    const nombre = formulario.querySelector('#nombre').value.trim();
+    const email = formulario.querySelector('#email').value.trim();
+    const telefono = formulario.querySelector('#telefono').value.trim();
+    const direccion = formulario.querySelector('#direccion').value.trim();
+    const ciudad = formulario.querySelector('#ciudad').value.trim();
+    const referidor = formulario.querySelector('#referidor').value.trim();
+
+    if (!nombre || !email || !telefono || !direccion || !ciudad || !referidor) {
+      alert('Por favor completa todos los campos, incluyendo quién te refirió.');
+      formulario.querySelector('#referidor').focus();
       return;
     }
-    
-    // Calcular totales
+
     const subtotal = appState.cart.getTotal();
     const shipping = subtotal > 200000 ? 0 : 12000;
     const total = subtotal + shipping;
-    
-    // Generar número de pedido
     const orderNumber = `BL-${Date.now().toString().slice(-6)}`;
-    
-    // Preparar datos del carrito para el correo
-    const carrito = appState.cart.items.map(item => `${item.quantity}x ${item.name} ($${item.price.toLocaleString()})`).join(", ");
-    
-    // Enviar correo con los datos del pedido usando EmailJS
+
+    let carritoTexto = appState.cart.items
+      .map(item => `${item.quantity}x ${item.name} ($${item.price.toLocaleString()})`)
+      .join(", ");
+
     if (typeof emailjs !== 'undefined') {
       emailjs.send("service_owxur5f", "template_sck7rdl", {
         nombre,
@@ -968,59 +820,59 @@ function procesarPedido(event) {
         referidor,
         metodo_pago: 'Wompi',
         total: total.toLocaleString(),
-        carrito,
+        carrito: carritoTexto,
         referencia: orderNumber
-      }, "Cqwg1EyqFLvPg7ULx")
-      .then(function(response) {
-        console.log("📧 Pedido enviado correctamente");
-        
-        // Cerrar formulario de checkout
-        const checkoutForm = document.getElementById('checkoutForm');
-        checkoutForm.classList.remove('active');
-        checkoutForm.classList.add('hidden');
-        
-        // Mostrar modal de Wompi
+      }).then(() => {
+        console.log("📧 Pedido registrado, redirigiendo a Wompi...");
+
         mostrarModalWompi(total, orderNumber);
-      })
-      .catch(function(error) {
+      }).catch(error => {
         console.error("❌ Error al enviar correo:", error);
-        alert("Hubo un error al procesar el pedido. Por favor, intenta nuevamente.");
+        alert("Error al procesar el pedido. Por favor intenta nuevamente.");
       });
     } else {
-      console.error('❌ EmailJS no está disponible');
-      alert("Error al procesar el pedido: El servicio de correo no está disponible. Por favor, intenta nuevamente.");
+      alert("El servicio de correo no está disponible. Intenta nuevamente más tarde.");
     }
   } catch (error) {
     console.error('❌ Error en procesarPedido:', error);
-    alert("Ocurrió un error inesperado. Por favor, intenta nuevamente.");
+    alert("Ocurrió un error inesperado. Por favor intenta nuevamente.");
   }
 }
 
 // Mostrar modal de Wompi
 function mostrarModalWompi(total, orderNumber) {
   console.log('💳 Preparando pago con Wompi...');
-  
-  // Crear un modal con instrucciones para Wompi
+
+  const urlWompi = "https://checkout.wompi.co/l/VPOS_nJo3xk";
   const wompiModal = document.createElement('div');
   wompiModal.className = 'modal active';
   wompiModal.id = 'wompiModal';
   wompiModal.innerHTML = `
     <div class="modal-content payment-modal">
       <button class="close-modal" aria-label="Cerrar">&times;</button>
-      <h2>Pago con Wompi</h2>
-      <div class="payment-info">
-        <p>A continuación serás redirigido a Wompi para completar tu pago.</p>
-        <div class="payment-details">
-          <p><strong>Monto a pagar:</strong> $${total.toLocaleString()}</p>
-          <p><strong>Número de pedido:</strong> ${orderNumber}</p>
-          <p class="important-note">IMPORTANTE: Por favor ingresa exactamente el monto indicado arriba. Cualquier inconsistencia impedirá que el pedido sea despachado.</p>
-        </div>
-        <div class="form-actions">
-          <button id="btnIrAWompi" class="btn-submit-order">Ir a Wompi</button>
-        </div>
-      </div>
+      <h2>Pagar con Wompi</h2>
+      <p><strong>Monto:</strong> $${total.toLocaleString()}</p>
+      <p><strong>Pedido:</strong> ${orderNumber}</p>
+      <a href="${urlWompi}" target="_blank" id="btnIrAWompi" class="btn-submit-order">Ir a Wompi</a>
     </div>
   `;
+  document.body.appendChild(wompiModal);
+
+  document.getElementById('btnIrAWompi').addEventListener('click', () => {
+    window.open(urlWompi, '_blank');
+    document.getElementById('wompiModal').remove();
+    mostrarConfirmacionPedido(orderNumber);
+    appState.cart.clear();
+    actualizarContadorCarrito();
+  });
+
+  wompiModal.querySelector('.close-modal').addEventListener('click', () => {
+    document.getElementById('wompiModal').remove();
+    mostrarConfirmacionPedido(orderNumber);
+    appState.cart.clear();
+    actualizarContadorCarrito();
+  });
+}
   
   document.body.appendChild(wompiModal);
   
