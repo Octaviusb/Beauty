@@ -322,8 +322,15 @@ function procesarPedido(event) {
     const referidor = formulario.querySelector('#referidor')?.value || '';
     
     // Validar datos básicos
-    if (!nombre || !email || !telefono || !direccion || !ciudad || !referidor) {
-      alert('Por favor completa todos los campos obligatorios, incluyendo quién te refirió.');
+    if (!nombre || !email || !telefono || !direccion || !ciudad) {
+      alert('Por favor completa todos los campos obligatorios.');
+      return;
+    }
+    
+    // Validar específicamente el campo referidor
+    if (!referidor) {
+      alert('Por favor indica quién te refirió. Este campo es obligatorio.');
+      document.getElementById('referidor').focus();
       return;
     }
     
@@ -396,7 +403,7 @@ function mostrarModalWompi(total, orderNumber) {
           <p class="important-note">IMPORTANTE: Por favor ingresa exactamente el monto indicado arriba. Cualquier inconsistencia impedirá que el pedido sea despachado.</p>
         </div>
         <div class="form-actions">
-          <button id="btnIrAWompi" class="btn-submit-order">Ir a Wompi</button>
+          <a href="https://checkout.wompi.co/l/VPOS_nJo3xk" target="_blank" id="btnIrAWompi" class="btn-submit-order">Ir a Wompi</a>
         </div>
       </div>
     </div>
@@ -406,124 +413,15 @@ function mostrarModalWompi(total, orderNumber) {
   
   // Configurar el botón para ir a Wompi
   document.getElementById('btnIrAWompi').addEventListener('click', () => {
-    // Ir directamente a Wompi sin usar iniciarPagoWompi
-    const urlWompi = "https://checkout.wompi.co/l/VPOS_nJo3xk";
-    window.open(urlWompi, '_blank') || window.location.replace(urlWompi);
-    
     // Cerrar el modal y mostrar confirmación
-    document.getElementById('wompiModal').remove();
-    mostrarConfirmacionPedido(orderNumber);
-    
-    // Limpiar carrito
-    appState.cart.clear();
-    actualizarContadorCarrito();
-  });
-  
-  // Configurar el botón de cerrar
-  wompiModal.querySelector('.close-modal').addEventListener('click', () => {
-    document.getElementById('wompiModal').remove();
-    mostrarConfirmacionPedido(orderNumber);
-    
-    // Limpiar carrito
-    appState.cart.clear();
-    actualizarContadorCarrito();
-  });
-}
-
-// Mostrar confirmación de pedido
-function mostrarConfirmacionPedido(orderNumber) {
-  const confirmationModal = document.getElementById('confirmationModal');
-  const orderNumberElement = document.getElementById('order-number');
-  const continuarComprandoBtn = document.getElementById('btn-continue-shopping');
-  
-  // Actualizar número de pedido
-  if (orderNumberElement) {
-    orderNumberElement.textContent = orderNumber;
-  }
-  
-  // Mostrar modal
-  confirmationModal.classList.remove('hidden');
-  confirmationModal.classList.add('active');
-  
-  // Configurar botón para continuar comprando
-  if (continuarComprandoBtn) {
-    continuarComprandoBtn.addEventListener('click', () => {
-      confirmationModal.classList.remove('active');
-      confirmationModal.classList.add('hidden');
-    });
-  }
-}
-
-// Inicialización
-document.addEventListener('DOMContentLoaded', () => {
-  console.log('🚀 Inicializando aplicación...');
-  
-  // Agregar botón para limpiar caché (solo visible en desarrollo)
-  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-    const limpiarBtn = document.createElement('button');
-    limpiarBtn.textContent = 'Limpiar Caché';
-    limpiarBtn.style.position = 'fixed';
-    limpiarBtn.style.bottom = '10px';
-    limpiarBtn.style.right = '10px';
-    limpiarBtn.style.zIndex = '9999';
-    limpiarBtn.style.padding = '5px 10px';
-    limpiarBtn.style.backgroundColor = '#d63384';
-    limpiarBtn.style.color = 'white';
-    limpiarBtn.style.border = 'none';
-    limpiarBtn.style.borderRadius = '4px';
-    limpiarBtn.style.cursor = 'pointer';
-    limpiarBtn.style.fontSize = '12px';
-    
-    limpiarBtn.addEventListener('click', () => {
-      localStorage.removeItem('productos');
-      localStorage.removeItem('productosCache');
-      localStorage.removeItem('lastUpdate');
-      window.location.reload(true);
-    });
-    
-    document.body.appendChild(limpiarBtn);
-  }
-  
-  // Cargar productos desde la API primero
-  cargarProductos();
-  configurarCarrito();
-  actualizarContadorCarrito();
-  
-  // Actualizar año en el footer
-  document.getElementById('current-year').textContent = new Date().getFullYear();
-});
-    <div class="modal-content payment-modal">
-      <button class="close-modal" aria-label="Cerrar">&times;</button>
-      <h2>Pago con Wompi</h2>
-      <div class="payment-info">
-        <p>A continuación serás redirigido a Wompi para completar tu pago.</p>
-        <div class="payment-details">
-          <p><strong>Monto a pagar:</strong> $${total.toLocaleString()}</p>
-          <p><strong>Número de pedido:</strong> ${orderNumber}</p>
-          <p class="important-note">IMPORTANTE: Por favor ingresa exactamente el monto indicado arriba. Cualquier inconsistencia impedirá que el pedido sea despachado.</p>
-        </div>
-        <div class="form-actions">
-          <button id="btnIrAWompi" class="btn-submit-order">Ir a Wompi</button>
-        </div>
-      </div>
-    </div>
-  `;
-  
-  document.body.appendChild(wompiModal);
-  
-  // Configurar el botón para ir a Wompi
-  document.getElementById('btnIrAWompi').addEventListener('click', () => {
-    // Ir directamente a Wompi sin usar iniciarPagoWompi
-    const urlWompi = "https://checkout.wompi.co/l/VPOS_nJo3xk";
-    window.open(urlWompi, '_blank') || window.location.replace(urlWompi);
-    
-    // Cerrar el modal y mostrar confirmación
-    document.getElementById('wompiModal').remove();
-    mostrarConfirmacionPedido(orderNumber);
-    
-    // Limpiar carrito
-    appState.cart.clear();
-    actualizarContadorCarrito();
+    setTimeout(() => {
+      document.getElementById('wompiModal').remove();
+      mostrarConfirmacionPedido(orderNumber);
+      
+      // Limpiar carrito
+      appState.cart.clear();
+      actualizarContadorCarrito();
+    }, 500);
   });
   
   // Configurar el botón de cerrar
