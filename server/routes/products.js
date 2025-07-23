@@ -2,10 +2,16 @@ console.log('¡El archivo products.js está siendo requerido!'); // Este log est
 
 const express = require('express');
 const router = express.Router();
+import fs from 'fs';
+import path from 'path';
 
-// **** ATENCIÓN: ASEGÚRATE DE QUE ESTA LÍNEA NO EXISTA ****
-// const db = require('../db/db'); // SI ESTÁ AQUÍ, ¡ELIMÍNALA O COMENTALA!
-// **********************************************************
+export default function handler(req, res) {
+  const filePath = path.join(process.cwd(), 'public', 'productos.json');
+  const fileContents = fs.readFileSync(filePath, 'utf8');
+  const productos = JSON.parse(fileContents);
+
+  res.status(200).json(productos);
+}
 
 // Middleware de autenticación específico para este router
 const API_SECRET = 'super-secret-key'; // ¡Debe coincidir con el de admin.js!
