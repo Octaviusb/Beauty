@@ -152,7 +152,16 @@ function cargarProductos() {
   console.log('🔄 Cargando productos...');
   
   // Cargar directamente desde el JSON local para evitar problemas CORS
-  cargarProductosCompletos();
+  try {
+    cargarProductosCompletos();
+  } catch (e) {
+    console.error('Error al cargar productos:', e);
+    // Mostrar mensaje de error
+    const contenedor = document.getElementById('product-list');
+    if (contenedor) {
+      contenedor.innerHTML = "<p class='error-message'>Error al cargar productos. Por favor, intenta recargar la página.</p>";
+    }
+  }
 }
 
 // Cargar productos completos directamente (expuesto globalmente para el filtro)
@@ -366,8 +375,19 @@ function procesarPedido(event) {
         checkoutForm.classList.remove('active');
         checkoutForm.classList.add('hidden');
         
-        // Mostrar modal de Wompi
-        mostrarModalWompi(total, orderNumber);
+        try {
+          // Mostrar modal de Wompi
+          mostrarModalWompi(total, orderNumber);
+        } catch (e) {
+          console.error('Error al mostrar modal de Wompi:', e);
+          // Abrir Wompi directamente si hay error
+          window.open("https://checkout.wompi.co/l/VPOS_nJo3xk", '_blank');
+          // Mostrar confirmación
+          mostrarConfirmacionPedido(orderNumber);
+          // Limpiar carrito
+          appState.cart.clear();
+          actualizarContadorCarrito();
+        }
       })
       .catch(function(error) {
         console.error("❌ Error al enviar correo:", error);
@@ -387,6 +407,9 @@ function procesarPedido(event) {
 function mostrarModalWompi(total, orderNumber) {
   console.log('💳 Preparando pago con Wompi...');
   
+  // URL directa de Wompi
+  const urlWompi = "https://checkout.wompi.co/l/VPOS_nJo3xk";
+  
   // Crear un modal con instrucciones para Wompi
   const wompiModal = document.createElement('div');
   wompiModal.className = 'modal active';
@@ -403,7 +426,7 @@ function mostrarModalWompi(total, orderNumber) {
           <p class="important-note">IMPORTANTE: Por favor ingresa exactamente el monto indicado arriba. Cualquier inconsistencia impedirá que el pedido sea despachado.</p>
         </div>
         <div class="form-actions">
-          <a href="https://checkout.wompi.co/l/VPOS_nJo3xk" target="_blank" id="btnIrAWompi" class="btn-submit-order">Ir a Wompi</a>
+          <a href="${urlWompi}" target="_blank" id="btnIrAWompi" class="btn-submit-order">Ir a Wompi</a>
         </div>
       </div>
     </div>
