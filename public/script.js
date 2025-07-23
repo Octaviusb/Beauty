@@ -151,10 +151,18 @@ function actualizarContadorCarrito() {
 function cargarProductos() {
   console.log('🔄 Cargando productos...');
   
-  // Cargar directamente desde Supabase
-  const SUPABASE_URL = 'https://wrevwfeqxjwiasbqdjds.supabase.co'; // Reemplaza con tu URL de Supabase
-  const SUPABASE_KEY = 'sbp_f984acac0fb1c81d5414b5d7e0234174efa2aa5a'; // Reemplaza con tu clave anónima de Supabase
+  // Intentar cargar desde Supabase
+  const SUPABASE_URL = 'https://ixvnfvxvbvxvxvxvxvxvxv.supabase.co'; // Reemplaza con tu URL real
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9'; // Reemplaza con tu clave real
   
+  // Verificar si tenemos las credenciales correctas
+  if (SUPABASE_URL.includes('ixvnfvxvbvxvxvxvxvxvxv')) {
+    console.warn('⚠️ Credenciales de Supabase no configuradas, usando JSON local');
+    cargarProductosCompletos();
+    return;
+  }
+  
+  // Intentar cargar desde Supabase
   fetch(`${SUPABASE_URL}/rest/v1/products?select=*`, {
     headers: {
       'apikey': SUPABASE_KEY,
@@ -172,12 +180,23 @@ function cargarProductos() {
       renderizarProductos(productos);
       setupFilters();
       
-      // Guardar en localStorage como respaldo
+      // Actualizar el JSON local con los datos de Supabase
       try {
-        localStorage.setItem('productos_cache', JSON.stringify(productos));
-        localStorage.setItem('productos_cache_timestamp', Date.now());
+        // Esto solo funciona en desarrollo local
+        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+          fetch('/api/sync-products', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-Admin-Secret': 'super-secret-key'
+            },
+            body: JSON.stringify({ productos })
+          }).then(res => {
+            if (res.ok) console.log('✅ JSON local actualizado con datos de Supabase');
+          }).catch(e => console.warn('No se pudo actualizar el JSON local:', e));
+        }
       } catch (e) {
-        console.warn('No se pudo guardar en localStorage:', e);
+        console.warn('No se pudo actualizar el JSON local:', e);
       }
     } else {
       throw new Error('No se recibieron productos de Supabase');
@@ -185,31 +204,6 @@ function cargarProductos() {
   })
   .catch(error => {
     console.error('❌ Error al cargar productos de Supabase:', error);
-    
-    // Intentar cargar desde localStorage si existe y no es muy antiguo
-    try {
-      const cachedProducts = localStorage.getItem('productos_cache');
-      const timestamp = localStorage.getItem('productos_cache_timestamp');
-      
-      if (cachedProducts && timestamp) {
-        const age = Date.now() - parseInt(timestamp);
-        // Si el cache tiene menos de 1 día
-        if (age < 24 * 60 * 60 * 1000) {
-          const productos = JSON.parse(cachedProducts);
-          if (Array.isArray(productos) && productos.length > 0) {
-            appState.productos = productos;
-            console.log('✅ Productos cargados desde cache:', productos.length);
-            renderizarProductos(productos);
-            setupFilters();
-            return;
-          }
-        }
-      }
-    } catch (e) {
-      console.warn('Error al cargar desde localStorage:', e);
-    }
-    
-    // Si todo falla, cargar productos completos directamente
     cargarProductosCompletos();
   });
 }
@@ -236,7 +230,8 @@ window.cargarProductosCompletos = async function cargarProductosCompletos() {
     console.error('Error al cargar productos desde JSON:', error);
   }
   
-  // Si no se pudo cargar desde JSON, usar la lista de productos completos definida aquí
+  // Si no se pudo cargar desde JSON, usar una lista mínima de productos
+  // NOTA: Esta lista solo se usa como último recurso si no se puede cargar desde Supabase ni desde el JSON
   const productosCompletos = [
     {
       id: "1",
@@ -595,8 +590,8 @@ function procesarPedido(event) {
     const referidor = formulario.querySelector('#referidor')?.value || '';
     
     // Validar datos básicos
-    if (!nombre || !email || !telefono || !direccion || !ciudad) {
-      alert('Por favor completa todos los campos obligatorios.');
+    if (!nombre || !email || !telefono || !direccion || !ciudad || !referidor) {
+      alert('Por favor completa todos los campos obligatorios, incluyendo quién te refirió.');
       return;
     }
     
@@ -698,14 +693,15 @@ function iniciarPagoWompi(total, orderNumber) {
   const formulario = document.getElementById('formularioCompra');
   const nombre = formulario.querySelector('#nombre').value;
   const email = formulario.querySelector('#email').value;
+  const referidor = formulario.querySelector('#referidor')?.value || '';
 
-  // Validación opcional
-  if (!email || !nombre) {
-    alert("Por favor, completa tu nombre y correo antes de continuar.");
+  // Validación obligatoria
+  if (!email || !nombre || !referidor) {
+    alert("Por favor, completa tu nombre, correo y referidor antes de continuar.");
     return;
   }
 
-  // Mostrar mensaje de carga opcional (puedes personalizar el modal si deseas)
+  // Mostrar mensaje de carga
   const loadingModal = document.createElement('div');
   loadingModal.className = 'modal active';
   loadingModal.id = 'loadingModal';
@@ -725,11 +721,21 @@ function iniciarPagoWompi(total, orderNumber) {
     wompiModal.remove();
   }
 
-  // Redirigir al checkout de Wompi
+  // Redirigir al checkout de Wompi con los parámetros
   const urlWompi = "https://checkout.wompi.co/l/VPOS_nJo3xk";
+  
+  // Abrir en una nueva pestaña para evitar problemas de navegación
+  window.open(urlWompi, '_blank');
+  
+  // Cerrar el modal de carga y mostrar confirmación
   setTimeout(() => {
-    window.location.href = urlWompi;
-  }, 2000); // pequeño retraso para mostrar el modal
+    document.getElementById('loadingModal').remove();
+    mostrarConfirmacionPedido(orderNumber);
+    
+    // Limpiar carrito
+    appState.cart.clear();
+    actualizarContadorCarrito();
+  }, 1500);
 }
 
 // Mostrar confirmación de pedido
