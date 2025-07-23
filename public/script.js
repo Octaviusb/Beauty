@@ -839,55 +839,29 @@ function procesarPedido(event) {
   }
 }
 
-// Mostrar modal de Wompi
 function mostrarModalWompi(total, orderNumber) {
-  console.log('💳 Preparando pago con Wompi...');
+  const wompiModal = document.getElementById('wompiModal');
+  if (!wompiModal) return;
 
-  const urlWompi = "https://checkout.wompi.co/l/VPOS_nJo3xk";
-  const wompiModal = document.createElement('div');
-  wompiModal.className = 'modal active';
-  wompiModal.id = 'wompiModal';
-  wompiModal.innerHTML = `
-    <div class="modal-content payment-modal">
-      <button class="close-modal" aria-label="Cerrar">&times;</button>
-      <h2>Pagar con Wompi</h2>
-      <p><strong>Monto:</strong> $${total.toLocaleString()}</p>
-      <p><strong>Pedido:</strong> ${orderNumber}</p>
-      <a href="${urlWompi}" target="_blank" id="btnIrAWompi" class="btn-submit-order">Ir a Wompi</a>
-    </div>
-  `;
-  document.body.appendChild(wompiModal);
+  document.getElementById('wompi-total').textContent = `$${total.toLocaleString()}`;
+  document.getElementById('wompi-order-number').textContent = orderNumber;
 
+  wompiModal.classList.remove('hidden');
+  wompiModal.classList.add('active');
+
+  // Limpiar carrito después de ir a Wompi
   document.getElementById('btnIrAWompi').addEventListener('click', () => {
-    window.open(urlWompi, '_blank');
-    document.getElementById('wompiModal').remove();
+    wompiModal.classList.remove('active');
+    wompiModal.classList.add('hidden');
     mostrarConfirmacionPedido(orderNumber);
     appState.cart.clear();
     actualizarContadorCarrito();
   });
 
   wompiModal.querySelector('.close-modal').addEventListener('click', () => {
-    document.getElementById('wompiModal').remove();
+    wompiModal.classList.remove('active');
+    wompiModal.classList.add('hidden');
     mostrarConfirmacionPedido(orderNumber);
-    appState.cart.clear();
-    actualizarContadorCarrito();
-  });
-}
-  
-  document.body.appendChild(wompiModal);
-  
-  // Configurar el botón para ir a Wompi
-  document.getElementById('btnIrAWompi').addEventListener('click', () => {
-    // Enlace de Wompi proporcionado
-    window.location.href = 'https://checkout.wompi.co/l/VPOS_nJo3xk';
-  });
-  
-  // Configurar el botón de cerrar
-  wompiModal.querySelector('.close-modal').addEventListener('click', () => {
-    document.getElementById('wompiModal').remove();
-    mostrarConfirmacionPedido(orderNumber);
-    
-    // Limpiar carrito
     appState.cart.clear();
     actualizarContadorCarrito();
   });
