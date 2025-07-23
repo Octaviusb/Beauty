@@ -151,70 +151,67 @@ function actualizarContadorCarrito() {
 function cargarProductos() {
   console.log('🔄 Cargando productos...');
   
-  // Verificar si estamos en un entorno local o de desarrollo
-  const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-  const apiUrl = isLocalhost ? '/api/products' : 'https://beauty-line-api.vercel.app/api/products';
+  // Cargar directamente desde Supabase
+  const SUPABASE_URL = 'https://wrevwfeqxjwiasbqdjds.supabase.co'; // Reemplaza con tu URL de Supabase
+  const SUPABASE_KEY = 'sbp_f984acac0fb1c81d5414b5d7e0234174efa2aa5a'; // Reemplaza con tu clave anónima de Supabase
   
-  // Intentar cargar productos desde la API con un timeout para evitar esperas largas
-  const timeoutPromise = new Promise((_, reject) => {
-    setTimeout(() => reject(new Error('Timeout al cargar productos')), 5000);
-  });
-  
-  Promise.race([
-    fetch(apiUrl),
-    timeoutPromise
-  ])
-    .then(response => {
-      if (!response.ok) throw new Error(`Error: ${response.status}`);
-      return response.json();
-    })
-    .then(productos => {
-      if (Array.isArray(productos) && productos.length > 0) {
-        appState.productos = productos;
-        console.log('✅ Productos de API cargados:', productos.length);
-        renderizarProductos(productos);
-        setupFilters();
-        
-        // Guardar en localStorage como respaldo
-        try {
-          localStorage.setItem('productos_cache', JSON.stringify(productos));
-          localStorage.setItem('productos_cache_timestamp', Date.now());
-        } catch (e) {
-          console.warn('No se pudo guardar en localStorage:', e);
-        }
-      } else {
-        throw new Error('No se recibieron productos de la API');
-      }
-    })
-    .catch(error => {
-      console.error('❌ Error al cargar productos de API:', error);
+  fetch(`${SUPABASE_URL}/rest/v1/products?select=*`, {
+    headers: {
+      'apikey': SUPABASE_KEY,
+      'Authorization': `Bearer ${SUPABASE_KEY}`
+    }
+  })
+  .then(response => {
+    if (!response.ok) throw new Error(`Error: ${response.status}`);
+    return response.json();
+  })
+  .then(productos => {
+    if (Array.isArray(productos) && productos.length > 0) {
+      appState.productos = productos;
+      console.log('✅ Productos de Supabase cargados:', productos.length);
+      renderizarProductos(productos);
+      setupFilters();
       
-      // Intentar cargar desde localStorage si existe y no es muy antiguo
+      // Guardar en localStorage como respaldo
       try {
-        const cachedProducts = localStorage.getItem('productos_cache');
-        const timestamp = localStorage.getItem('productos_cache_timestamp');
-        
-        if (cachedProducts && timestamp) {
-          const age = Date.now() - parseInt(timestamp);
-          // Si el cache tiene menos de 1 día
-          if (age < 24 * 60 * 60 * 1000) {
-            const productos = JSON.parse(cachedProducts);
-            if (Array.isArray(productos) && productos.length > 0) {
-              appState.productos = productos;
-              console.log('✅ Productos cargados desde cache:', productos.length);
-              renderizarProductos(productos);
-              setupFilters();
-              return;
-            }
+        localStorage.setItem('productos_cache', JSON.stringify(productos));
+        localStorage.setItem('productos_cache_timestamp', Date.now());
+      } catch (e) {
+        console.warn('No se pudo guardar en localStorage:', e);
+      }
+    } else {
+      throw new Error('No se recibieron productos de Supabase');
+    }
+  })
+  .catch(error => {
+    console.error('❌ Error al cargar productos de Supabase:', error);
+    
+    // Intentar cargar desde localStorage si existe y no es muy antiguo
+    try {
+      const cachedProducts = localStorage.getItem('productos_cache');
+      const timestamp = localStorage.getItem('productos_cache_timestamp');
+      
+      if (cachedProducts && timestamp) {
+        const age = Date.now() - parseInt(timestamp);
+        // Si el cache tiene menos de 1 día
+        if (age < 24 * 60 * 60 * 1000) {
+          const productos = JSON.parse(cachedProducts);
+          if (Array.isArray(productos) && productos.length > 0) {
+            appState.productos = productos;
+            console.log('✅ Productos cargados desde cache:', productos.length);
+            renderizarProductos(productos);
+            setupFilters();
+            return;
           }
         }
-      } catch (e) {
-        console.warn('Error al cargar desde localStorage:', e);
       }
-      
-      // Si todo falla, cargar productos completos directamente
-      cargarProductosCompletos();
-    });
+    } catch (e) {
+      console.warn('Error al cargar desde localStorage:', e);
+    }
+    
+    // Si todo falla, cargar productos completos directamente
+    cargarProductosCompletos();
+  });
 }
 
 // Cargar productos completos directamente (expuesto globalmente para el filtro)
