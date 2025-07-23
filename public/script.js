@@ -151,61 +151,8 @@ function actualizarContadorCarrito() {
 function cargarProductos() {
   console.log('🔄 Cargando productos...');
   
-  // Intentar cargar desde Supabase
-  const SUPABASE_URL = 'https://wrevwfeqxjwiasbqdjds.supabase.co'; // Reemplaza con tu URL real
-  const SUPABASE_KEY = 'sbp_f984acac0fb1c81d5414b5d7e0234174efa2aa5a'; // Reemplaza con tu clave real
-  
-  // Verificar si tenemos las credenciales correctas
-  if (SUPABASE_URL.includes('wrevwfeqxjwiasbqdjds')) {
-    console.warn('⚠️ Credenciales de Supabase no configuradas, usando JSON local');
-    cargarProductosCompletos();
-    return;
-  }
-  
-  // Intentar cargar desde Supabase
-  fetch(`${SUPABASE_URL}/rest/v1/products?select=*`, {
-    headers: {
-      'apikey': SUPABASE_KEY,
-      'Authorization': `Bearer ${SUPABASE_KEY}`
-    }
-  })
-  .then(response => {
-    if (!response.ok) throw new Error(`Error: ${response.status}`);
-    return response.json();
-  })
-  .then(productos => {
-    if (Array.isArray(productos) && productos.length > 0) {
-      appState.productos = productos;
-      console.log('✅ Productos de Supabase cargados:', productos.length);
-      renderizarProductos(productos);
-      setupFilters();
-      
-      // Actualizar el JSON local con los datos de Supabase
-      try {
-        // Esto solo funciona en desarrollo local
-        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-          fetch('/api/sync-products', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'X-Admin-Secret': 'super-secret-key'
-            },
-            body: JSON.stringify({ productos })
-          }).then(res => {
-            if (res.ok) console.log('✅ JSON local actualizado con datos de Supabase');
-          }).catch(e => console.warn('No se pudo actualizar el JSON local:', e));
-        }
-      } catch (e) {
-        console.warn('No se pudo actualizar el JSON local:', e);
-      }
-    } else {
-      throw new Error('No se recibieron productos de Supabase');
-    }
-  })
-  .catch(error => {
-    console.error('❌ Error al cargar productos de Supabase:', error);
-    cargarProductosCompletos();
-  });
+  // Cargar directamente desde el JSON local para evitar problemas CORS
+  cargarProductosCompletos();
 }
 
 // Cargar productos completos directamente (expuesto globalmente para el filtro)
@@ -230,310 +177,14 @@ window.cargarProductosCompletos = async function cargarProductosCompletos() {
     console.error('Error al cargar productos desde JSON:', error);
   }
   
-  // Si no se pudo cargar desde JSON, usar una lista mínima de productos
-  // NOTA: Esta lista solo se usa como último recurso si no se puede cargar desde Supabase ni desde el JSON
-  const productosCompletos = [
-    {
-    "id": 15,
-    "name": "Esmalte 1",
-    "category": "esmaltes",
-    "price": 7000,
-    "description": "Color y brillo intenso",
-    "image": "images/esmaltes/img1.jpg",
-    "badge": ""
-  },
-  {
-    "id": 16,
-    "name": "Esmalte 2",
-    "category": "esmaltes",
-    "price": 7000,
-    "description": "Color y brillo intenso",
-    "image": "images/esmaltes/img2.jpg",
-    "badge": ""
-  },
-  {
-    "id": 17,
-    "name": "Esmalte 3",
-    "category": "esmaltes",
-    "price": 7000,
-    "description": "Color y brillo intenso",
-    "image": "images/esmaltes/img3.jpg",
-    "badge": ""
-  },
-  {
-    "id": 18,
-    "name": "Esmalte 4",
-    "category": "esmaltes",
-    "price": 7000,
-    "description": "Color y brillo intenso",
-    "image": "images/esmaltes/img4.jpg",
-    "badge": ""
-  },
-  {
-    "id": 19,
-    "name": "Esmalte 5",
-    "category": "esmaltes",
-    "price": 7000,
-    "description": "Color y brillo intenso",
-    "image": "images/esmaltes/img5.jpg",
-    "badge": ""
-  },
-  {
-    "id": 20,
-    "name": "Esmalte 6",
-    "category": "esmaltes",
-    "price": 7000,
-    "description": "Color y brillo intenso",
-    "image": "images/esmaltes/img6.jpg",
-    "badge": ""
-  },
-  {
-    "id": 21,
-    "name": "Esmalte 7",
-    "category": "esmaltes",
-    "price": 7000,
-    "description": "Color y brillo intenso",
-    "image": "images/esmaltes/img7.jpg",
-    "badge": ""
-  },
-  {
-    "id": 22,
-    "name": "Esmalte 8",
-    "category": "esmaltes",
-    "price": 7000,
-    "description": "Color y brillo intenso",
-    "image": "images/esmaltes/img8.jpg",
-    "badge": ""
-  },
-  {
-    "id": 23,
-    "name": "Esmalte 9",
-    "category": "esmaltes",
-    "price": 7000,
-    "description": "Color y brillo intenso",
-    "image": "images/esmaltes/img9.jpg",
-    "badge": ""
-  },
-  {
-    "id": 24,
-    "name": "Esmalte 10",
-    "category": "esmaltes",
-    "price": 7000,
-    "description": "Color y brillo intenso",
-    "image": "images/esmaltes/img10.jpg",
-    "badge": ""
-  },
-  {
-    "id": 25,
-    "name": "Esmalte 11",
-    "category": "esmaltes",
-    "price": 7000,
-    "description": "Color y brillo intenso",
-    "image": "images/esmaltes/img11.jpg",
-    "badge": ""
-  },
-  {
-    "id": 26,
-    "name": "Esmalte 12",
-    "category": "esmaltes",
-    "price": 7000,
-    "description": "Color y brillo intenso",
-    "image": "images/esmaltes/img12.jpg",
-    "badge": ""
-  },
-  {
-    "id": 27,
-    "name": "Esmalte 13",
-    "category": "esmaltes",
-    "price": 7000,
-    "description": "Color y brillo intenso",
-    "image": "images/esmaltes/img13.jpg",
-    "badge": ""
-  },
-  {
-    "id": 28,
-    "name": "Esmalte 14",
-    "category": "esmaltes",
-    "price": 7000,
-    "description": "Color y brillo intenso",
-    "image": "images/esmaltes/img14.jpg",
-    "badge": ""
-  },
-  {
-    "id": 29,
-    "name": "Esmalte 15",
-    "category": "esmaltes",
-    "price": 7000,
-    "description": "Color y brillo intenso",
-    "image": "images/esmaltes/img15.jpg",
-    "badge": ""
-  },
-  {
-    "id": 30,
-    "name": "Esmalte 16",
-    "category": "esmaltes",
-    "price": 7000,
-    "description": "Color y brillo intenso",
-    "image": "images/esmaltes/img16.jpg",
-    "badge": ""
-  },
-  {
-    "id": 31,
-    "name": "Esmalte 17",
-    "category": "esmaltes",
-    "price": 7000,
-    "description": "Color y brillo intenso",
-    "image": "images/esmaltes/img17.jpg",
-    "badge": ""
-  },
-  {
-    "id": 32,
-    "name": "Esmalte 18",
-    "category": "esmaltes",
-    "price": 7000,
-    "description": "Color y brillo intenso",
-    "image": "images/esmaltes/img18.jpg",
-    "badge": ""
-  },
-  {
-    "id": 33,
-    "name": "Esmalte 19",
-    "category": "esmaltes",
-    "price": 7000,
-    "description": "Color y brillo intenso",
-    "image": "images/esmaltes/img19.jpg",
-    "badge": ""
-  },
-  {
-    "id": 34,
-    "name": "Esmalte 20",
-    "category": "esmaltes",
-    "price": 7000,
-    "description": "Color y brillo intenso",
-    "image": "images/esmaltes/img20.jpg",
-    "badge": ""
-  },
-  {
-    "id": 35,
-    "name": "Esmalte 21",
-    "category": "esmaltes",
-    "price": 7000,
-    "description": "Color y brillo intenso",
-    "image": "images/esmaltes/img21.jpg",
-    "badge": ""
-  },
-  {
-    "id": 36,
-    "name": "Esmalte 22",
-    "category": "esmaltes",
-    "price": 7000,
-    "description": "Color y brillo intenso",
-    "image": "images/esmaltes/img22.jpg",
-    "badge": ""
-  },
-  {
-    "id": 37,
-    "name": "Esmalte 23",
-    "category": "esmaltes",
-    "price": 7000,
-    "description": "Color y brillo intenso",
-    "image": "images/esmaltes/img23.jpg",
-    "badge": ""
-  },
-  {
-    "id": 38,
-    "name": "Esmalte 24",
-    "category": "esmaltes",
-    "price": 7000,
-    "description": "Color y brillo intenso",
-    "image": "images/esmaltes/img24.jpg",
-    "badge": ""
-  },
-  {
-    "id": 39,
-    "name": "Gel de Baño",
-    "category": "higiene",
-    "price": 29400,
-    "description": "Gel suave para piel sensible",
-    "image": "images/higiene/gel-de-bao.jpg",
-    "badge": ""
-  },
-  {
-    "id": 41,
-    "name": "Maquillaje 1",
-    "category": "maquillaje",
-    "price": 35000,
-    "description": "Producto de maquillaje",
-    "image": "images/maquillaje/img70.jpg",
-    "badge": ""
-  },
-  {
-    "id": 42,
-    "name": "Maquillaje 2",
-    "category": "maquillaje",
-    "price": 35000,
-    "description": "Producto de maquillaje",
-    "image": "images/maquillaje/img71.jpg",
-    "badge": ""
-  },
-  {
-    "id": 43,
-    "name": "Agua Micelar",
-    "category": "skincare",
-    "price": 39200,
-    "description": "Limpieza sin enjuague",
-    "image": "images/skincare/agua-micelar.jpg",
-    "badge": ""
-  },
-  {
-    "id": 44,
-    "name": "Ampollas Reafirmantes",
-    "category": "skincare",
-    "price": 75000,
-    "description": "Tratamiento intensivo para piel madura",
-    "image": "images/skincare/ampollas-reafirmantes.jpg",
-    "badge": ""
-  },
-  {
-    "id": 45,
-    "name": "Contorno de Ojos",
-    "category": "skincare",
-    "price": 48000,
-    "description": "Reduce ojeras y líneas de expresión",
-    "image": "images/skincare/contorno-de-ojos.jpg",
-    "badge": ""
-  },
-  {
-    "id": 46,
-    "name": "Crema Antiarrugas",
-    "category": "skincare",
-    "price": 68000,
-    "description": "Combate los signos de la edad",
-    "image": "images/skincare/crema-antiarrugas.jpg",
-    "badge": ""
-  },
-  {
-    "id": 47,
-    "name": "Crema de Día",
-    "category": "skincare",
-    "price": 45000,
-    "description": "Hidratación diaria para todo tipo de piel",
-    "image": "images/skincare/crema-de-da.jpg",
-    "badge": ""
-  },
-  {
-    "id": 48,
-    "name": "Crema de Noche",
-    "category": "skincare",
-    "price": 52000,
-    "description": "Regeneración nocturna intensiva",
-    "image": "images/skincare/crema-de-noche.jpg",
-    "badge": ""
-  },
-  ];
+  // Si no se pudo cargar desde JSON, mostrar mensaje de error
+  console.error('❌ No se pudieron cargar los productos desde el JSON');
+  
+  // Usar un array vacío para evitar errores
+  const productosCompletos = [];
   
   appState.productos = productosCompletos;
-  console.log('✅ Productos completos cargados:', appState.productos.length);
+  console.log('✅ No hay productos de respaldo disponibles');
   renderizarProductos(productosCompletos);
   setupFilters();
 }
@@ -755,7 +406,17 @@ function mostrarModalWompi(total, orderNumber) {
   
   // Configurar el botón para ir a Wompi
   document.getElementById('btnIrAWompi').addEventListener('click', () => {
-    iniciarPagoWompi(total, orderNumber);
+    // Ir directamente a Wompi sin usar iniciarPagoWompi
+    const urlWompi = "https://checkout.wompi.co/l/VPOS_nJo3xk";
+    window.open(urlWompi, '_blank') || window.location.replace(urlWompi);
+    
+    // Cerrar el modal y mostrar confirmación
+    document.getElementById('wompiModal').remove();
+    mostrarConfirmacionPedido(orderNumber);
+    
+    // Limpiar carrito
+    appState.cart.clear();
+    actualizarContadorCarrito();
   });
   
   // Configurar el botón de cerrar
@@ -769,67 +430,111 @@ function mostrarModalWompi(total, orderNumber) {
   });
 }
 
-// Iniciar pago con Wompi (versión con redirección directa al enlace de pago)
-function iniciarPagoWompi(total, orderNumber) {
-  const formulario = document.getElementById('formularioCompra');
-  const nombre = formulario.querySelector('#nombre').value;
-  const email = formulario.querySelector('#email').value;
-  const referidor = formulario.querySelector('#referidor')?.value || '';
-
-  // Validación obligatoria
-  if (!email || !nombre || !referidor) {
-    alert("Por favor, completa tu nombre, correo y referidor antes de continuar.");
-    return;
+// Mostrar confirmación de pedido
+function mostrarConfirmacionPedido(orderNumber) {
+  const confirmationModal = document.getElementById('confirmationModal');
+  const orderNumberElement = document.getElementById('order-number');
+  const continuarComprandoBtn = document.getElementById('btn-continue-shopping');
+  
+  // Actualizar número de pedido
+  if (orderNumberElement) {
+    orderNumberElement.textContent = orderNumber;
   }
+  
+  // Mostrar modal
+  confirmationModal.classList.remove('hidden');
+  confirmationModal.classList.add('active');
+  
+  // Configurar botón para continuar comprando
+  if (continuarComprandoBtn) {
+    continuarComprandoBtn.addEventListener('click', () => {
+      confirmationModal.classList.remove('active');
+      confirmationModal.classList.add('hidden');
+    });
+  }
+}
 
-  // Mostrar mensaje de carga
-  const loadingModal = document.createElement('div');
-  loadingModal.className = 'modal active';
-  loadingModal.id = 'loadingModal';
-  loadingModal.innerHTML = `
+// Inicialización
+document.addEventListener('DOMContentLoaded', () => {
+  console.log('🚀 Inicializando aplicación...');
+  
+  // Agregar botón para limpiar caché (solo visible en desarrollo)
+  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+    const limpiarBtn = document.createElement('button');
+    limpiarBtn.textContent = 'Limpiar Caché';
+    limpiarBtn.style.position = 'fixed';
+    limpiarBtn.style.bottom = '10px';
+    limpiarBtn.style.right = '10px';
+    limpiarBtn.style.zIndex = '9999';
+    limpiarBtn.style.padding = '5px 10px';
+    limpiarBtn.style.backgroundColor = '#d63384';
+    limpiarBtn.style.color = 'white';
+    limpiarBtn.style.border = 'none';
+    limpiarBtn.style.borderRadius = '4px';
+    limpiarBtn.style.cursor = 'pointer';
+    limpiarBtn.style.fontSize = '12px';
+    
+    limpiarBtn.addEventListener('click', () => {
+      localStorage.removeItem('productos');
+      localStorage.removeItem('productosCache');
+      localStorage.removeItem('lastUpdate');
+      window.location.reload(true);
+    });
+    
+    document.body.appendChild(limpiarBtn);
+  }
+  
+  // Cargar productos desde la API primero
+  cargarProductos();
+  configurarCarrito();
+  actualizarContadorCarrito();
+  
+  // Actualizar año en el footer
+  document.getElementById('current-year').textContent = new Date().getFullYear();
+});
     <div class="modal-content payment-modal">
-      <h2>Redirigiendo a Wompi...</h2>
+      <button class="close-modal" aria-label="Cerrar">&times;</button>
+      <h2>Pago con Wompi</h2>
       <div class="payment-info">
-        <p>Estamos preparando tu pago con Wompi. Un momento por favor.</p>
+        <p>A continuación serás redirigido a Wompi para completar tu pago.</p>
+        <div class="payment-details">
+          <p><strong>Monto a pagar:</strong> $${total.toLocaleString()}</p>
+          <p><strong>Número de pedido:</strong> ${orderNumber}</p>
+          <p class="important-note">IMPORTANTE: Por favor ingresa exactamente el monto indicado arriba. Cualquier inconsistencia impedirá que el pedido sea despachado.</p>
+        </div>
+        <div class="form-actions">
+          <button id="btnIrAWompi" class="btn-submit-order">Ir a Wompi</button>
+        </div>
       </div>
     </div>
   `;
-  document.body.appendChild(loadingModal);
-
-  // Cerrar el modal de Wompi
-  const wompiModal = document.getElementById('wompiModal');
-  if (wompiModal) {
-    wompiModal.remove();
-  }
-
-  // URL directa de Wompi
-  const urlWompi = "https://checkout.wompi.co/l/VPOS_nJo3xk";
   
-  try {
-    // Intentar abrir en una nueva pestaña
-    const newWindow = window.open(urlWompi, '_blank');
+  document.body.appendChild(wompiModal);
+  
+  // Configurar el botón para ir a Wompi
+  document.getElementById('btnIrAWompi').addEventListener('click', () => {
+    // Ir directamente a Wompi sin usar iniciarPagoWompi
+    const urlWompi = "https://checkout.wompi.co/l/VPOS_nJo3xk";
+    window.open(urlWompi, '_blank') || window.location.replace(urlWompi);
     
-    // Si el navegador bloquea la apertura de la ventana
-    if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
-      // Redirigir en la misma ventana como alternativa
-      window.location.href = urlWompi;
-    }
-  } catch (e) {
-    console.error('Error al abrir Wompi:', e);
-    // Redirigir en la misma ventana como alternativa
-    window.location.href = urlWompi;
-  }
-  
-  // Cerrar el modal de carga y mostrar confirmación
-  setTimeout(() => {
-    const loadingModalElement = document.getElementById('loadingModal');
-    if (loadingModalElement) loadingModalElement.remove();
+    // Cerrar el modal y mostrar confirmación
+    document.getElementById('wompiModal').remove();
     mostrarConfirmacionPedido(orderNumber);
     
     // Limpiar carrito
     appState.cart.clear();
     actualizarContadorCarrito();
-  }, 1500);
+  });
+  
+  // Configurar el botón de cerrar
+  wompiModal.querySelector('.close-modal').addEventListener('click', () => {
+    document.getElementById('wompiModal').remove();
+    mostrarConfirmacionPedido(orderNumber);
+    
+    // Limpiar carrito
+    appState.cart.clear();
+    actualizarContadorCarrito();
+  });
 }
 
 // Mostrar confirmación de pedido
