@@ -264,6 +264,25 @@
     </div>
   </div>
 
+  <!-- Modal de Pago con Wompi -->
+<div id="wompiModal" class="modal hidden" role="dialog" aria-modal="true">
+  <div class="modal-content payment-modal">
+    <button class="close-modal" aria-label="Cerrar">&times;</button>
+    <h2>Pago con Wompi</h2>
+    <div class="payment-info">
+      <p>Serás redirigido a Wompi para completar tu pago.</p>
+      <div class="payment-details">
+        <p><strong>Monto a pagar:</strong> <span id="wompi-total"></span></p>
+        <p><strong>Número de pedido:</strong> <span id="wompi-order-number"></span></p>
+      </div>
+      <div class="form-actions">
+        <a href="https://checkout.wompi.co/l/VPOS_nJo3xk" target="_blank" id="btnIrAWompi" class="btn-submit-order">Ir a Wompi</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+
   <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
   <script src="filtrar-productos.js"></script>
