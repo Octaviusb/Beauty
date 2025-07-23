@@ -62,7 +62,7 @@ window.renderizarProductos = function renderizarProductos(productos) {
     contenedor.innerHTML = productosFiltrados.map(producto => (
       `<div class='product-card'>
         <div class='product-image-container'>
-          <img src='${producto.image}' alt='${producto.name}' class='product-image' loading='lazy'>
+          <img src='${producto.image}' alt='${producto.name}' class='product-image' loading='lazy' onerror="this.onerror=null; this.src='/images/default-product.html';">
           ${producto.badge ? `<span class="product-badge">${producto.badge}</span>` : ''}
         </div>
         <div class='product-info'>
@@ -151,11 +151,22 @@ function actualizarContadorCarrito() {
 function cargarProductos() {
   console.log('🔄 Cargando productos...');
   
-  // Usar productos de respaldo primero para mostrar algo rápido mientras carga
-  cargarProductosRespaldo();
+  // NO cargar productos de respaldo para evitar mostrar datos incorrectos
+  // cargarProductosRespaldo();
   
-  // Intentar cargar productos desde la API
-  fetch('/api/products')
+  // Verificar si estamos en un entorno local o de desarrollo
+  const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+  const apiUrl = isLocalhost ? '/api/products' : 'https://beauty-line-api.vercel.app/api/products';
+  
+  // Intentar cargar productos desde la API con un timeout para evitar esperas largas
+  const timeoutPromise = new Promise((_, reject) => {
+    setTimeout(() => reject(new Error('Timeout al cargar productos')), 5000);
+  });
+  
+  Promise.race([
+    fetch(apiUrl),
+    timeoutPromise
+  ])
     .then(response => {
       if (!response.ok) throw new Error(`Error: ${response.status}`);
       return response.json();
@@ -166,13 +177,45 @@ function cargarProductos() {
         console.log('✅ Productos de API cargados:', productos.length);
         renderizarProductos(productos);
         setupFilters();
+        
+        // Guardar en localStorage como respaldo
+        try {
+          localStorage.setItem('productos_cache', JSON.stringify(productos));
+          localStorage.setItem('productos_cache_timestamp', Date.now());
+        } catch (e) {
+          console.warn('No se pudo guardar en localStorage:', e);
+        }
       } else {
         throw new Error('No se recibieron productos de la API');
       }
     })
     .catch(error => {
       console.error('❌ Error al cargar productos de API:', error);
-      // Cargar productos completos directamente
+      
+      // Intentar cargar desde localStorage si existe y no es muy antiguo
+      try {
+        const cachedProducts = localStorage.getItem('productos_cache');
+        const timestamp = localStorage.getItem('productos_cache_timestamp');
+        
+        if (cachedProducts && timestamp) {
+          const age = Date.now() - parseInt(timestamp);
+          // Si el cache tiene menos de 1 día
+          if (age < 24 * 60 * 60 * 1000) {
+            const productos = JSON.parse(cachedProducts);
+            if (Array.isArray(productos) && productos.length > 0) {
+              appState.productos = productos;
+              console.log('✅ Productos cargados desde cache:', productos.length);
+              renderizarProductos(productos);
+              setupFilters();
+              return;
+            }
+          }
+        }
+      } catch (e) {
+        console.warn('Error al cargar desde localStorage:', e);
+      }
+      
+      // Si todo falla, cargar productos completos directamente
       cargarProductosCompletos();
     });
 }
@@ -199,8 +242,7 @@ window.cargarProductosCompletos = async function cargarProductosCompletos() {
     console.error('Error al cargar productos desde JSON:', error);
   }
   
-  // Si no se pudo cargar desde JSON, usar la lista de respaldo
-  // Nota: Esta lista debe coincidir con productos.json
+  // Si no se pudo cargar desde JSON, usar la lista de productos completos definida aquí
   const productosCompletos = [
     {
       id: "1",
@@ -338,204 +380,6 @@ window.cargarProductosCompletos = async function cargarProductosCompletos() {
       badge: ""
     },
     {
-      id: "17",
-      name: "Esmalte 3",
-      category: "esmaltes",
-      price: 7000,
-      description: "Color y brillo intenso",
-      image: "images/esmaltes/img3.jpg",
-      badge: ""
-    },
-    {
-      id: "18",
-      name: "Esmalte 4",
-      category: "esmaltes",
-      price: 7000,
-      description: "Color y brillo intenso",
-      image: "images/esmaltes/img4.jpg",
-      badge: ""
-    },
-    {
-      id: "19",
-      name: "Esmalte 5",
-      category: "esmaltes",
-      price: 7000,
-      description: "Color y brillo intenso",
-      image: "images/esmaltes/img5.jpg",
-      badge: ""
-    },
-    {
-      id: "20",
-      name: "Esmalte 6",
-      category: "esmaltes",
-      price: 7000,
-      description: "Color y brillo intenso",
-      image: "images/esmaltes/img6.jpg",
-      badge: ""
-    },
-    {
-      id: "21",
-      name: "Esmalte 7",
-      category: "esmaltes",
-      price: 7000,
-      description: "Color y brillo intenso",
-      image: "images/esmaltes/img7.jpg",
-      badge: ""
-    },
-    {
-      id: "22",
-      name: "Esmalte 8",
-      category: "esmaltes",
-      price: 7000,
-      description: "Color y brillo intenso",
-      image: "images/esmaltes/img8.jpg",
-      badge: ""
-    },
-    {
-      id: "23",
-      name: "Esmalte 9",
-      category: "esmaltes",
-      price: 7000,
-      description: "Color y brillo intenso",
-      image: "images/esmaltes/img9.jpg",
-      badge: ""
-    },
-    {
-      id: "24",
-      name: "Esmalte 10",
-      category: "esmaltes",
-      price: 7000,
-      description: "Color y brillo intenso",
-      image: "images/esmaltes/img10.jpg",
-      badge: ""
-    },
-    {
-      id: "25",
-      name: "Esmalte 11",
-      category: "esmaltes",
-      price: 7000,
-      description: "Color y brillo intenso",
-      image: "images/esmaltes/img11.jpg",
-      badge: ""
-    },
-    {
-      id: "26",
-      name: "Esmalte 12",
-      category: "esmaltes",
-      price: 7000,
-      description: "Color y brillo intenso",
-      image: "images/esmaltes/img12.jpg",
-      badge: ""
-    },
-    {
-      id: "27",
-      name: "Esmalte 13",
-      category: "esmaltes",
-      price: 7000,
-      description: "Color y brillo intenso",
-      image: "images/esmaltes/img13.jpg",
-      badge: ""
-    },
-    {
-      id: "28",
-      name: "Esmalte 14",
-      category: "esmaltes",
-      price: 7000,
-      description: "Color y brillo intenso",
-      image: "images/esmaltes/img14.jpg",
-      badge: ""
-    },
-    {
-      id: "29",
-      name: "Esmalte 15",
-      category: "esmaltes",
-      price: 7000,
-      description: "Color y brillo intenso",
-      image: "images/esmaltes/img15.jpg",
-      badge: ""
-    },
-    {
-      id: "30",
-      name: "Esmalte 16",
-      category: "esmaltes",
-      price: 7000,
-      description: "Color y brillo intenso",
-      image: "images/esmaltes/img16.jpg",
-      badge: ""
-    },
-    {
-      id: "31",
-      name: "Esmalte 17",
-      category: "esmaltes",
-      price: 7000,
-      description: "Color y brillo intenso",
-      image: "images/esmaltes/img17.jpg",
-      badge: ""
-    },
-    {
-      id: "32",
-      name: "Esmalte 18",
-      category: "esmaltes",
-      price: 7000,
-      description: "Color y brillo intenso",
-      image: "images/esmaltes/img18.jpg",
-      badge: ""
-    },
-    {
-      id: "33",
-      name: "Esmalte 19",
-      category: "esmaltes",
-      price: 7000,
-      description: "Color y brillo intenso",
-      image: "images/esmaltes/img19.jpg",
-      badge: ""
-    },
-    {
-      id: "34",
-      name: "Esmalte 20",
-      category: "esmaltes",
-      price: 7000,
-      description: "Color y brillo intenso",
-      image: "images/esmaltes/img20.jpg",
-      badge: ""
-    },
-    {
-      id: "35",
-      name: "Esmalte 21",
-      category: "esmaltes",
-      price: 7000,
-      description: "Color y brillo intenso",
-      image: "images/esmaltes/img21.jpg",
-      badge: ""
-    },
-    {
-      id: "36",
-      name: "Esmalte 22",
-      category: "esmaltes",
-      price: 7000,
-      description: "Color y brillo intenso",
-      image: "images/esmaltes/img22.jpg",
-      badge: ""
-    },
-    {
-      id: "37",
-      name: "Esmalte 23",
-      category: "esmaltes",
-      price: 7000,
-      description: "Color y brillo intenso",
-      image: "images/esmaltes/img23.jpg",
-      badge: ""
-    },
-    {
-      id: "38",
-      name: "Esmalte 24",
-      category: "esmaltes",
-      price: 7000,
-      description: "Color y brillo intenso",
-      image: "images/esmaltes/img24.jpg",
-      badge: ""
-    },
-    {
       id: "39",
       name: "Gel de Baño",
       category: "higiene",
@@ -615,114 +459,6 @@ window.cargarProductosCompletos = async function cargarProductosCompletos() {
       description: "Regeneración nocturna intensiva",
       image: "images/skincare/crema-de-noche.jpg",
       badge: ""
-    },
-    {
-      id: "50",
-      name: "Exfoliante Facial",
-      category: "skincare",
-      price: 42000,
-      description: "Elimina células muertas",
-      image: "images/skincare/exfoliante-facial.jpg",
-      badge: ""
-    },
-    {
-      id: "51",
-      name: "Mascarilla Purificante",
-      category: "skincare",
-      price: 38000,
-      description: "Limpieza profunda de poros",
-      image: "images/skincare/mascarilla-purificante.jpg",
-      badge: ""
-    },
-    {
-      id: "52",
-      name: "Protector Solar",
-      category: "skincare",
-      price: 55000,
-      description: "SPF 50+ para uso diario",
-      image: "images/skincare/protector-solar.jpg",
-      badge: "Popular"
-    },
-    {
-      id: "53",
-      name: "Serum Antioxidante",
-      category: "skincare",
-      price: 65000,
-      description: "Con vitamina C para luminosidad",
-      image: "images/skincare/serum-antioxidante.jpg",
-      badge: ""
-    },
-    {
-      id: "54",
-      name: "Serum Hidratante",
-      category: "skincare",
-      price: 58000,
-      description: "Con ácido hialurónico",
-      image: "images/skincare/serum-hidratante.jpg",
-      badge: ""
-    },
-    {
-      id: "55",
-      name: "Tónico Facial",
-      category: "skincare",
-      price: 32000,
-      description: "Equilibra el pH de la piel",
-      image: "images/skincare/tnico-facial.jpg",
-      badge: ""
-    },
-    {
-      id: "56",
-      name: "Kit de Uñas 1",
-      category: "uñas",
-      price: 28000,
-      description: "Kit completo para manicura",
-      image: "images/uñas/img194.jpg",
-      badge: ""
-    },
-    {
-      id: "57",
-      name: "Kit de Uñas 2",
-      category: "uñas",
-      price: 32000,
-      description: "Kit profesional para uñas",
-      image: "images/uñas/img195.jpg",
-      badge: ""
-    },
-    {
-      id: "58",
-      name: "Kit de Uñas 3",
-      category: "uñas",
-      price: 35000,
-      description: "Kit completo para uñas acrílicas",
-      image: "images/uñas/img196.jpg",
-      badge: ""
-    },
-    {
-      id: "59",
-      name: "Kit de Uñas 4",
-      category: "uñas",
-      price: 42000,
-      description: "Kit profesional para uñas de gel",
-      image: "images/uñas/img197.jpg",
-      badge: "Nuevo"
-    },
-    {
-      id: "60",
-      name: "Kit de Uñas 5",
-      category: "uñas",
-      price: 38000,
-      description: "Kit completo para nail art",
-      image: "images/uñas/img203.jpg",
-      badge: ""
-    },
-    {
-      id: "61",
-      name: "Kit de Uñas 6",
-      category: "uñas",
-      price: 45000,
-      description: "Kit profesional para decoración de uñas",
-      image: "images/uñas/img204.jpg",
-      badge: ""
     }
   ];
   
@@ -732,82 +468,14 @@ window.cargarProductosCompletos = async function cargarProductosCompletos() {
   setupFilters();
 }
 
-// Productos de respaldo
-function cargarProductosRespaldo() {
-  console.log('🚨 Cargando productos de respaldo...');
-  
-  // Datos de productos de respaldo
-  const productosRespaldo = [
-    {
-      id: "1",
-      name: "Brocha Kabuki",
-      category: "accesorios",
-      price: 23800,
-      description: "Ideal para polvos sueltos",
-      image: "images/accesorios/brocha-kabuki.jpg",
-      badge: ""
-    },
-    {
-      id: "2",
-      name: "Caja de Almacenamiento",
-      category: "accesorios",
-      price: 44800,
-      description: "Para cosméticos y accesorios",
-      image: "images/accesorios/caja-de-almacenamiento.jpg",
-      badge: ""
-    },
-    {
-      id: "3",
-      name: "Cepillo Facial Eléctrico",
-      category: "accesorios",
-      price: 64400,
-      description: "Limpieza profunda",
-      image: "images/accesorios/cepillo-facial-elctrico.jpg",
-      badge: ""
-    },
-    {
-      id: "15",
-      name: "Esmalte 1",
-      category: "esmaltes",
-      price: 7000,
-      description: "Color y brillo intenso",
-      image: "images/esmaltes/img1.jpg",
-      badge: ""
-    },
-    {
-      id: "39",
-      name: "Gel de Baño",
-      category: "higiene",
-      price: 29400,
-      description: "Gel suave para piel sensible",
-      image: "images/higiene/gel-de-bao.jpg",
-      badge: ""
-    },
-    {
-      id: "41",
-      name: "Maquillaje 1",
-      category: "maquillaje",
-      price: 35000,
-      description: "Producto de maquillaje",
-      image: "images/maquillaje/img70.jpg",
-      badge: ""
-    },
-    {
-      id: "43",
-      name: "Agua Micelar",
-      category: "skincare",
-      price: 39200,
-      description: "Limpieza sin enjuague",
-      image: "images/skincare/agua-micelar.jpg",
-      badge: ""
-    }
-  ];
-  
-  appState.productos = productosRespaldo;
-  console.log('✅ Productos de respaldo cargados:', appState.productos.length);
-  renderizarProductos(productosRespaldo);
-  setupFilters();
-}
+// Productos de respaldo - FUNCIÓN ELIMINADA PARA EVITAR MOSTRAR PRODUCTOS INCORRECTOS
+// function cargarProductosRespaldo() {
+//   console.log('🚨 Cargando productos de respaldo...');
+//   const productosRespaldo = [];
+//   appState.productos = productosRespaldo;
+//   console.log('✅ No se cargan productos de respaldo para evitar datos incorrectos');
+//   setupFilters();
+// }
 
 // Configurar filtros
 function setupFilters() {
@@ -1000,45 +668,91 @@ function procesarPedido(event) {
 function mostrarModalWompi(total, orderNumber) {
   console.log('💳 Preparando pago con Wompi...');
   
-  // Crear un modal con instrucciones para Wompi
-  const wompiModal = document.createElement('div');
-  wompiModal.className = 'modal active';
-  wompiModal.id = 'wompiModal';
-  wompiModal.innerHTML = `
+  // Verificar si el script de integración de Wompi está cargado
+  if (typeof window.wompiCheckout === 'undefined') {
+    // Cargar el script de integración de Wompi
+    const script = document.createElement('script');
+    script.src = '/wompi-integration.js';
+    script.onload = () => {
+      iniciarPagoWompi(total, orderNumber);
+    };
+    document.head.appendChild(script);
+  } else {
+    iniciarPagoWompi(total, orderNumber);
+  }
+}
+
+// Iniciar pago con Wompi
+function iniciarPagoWompi(total, orderNumber) {
+  // Obtener datos del cliente del formulario
+  const formulario = document.getElementById('formularioCompra');
+  const nombre = formulario.querySelector('#nombre').value;
+  const email = formulario.querySelector('#email').value;
+  
+  // Mostrar modal de carga
+  const loadingModal = document.createElement('div');
+  loadingModal.className = 'modal active';
+  loadingModal.id = 'loadingModal';
+  loadingModal.innerHTML = `
     <div class="modal-content payment-modal">
-      <button class="close-modal" aria-label="Cerrar">&times;</button>
-      <h2>Pago con Wompi</h2>
+      <h2>Preparando pago</h2>
       <div class="payment-info">
-        <p>A continuación serás redirigido a Wompi para completar tu pago.</p>
-        <div class="payment-details">
-          <p><strong>Monto a pagar:</strong> $${total.toLocaleString()}</p>
-          <p><strong>Número de pedido:</strong> ${orderNumber}</p>
-          <p class="important-note">IMPORTANTE: Por favor ingresa exactamente el monto indicado arriba. Cualquier inconsistencia impedirá que el pedido sea despachado.</p>
-        </div>
-        <div class="form-actions">
-          <button id="btnIrAWompi" class="btn-submit-order">Ir a Wompi</button>
-        </div>
+        <p>Estamos preparando tu pago con Wompi...</p>
       </div>
     </div>
   `;
+  document.body.appendChild(loadingModal);
   
-  document.body.appendChild(wompiModal);
-  
-  // Configurar el botón para ir a Wompi
-  document.getElementById('btnIrAWompi').addEventListener('click', () => {
-    // Enlace de Wompi proporcionado
-    window.location.href = 'https://checkout.wompi.co/l/VPOS_nJo3xk';
-  });
-  
-  // Configurar el botón de cerrar
-  wompiModal.querySelector('.close-modal').addEventListener('click', () => {
-    document.getElementById('wompiModal').remove();
-    mostrarConfirmacionPedido(orderNumber);
-    
-    // Limpiar carrito
-    appState.cart.clear();
-    actualizarContadorCarrito();
-  });
+  // Iniciar el checkout de Wompi
+  window.wompiCheckout.init(
+    total, // Monto en pesos (sin centavos)
+    orderNumber, // Referencia única
+    email, // Email del cliente
+    nombre, // Nombre del cliente
+    function onSuccess(data) {
+      // Eliminar modal de carga
+      document.getElementById('loadingModal').remove();
+      
+      // Mostrar confirmación
+      mostrarConfirmacionPedido(orderNumber);
+      
+      // Limpiar carrito
+      appState.cart.clear();
+      actualizarContadorCarrito();
+    },
+    function onError(error) {
+      // Eliminar modal de carga
+      document.getElementById('loadingModal').remove();
+      
+      // Mostrar modal de error
+      const errorModal = document.createElement('div');
+      errorModal.className = 'modal active';
+      errorModal.id = 'errorModal';
+      errorModal.innerHTML = `
+        <div class="modal-content payment-modal">
+          <button class="close-modal" aria-label="Cerrar">&times;</button>
+          <h2>Error en el pago</h2>
+          <div class="payment-info">
+            <p>Ha ocurrido un error al procesar tu pago. Por favor, intenta nuevamente.</p>
+            <div class="form-actions">
+              <button id="btnReintentar" class="btn-submit-order">Reintentar pago</button>
+            </div>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(errorModal);
+      
+      // Configurar botones
+      document.getElementById('btnReintentar').addEventListener('click', () => {
+        document.getElementById('errorModal').remove();
+        mostrarModalWompi(total, orderNumber);
+      });
+      
+      errorModal.querySelector('.close-modal').addEventListener('click', () => {
+        document.getElementById('errorModal').remove();
+      });
+    }
+  );
 }
 
 // Mostrar confirmación de pedido
