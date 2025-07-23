@@ -721,15 +721,28 @@ function iniciarPagoWompi(total, orderNumber) {
     wompiModal.remove();
   }
 
-  // Redirigir al checkout de Wompi con los parámetros
+  // URL directa de Wompi
   const urlWompi = "https://checkout.wompi.co/l/VPOS_nJo3xk";
   
-  // Abrir en una nueva pestaña para evitar problemas de navegación
-  window.open(urlWompi, '_blank');
+  try {
+    // Intentar abrir en una nueva pestaña
+    const newWindow = window.open(urlWompi, '_blank');
+    
+    // Si el navegador bloquea la apertura de la ventana
+    if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
+      // Redirigir en la misma ventana como alternativa
+      window.location.href = urlWompi;
+    }
+  } catch (e) {
+    console.error('Error al abrir Wompi:', e);
+    // Redirigir en la misma ventana como alternativa
+    window.location.href = urlWompi;
+  }
   
   // Cerrar el modal de carga y mostrar confirmación
   setTimeout(() => {
-    document.getElementById('loadingModal').remove();
+    const loadingModalElement = document.getElementById('loadingModal');
+    if (loadingModalElement) loadingModalElement.remove();
     mostrarConfirmacionPedido(orderNumber);
     
     // Limpiar carrito
