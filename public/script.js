@@ -530,7 +530,7 @@ window.cargarProductosCompletos = async function cargarProductosCompletos() {
     "image": "images/skincare/crema-de-noche.jpg",
     "badge": ""
   },
-  ]
+  ];
   
   appState.productos = productosCompletos;
   console.log('✅ Productos completos cargados:', appState.productos.length);
