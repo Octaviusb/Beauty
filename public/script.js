@@ -37,6 +37,10 @@ window.appState = {
   currentFilter: 'all'
 };
 
+const SUPABASE_URL = 'https://lsxojnbkbqhuwaydiqqb.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxzeG9qbmJrYnFodXdheWRpcXFiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI1MDYzMzAsImV4cCI6MjA2ODA4MjMzMH0.uHQJ_F3NmeM2U4EsIq_UFSPMKd35MlMZnrboKOIy45g'; // Tu clave pública
+const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
 // Renderizar productos (expuesto globalmente para el filtro)
 window.renderizarProductos = function renderizarProductos(productos) {
   console.log('📊 Renderizando productos:', productos?.length || 0);
@@ -154,27 +158,26 @@ function cargarProductos() {
   // Usar productos de respaldo primero para mostrar algo rápido mientras carga
   cargarProductosRespaldo();
   
-  // Intentar cargar productos desde la API
-  fetch('/api/products')
-    .then(response => {
-      if (!response.ok) throw new Error(`Error: ${response.status}`);
-      return response.json();
-    })
-    .then(productos => {
-      if (Array.isArray(productos) && productos.length > 0) {
-        appState.productos = productos;
-        console.log('✅ Productos de API cargados:', productos.length);
-        renderizarProductos(productos);
-        setupFilters();
-      } else {
-        throw new Error('No se recibieron productos de la API');
-      }
-    })
-    .catch(error => {
-      console.error('❌ Error al cargar productos de API:', error);
-      // Cargar productos completos directamente
-      cargarProductosCompletos();
-    });
+ // Cargar productos directamente desde Supabase
+async function cargarProductosDesdeSupabase() {
+  console.log('🔄 Cargando productos desde Supabase...');
+  try {
+    const { data: productos, error } = await supabase
+      .from('products')
+      .select('*')
+      .order('id');
+
+    if (error) throw error;
+
+    appState.productos = productos;
+    console.log('✅ Productos cargados desde Supabase:', productos.length);
+    renderizarProductos(productos);
+    setupFilters();
+  } catch (error) {
+    console.error('❌ Error al cargar productos desde Supabase:', error);
+    const cont = document.getElementById('product-list');
+    if (cont) cont.innerHTML = "<p class='error-message'>No se pudieron cargar productos.</p>";
+  }
 }
 
 // Cargar productos completos directamente (expuesto globalmente para el filtro)
@@ -922,9 +925,9 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   
   // Cargar productos desde la API primero
-  cargarProductos();
   configurarCarrito();
   actualizarContadorCarrito();
+  cargarProductosDesdeSupabase();
   
   // Actualizar año en el footer
   document.getElementById('current-year').textContent = new Date().getFullYear();
