@@ -14,28 +14,29 @@ ts<!DOCTYPE html>
   <!-- Hojas de estilo -->
   <link rel="stylesheet" href="styles.css" />
   <link rel="stylesheet" href="styles-form.css" />
+  <link rel="stylesheet" href="styles-wompi.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="icon" href="assets/favicon.ico" type="image/x-icon">
+  <link rel="icon" href="./assets/favicon.ico" type="image/x-icon">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
   
   <!-- Scripts -->
-  <script type="module" src="supabase-client.js"></script>
-  <script type="module" src="script.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="script.js"></script>
   <script>
     if(window.location.hostname === "localhost") {
       window.OtAutoBlock = false; // Desactiva el bloqueo en desarrollo local
     }
   </script>
   <!-- Script de Wompi -->
-  <script type="module" src="https://checkout.wompi.co/widget.js"></script>
+  <script src="https://checkout.wompi.co/widget.js"></script>
 </head>
 <body>
   <header class="main-header" role="banner">
     <div class="header-container">
       <h1 class="logo">
-        <img src="images/logo.png" alt="Beauty Club Logo" width="150" height="50" loading="lazy">
+        <img src="assets/logo.png" alt="Beauty Club Logo" width="150" height="50" loading="lazy">
         <a href="/" aria-label="Beauty Club - Inicio">Beauty<span>Line</span></a>
       </h1>
 
@@ -198,8 +199,8 @@ ts<!DOCTYPE html>
             </div>
 
             <div class="form-group">
-              <label for="referidor">¿Quién te refirió a nosotros?</label>
-              <input type="text" id="referidor" name="referidor" autocomplete="off" placeholder="Nombre de quien te refirió" required>
+              <label for="referidor">¿Quién te refirió a nosotros?*</label>
+              <input type="text" id="referidor" name="referidor" required autocomplete="off" placeholder="Nombre de quien te refirió">
             </div>
           </div>
           
@@ -271,7 +272,7 @@ ts<!DOCTYPE html>
   </div>
 
   <!-- Scripts -->
-  <script type="module" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
   <script>
     emailjs.init("Cqwg1EyqFLvPg7ULx");
     document.getElementById('current-year').textContent = new Date().getFullYear();
