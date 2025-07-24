@@ -43,18 +43,31 @@ const appState = {
   productos: []
 };
 
-// Cargar productos desde la API
+//cargar productos
+import { supabase } from './supabaseClient.js';
+
 async function cargarProductos() {
-  try {
-    const response = await fetch('https://beauty-mocha-ten.vercel.app/api/products');
-    const productos = await response.json();
-    appState.productos = productos;
-    renderizarProductos(productos);
-    console.log('✅ Productos cargados:', productos.length);
-  } catch (error) {
-    console.error("❌ Error al cargar productos:", error);
+  console.log("🔄 Cargando productos desde Supabase...");
+
+  const { data: productos, error } = await supabase
+    .from('productos')  // el nombre de tu tabla en Supabase
+    .select('*');
+
+  if (error) {
+    console.error("❌ Error al cargar productos de Supabase:", error);
+    return;
   }
+
+  if (!productos || productos.length === 0) {
+    console.warn("⚠️ No hay productos en la base de datos.");
+    return;
+  }
+
+  appState.productos = productos;
+  renderizarProductos(productos);
+  console.log('✅ Productos cargados desde Supabase:', productos.length);
 }
+
 
 // Renderizar productos
 function renderizarProductos(productos) {
