@@ -296,93 +296,105 @@ async function guardarPedidoEnSupabase(pedido) {
   }
 }
 
-// Procesar pedido
-async function procesarPedido(e) {
-  e.preventDefault();
+// PROCESAR PEDIDO - VERSIÓN SIMPLIFICADA
+function procesarPedido() {
   console.log('🛒 Procesando pedido...');
-
-  const submitBtn = e.target.querySelector('button[type="submit"]');
-  const originalText = submitBtn.textContent;
-  submitBtn.disabled = true;
-  submitBtn.textContent = "Procesando...";
-
-  const formData = new FormData(e.target);
   
-  // Obtener datos del formulario
+  // Obtener datos del formulario DIRECTAMENTE por ID
+  const nombre = document.getElementById('nombre')?.value || '';
+  const email = document.getElementById('email')?.value || '';
+  const telefono = document.getElementById('telefono')?.value || '';
+  const direccion = document.getElementById('direccion')?.value || '';
+  const ciudad = document.getElementById('ciudad')?.value || '';
+  const referidor = document.getElementById('referidor')?.value || 'No especificado';
+
+  console.log('📋 Datos capturados:');
+  console.log('- Nombre:', nombre);
+  console.log('- Email:', email);
+  console.log('- Teléfono:', telefono);
+  console.log('- Dirección:', direccion);
+  console.log('- Ciudad:', ciudad);
+  console.log('🏷️ Referidor:', referidor);
+
+  // Validación básica
+  if (!nombre || !email || !telefono || !direccion || !ciudad) {
+    alert('Por favor completa todos los campos obligatorios');
+    return;
+  }
+
   const cliente = {
-    nombre: formData.get("nombre"),
-    email: formData.get("email"),
-    direccion: formData.get("direccion"),
-    telefono: formData.get("telefono"),
-    ciudad: formData.get("ciudad"),
-    referidor: formData.get("referidor") || "No especificado"
+    nombre: nombre,
+    email: email,
+    direccion: direccion,
+    telefono: telefono,
+    ciudad: ciudad,
+    referidor: referidor
   };
 
-  console.log('📋 Datos del cliente:', cliente);
-  console.log('🏷️ Referidor capturado:', cliente.referidor);
+  // Preparar datos para Supabase
+  const orderNumber = `BL-${Date.now().toString().slice(-6)}`;
+  const pedido = {
+    cliente_nombre: cliente.nombre,
+    cliente_email: cliente.email,
+    cliente_telefono: cliente.telefono,
+    direccion: cliente.direccion,
+    ciudad: cliente.ciudad,
+    referidor: cliente.referidor,
+    productos: appState.cart.items,
+    total: appState.cart.getTotal(),
+    estado: 'pendiente',
+    numero_orden: orderNumber
+  };
 
-  try {
-    // Preparar datos para Supabase
-    const orderNumber = `BL-${Date.now().toString().slice(-6)}`;
-    const pedido = {
-      cliente_nombre: cliente.nombre,
-      cliente_email: cliente.email,
-      cliente_telefono: cliente.telefono,
-      direccion: cliente.direccion,
-      ciudad: cliente.ciudad,
-      referidor: cliente.referidor,
-      productos: appState.cart.items,
-      total: appState.cart.getTotal(),
-      estado: 'pendiente',
-      numero_orden: orderNumber
-    };
-
-    // Guardar en Supabase
-    const guardado = await guardarPedidoEnSupabase(pedido);
-    if (!guardado) {
-      throw new Error('No se pudo guardar el pedido en la base de datos');
+  // Guardar en Supabase (opcional)
+  guardarPedidoEnSupabase(pedido).then(guardado => {
+    if (guardado) {
+      console.log('✅ Pedido guardado en Supabase');
+    } else {
+      console.warn('⚠️ No se pudo guardar en Supabase, continuando...');
     }
+  });
 
-    const emailSuccess = await enviarOrdenPorCorreo(
-      cliente,
-      appState.cart.items,
-      appState.cart.getTotal()
-    );
+  // Enviar correo
+  enviarOrdenPorCorreo(cliente, appState.cart.items, appState.cart.getTotal())
+    .then(emailSuccess => {
+      if (!emailSuccess) {
+        alert("Error al enviar el correo");
+        return;
+      }
 
-    if (!emailSuccess) throw new Error("Fallo al enviar el correo");
+      console.log("📧 Pedido enviado correctamente");
 
-    console.log("📧 Pedido enviado correctamente");
+      // Cerrar formulario y mostrar confirmación
+      document.getElementById("checkoutForm").classList.add("hidden");
+      document.getElementById("confirmationModal")?.classList.remove("hidden");
 
-    // Cerrar formulario y mostrar confirmación
-    document.getElementById("checkoutForm").classList.add("hidden");
-    document.getElementById("confirmationModal").classList.remove("hidden");
-
-    const total = appState.cart.getTotal();
-    const referidor = cliente.referidor || 'Cliente';
-    const montoCentavos = Math.round(total * 100);
-    const referenciaEncoded = encodeURIComponent(`${referidor}-${orderNumber}`);
-    const url = `https://checkout.wompi.co/l/VPOS_nJo3xk?amount=${montoCentavos}&currency=COP&reference=${referenciaEncoded}`;
-    
-    console.log('💳 URL de Wompi generada:', url);
-    console.log('🏷️ Referidor en URL:', referidor);
-    console.log('💰 Total:', total);
-    console.log('🔢 Monto en centavos:', montoCentavos);
-    console.log('📝 Referencia completa:', `${referidor}-${orderNumber}`);
-    
-    setTimeout(() => {
-      window.open(url, '_blank');
-      appState.cart.clear();
-      actualizarContadorCarrito();
-      document.getElementById("confirmationModal").classList.add("hidden");
-      e.target.reset();
-    }, 3000);
-  } catch (error) {
-    alert("Hubo un error al procesar tu pedido.");
-    console.error(error);
-  } finally {
-    submitBtn.disabled = false;
-    submitBtn.textContent = originalText;
-  }
+      // Generar URL de Wompi
+      const total = appState.cart.getTotal();
+      const referidorUrl = cliente.referidor || 'Cliente';
+      const montoCentavos = Math.round(total * 100);
+      const referenciaCompleta = `${referidorUrl}-${orderNumber}`;
+      const referenciaEncoded = encodeURIComponent(referenciaCompleta);
+      const url = `https://checkout.wompi.co/l/VPOS_nJo3xk?amount=${montoCentavos}&currency=COP&reference=${referenciaEncoded}`;
+      
+      console.log('💳 URL de Wompi generada:', url);
+      console.log('🏷️ Referidor en URL:', referidorUrl);
+      console.log('💰 Total:', total);
+      console.log('🔢 Monto en centavos:', montoCentavos);
+      console.log('📝 Referencia completa:', referenciaCompleta);
+      
+      setTimeout(() => {
+        window.open(url, '_blank');
+        appState.cart.clear();
+        actualizarContadorCarrito();
+        document.getElementById("confirmationModal")?.classList.add("hidden");
+        document.getElementById('formularioCompra')?.reset();
+      }, 3000);
+    })
+    .catch(error => {
+      alert("Hubo un error al procesar tu pedido.");
+      console.error(error);
+    });
 }
 
 // Configurar filtros
@@ -417,10 +429,13 @@ document.addEventListener('DOMContentLoaded', () => {
   // Cargar productos
   cargarProductos();
   
-  // Configurar formulario de compra
+  // Configurar formulario de compra - DIRECTO
   const formularioCompra = document.getElementById("formularioCompra");
   if (formularioCompra) {
-    formularioCompra.addEventListener("submit", procesarPedido);
+    formularioCompra.addEventListener("submit", (e) => {
+      e.preventDefault();
+      procesarPedido();
+    });
   }
   
   // Actualizar año
