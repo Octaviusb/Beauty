@@ -23,15 +23,15 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
   
   <!-- Scripts -->
-  <script src="supabase-client.js"></script>
-  <script src="script.js"></script>
+  <script type="module" src="supabase-client.js"></script>
+  <script type="module" src="script.js"></script>
   <script>
     if(window.location.hostname === "localhost") {
       window.OtAutoBlock = false; // Desactiva el bloqueo en desarrollo local
     }
   </script>
   <!-- Script de Wompi -->
-  <script src="https://checkout.wompi.co/widget.js"></script>
+  <script type="module" src="https://checkout.wompi.co/widget.js"></script>
 </head>
 <body>
   <header class="main-header" role="banner">
@@ -273,9 +273,9 @@
   </div>
 
   <!-- Scripts -->
-  <script src="vercel-fix.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
-  <script src="filtrar-productos.js"></script>
+  <script type="module" src="vercel-fix.js"></script>
+  <script type="module" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+  <script type="module" src="filtrar-productos.js"></script>
   <script>
     emailjs.init("Cqwg1EyqFLvPg7ULx");
     document.getElementById('current-year').textContent = new Date().getFullYear();
