@@ -15,6 +15,7 @@
   <link rel="stylesheet" href="styles.css" />
   <link rel="stylesheet" href="styles-form.css" />
   <link rel="stylesheet" href="styles-wompi.css" />
+  <link rel="stylesheet" href="styles-warning.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600&display=swap" rel="stylesheet">
@@ -35,7 +36,8 @@
   <header class="main-header" role="banner">
     <div class="header-container">
       <h1 class="logo">
-        <img src="/images/logo.png" alt="Beauty Club Logo" width="150" height="50" loading="lazy">
+        <img src="assets/logo.png" alt="Beauty Club Logo" width="150" height="50" loading="lazy">
+        <a href="/" aria-label="Beauty Club - Inicio">Beauty<span>Line</span></a>
       </h1>
 
       <button class="cart-icon" id="cartButton" aria-label="Carrito de compras" aria-expanded="false">
@@ -197,8 +199,8 @@
             </div>
 
             <div class="form-group">
-              <label for="referidor">¿Quién te refirió?*</label>
-              <input type="text" id="referidor" name="referidor" required>
+              <label for="referidor">¿Quién te refirió a nosotros? (Opcional)</label>
+              <input type="text" id="referidor" name="referidor" autocomplete="off" placeholder="Nombre de quien te refirió">
             </div>
           </div>
           
@@ -269,36 +271,13 @@
     </div>
   </div>
 
-  <!-- Modal de Pago con Wompi -->
-<div id="wompiModal" class="modal hidden" role="dialog" aria-modal="true">
-  <div class="modal-content payment-modal">
-    <button class="close-modal" aria-label="Cerrar">&times;</button>
-    <h2>Pago con Wompi</h2>
-    <div class="payment-info">
-      <p>Serás redirigido a Wompi para completar tu pago.</p>
-      <div class="payment-details">
-        <p><strong>Monto a pagar:</strong> <span id="wompi-total"></span></p>
-        <p><strong>Número de pedido:</strong> <span id="wompi-order-number"></span></p>
-      </div>
-      <div class="form-actions">
-        <a href="https://checkout.wompi.co/l/VPOS_nJo3xk" target="_blank" id="btnIrAWompi" class="btn-submit-order">Ir a Wompi</a>
-      </div>
-    </div>
-  </div>
-</div>
-
-
   <!-- Scripts -->
+  <script src="vercel-fix.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
   <script src="filtrar-productos.js"></script>
   <script>
     emailjs.init("Cqwg1EyqFLvPg7ULx");
     document.getElementById('current-year').textContent = new Date().getFullYear();
   </script>
-  <script>
-  console.log('⚙️ Test script cargado');
-  console.assert(document.querySelector('#referidor') !== null, '❌ Falta #referidor');
-  console.assert(typeof redirigirAWompi === 'function', '❌ Falta función redirigirAWompi');
-</script>
 </body>
 </html>
