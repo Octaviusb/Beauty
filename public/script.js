@@ -442,14 +442,58 @@ document.addEventListener('DOMContentLoaded', () => {
   // Cargar productos
   cargarProductos();
   
-  // Configurar formulario de compra - DIRECTO
-  const formularioCompra = document.getElementById("formularioCompra");
-  if (formularioCompra) {
-    formularioCompra.addEventListener("submit", (e) => {
-      e.preventDefault();
+ // Configurar formulario de compra - DIRECTO
+const formularioCompra = document.getElementById("formularioCompra");
+
+if (formularioCompra) {
+  formularioCompra.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const formData = new FormData(formularioCompra);
+
+    const cliente = {
+      nombre: formData.get("nombre"),
+      email: formData.get("email"),
+      telefono: formData.get("telefono"),
+      direccion: formData.get("direccion"),
+      ciudad: formData.get("ciudad") || "Sin ciudad",
+      referidor: formData.get("referidor") || "N/A"
+    };
+
+    const pedido = {
+      cliente_nombre: cliente.nombre,
+      cliente_email: cliente.email,
+      cliente_telefono: cliente.telefono,
+      direccion: cliente.direccion,
+      ciudad: cliente.ciudad,
+      referidor: cliente.referidor,
+      productos: appState.cart.items,
+      total: appState.cart.getTotal(),
+      estado: "pendiente"
+    };
+
+    try {
+      // 1. Guardar el pedido en Supabase
+      await window.supabaseClient.guardarPedido(pedido);
+
+      // 2. Enviar por correo
+      const emailSuccess = await enviarOrdenPorCorreo(
+        cliente,
+        appState.cart.items,
+        appState.cart.getTotal()
+      );
+
+      if (!emailSuccess) throw new Error("Fallo al enviar el correo");
+
+      // 3. Continuar con proceso de pago (Wompi)
       procesarPedido();
-    });
-  }
+
+    } catch (error) {
+      console.error("❌ Error al procesar el pedido:", error);
+      alert("Hubo un error al procesar el pedido. Intenta nuevamente.");
+    }
+  });
+}
   
   // Actualizar año
   const yearElement = document.getElementById('current-year');
