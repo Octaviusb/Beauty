@@ -24,18 +24,22 @@ const appState = {
 // Cargar productos desde Supabase
 async function cargarProductos() {
   console.log("🔄 Cargando productos desde Supabase...");
-  const { data: productos, error } = await supabase.from('productos').select('*');
-  if (error) {
+  const { cargarProductosSupabase } = window.supabaseClient;
+
+  try {
+    const productos = await cargarProductosSupabase();
+
+    if (!productos || productos.length === 0) {
+      console.warn("⚠️ No hay productos en la base de datos.");
+      return;
+    }
+
+    appState.productos = productos;
+    renderizarProductos(productos);
+    console.log('✅ Productos cargados desde Supabase:', productos.length);
+  } catch (error) {
     console.error("❌ Error al cargar productos de Supabase:", error);
-    return;
   }
-  if (!productos || productos.length === 0) {
-    console.warn("⚠️ No hay productos en la base de datos.");
-    return;
-  }
-  appState.productos = productos;
-  renderizarProductos(productos);
-  console.log('✅ Productos cargados desde Supabase:', productos.length);
 }
 
 // Renderizar productos
