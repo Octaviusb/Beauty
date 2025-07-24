@@ -175,7 +175,7 @@ function configurarCheckoutForm() {
       telefono: formData.get('telefono') || '',
       direccion: formData.get('direccion') || '',
       ciudad: formData.get('ciudad') || '',
-      referidor: formData.get('referidor') || 'N/A'
+      referidor: formData.get('referidor')
     };
     const total = appState.carrito.reduce((s, i) => s + i.price * i.quantity, 0);
     const pedido = {
