@@ -1,934 +1,160 @@
-// Estado global de la aplicación (expuesto globalmente para el filtro)
-window.appState = {
+// Credenciales Supabase
+const SUPABASE_URL = 'https://lsxojnbkbqhuwaydiqqb.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxzeG9qbmJrYnFodXdheWRpcXFiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI1MDYzMzAsImV4cCI6MjA2ODA4MjMzMH0.uHQJ_F3NmeM2U4EsIq_UFSPMKd35MlMZnrboKOIy45g';
+let appState = {
+  productos: [],
   cart: {
     items: [],
-
-    addItem(item) {
-      const index = this.items.findIndex(p => p.id === item.id);
-      if (index >= 0) {
-        this.items[index].quantity += 1;
-      } else {
-        this.items.push({ ...item, quantity: 1 });
-      }
-      this.showFeedback(item.name);
-    },
-
-    removeItem(id) {
-      this.items = this.items.filter(item => item.id !== id);
-    },
-
     clear() {
       this.items = [];
-    },
-
-    getTotal() {
-      return this.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    },
-
-    showFeedback(productName) {
-      const feedback = document.createElement('div');
-      feedback.className = 'cart-feedback';
-      feedback.textContent = "✓ " + productName + " agregado";
-      document.body.appendChild(feedback);
-      setTimeout(() => feedback.remove(), 2000);
+      localStorage.removeItem('cart');
     }
-  },
-  productos: [],
-  currentFilter: 'all'
+  }
 };
 
-const SUPABASE_URL = 'https://lsxojnbkbqhuwaydiqqb.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxzeG9qbmJrYnFodXdheWRpcXFiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI1MDYzMzAsImV4cCI6MjA2ODA4MjMzMH0.uHQJ_F3NmeM2U4EsIq_UFSPMKd35MlMZnrboKOIy45g'; // Tu clave pública
-const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+document.addEventListener('DOMContentLoaded', async () => {
+  console.log('🚀 Inicializando aplicación...');
+  await cargarProductos();
+  configurarEventosGenerales();
+});
 
-// Renderizar productos (expuesto globalmente para el filtro)
-window.renderizarProductos = function renderizarProductos(productos) {
-  console.log('📊 Renderizando productos:', productos?.length || 0);
-  const contenedor = document.getElementById('product-list');
-  if (!contenedor) {
-    console.error('❌ Contenedor de productos no encontrado');
-    return;
-  }
-
-  if (!productos || productos.length === 0) {
-    console.warn('⚠️ No hay productos para mostrar');
-    contenedor.innerHTML = "<p class='info-message'>No hay productos disponibles en este momento.</p>";
-    return;
-  }
-
-  const productosFiltrados = appState.currentFilter === 'all' 
-    ? productos 
-    : productos.filter(p => p.category === appState.currentFilter);
-  
-  console.log('🔍 Productos filtrados:', productosFiltrados.length, 'Filtro actual:', appState.currentFilter);
-
+// Cargar productos desde Supabase o fallback JSON
+async function cargarProductos() {
   try {
-    contenedor.innerHTML = productosFiltrados.map(producto => (
-      `<div class='product-card'>
-        <div class='product-image-container'>
-          <img src='${producto.image}' alt='${producto.name}' class='product-image' loading='lazy'>
-          ${producto.badge ? `<span class="product-badge">${producto.badge}</span>` : ''}
-        </div>
-        <div class='product-info'>
-          <h3 class='product-title'>${producto.name}</h3>
-          ${producto.description ? `<p class='product-description'>${producto.description}</p>` : ''}
-          <div class='product-price'>$${producto.price.toLocaleString()}</div>
-          <button class='add-to-cart' data-id='${producto.id}' data-name='${producto.name}' data-price='${producto.price}'>
-            Agregar al carrito
-          </button>
-        </div>
-      </div>`
-    )).join('');
-
-    document.querySelectorAll('.add-to-cart').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const productData = {
-          id: btn.dataset.id,
-          name: btn.dataset.name,
-          price: Number(btn.dataset.price)
-        };
-        appState.cart.addItem(productData);
-        actualizarContadorCarrito();
-      });
-    });
-    
-    console.log('✅ Eventos de botones configurados');
-  } catch (error) {
-    console.error('❌ Error al renderizar productos:', error);
-    contenedor.innerHTML = `<p class='error-message'>Error al mostrar los productos: ${error.message}</p>`;
-  }
-}
-
-// Mostrar carrito
-function mostrarCarrito() {
-  const modal = document.getElementById('carrito-modal');
-  const lista = modal.querySelector('.cart-items');
-  const total = modal.querySelector('.total-amount');
-
-  if (!modal || !lista || !total) return;
-
-  lista.innerHTML = '';
-
-  if (appState.cart.items.length === 0) {
-    lista.innerHTML = '<p class="empty-cart">Tu carrito está vacío</p>';
-    total.textContent = '$0';
-  } else {
-    appState.cart.items.forEach(item => {
-      const itemDiv = document.createElement('div');
-      itemDiv.className = 'cart-item';
-      itemDiv.innerHTML = `
-        <span class="item-name">${item.name}</span>
-        <span class="item-quantity">x${item.quantity}</span>
-        <span class="item-price">$${(item.price * item.quantity).toLocaleString()}</span>
-      `;
-      lista.appendChild(itemDiv);
-    });
-    total.textContent = `$${appState.cart.getTotal().toLocaleString()}`;
-  }
-
-  modal.classList.remove('hidden');
-  modal.classList.add('active');
-  modal.setAttribute('aria-modal', 'true');
-}
-
-// Cerrar carrito
-function cerrarCarrito() {
-  const modal = document.getElementById('carrito-modal');
-  if (modal) {
-    modal.classList.remove('active');
-    modal.classList.add('hidden');
-    modal.setAttribute('aria-modal', 'false');
-  }
-}
-
-// Actualizar contador del carrito
-function actualizarContadorCarrito() {
-  const count = appState.cart.items.reduce((sum, item) => sum + item.quantity, 0);
-  const countElement = document.getElementById('cart-count');
-  if (countElement) {
-    countElement.textContent = count;
-    countElement.style.display = count ? 'inline-block' : 'none';
-  }
-}
-
-// Cargar productos
-function cargarProductos() {
-  console.log('🔄 Cargando productos...');
-  
-  // Usar productos de respaldo primero para mostrar algo rápido mientras carga
-  cargarProductosRespaldo();
-  
- // Cargar productos directamente desde Supabase
-async function cargarProductosDesdeSupabase() {
-  console.log('🔄 Cargando productos desde Supabase...');
-  try {
-    const { data: productos, error } = await supabase
-      .from('products')
-      .select('*')
-      .order('id');
-
-    if (error) throw error;
-
-    appState.productos = productos;
-    console.log('✅ Productos cargados desde Supabase:', productos.length);
-    renderizarProductos(productos);
-    setupFilters();
-  } catch (error) {
-    console.error('❌ Error al cargar productos desde Supabase:', error);
-    const cont = document.getElementById('product-list');
-    if (cont) cont.innerHTML = "<p class='error-message'>No se pudieron cargar productos.</p>";
-  }
-}
-
-// Cargar productos completos directamente (expuesto globalmente para el filtro)
-window.cargarProductosCompletos = async function cargarProductosCompletos() {
-  console.log('🔄 Cargando productos completos...');
-  
-  try {
-    // Forzar recarga del JSON para evitar caché
-    const timestamp = new Date().getTime();
-    const response = await fetch(`/productos.json?t=${timestamp}`);
-    if (response.ok) {
-      const productos = await response.json();
-      if (productos && productos.length > 0) {
+    if (!SUPABASE_URL.includes('TU_URL')) {
+      const productos = await fetchProductosDesdeSupabase();
+      if (productos.length) {
         appState.productos = productos;
-        console.log('✅ Productos cargados desde JSON:', productos.length);
+        console.log('✅ Productos cargados desde Supabase:', productos.length);
         renderizarProductos(productos);
-        setupFilters();
         return;
       }
     }
-  } catch (error) {
-    console.error('Error al cargar productos desde JSON:', error);
+    throw new Error('❌ Falló carga Supabase. Usando respaldo local...');
+  } catch (err) {
+    console.warn(err.message);
+    const productos = await fetch('/productos.json').then(r => r.json());
+    appState.productos = productos;
+    console.log('📁 Productos cargados desde JSON:', productos.length);
+    renderizarProductos(productos);
   }
-  
-  // Si no se pudo cargar desde JSON, usar la lista de respaldo
-  // Nota: Esta lista debe coincidir con productos.json
-  const productosCompletos = [
-    {
-      id: "15",
-      name: "Esmalte 1",
-      category: "esmaltes",
-      price: 7000,
-      description: "Color y brillo intenso",
-      image: "images/esmaltes/img1.jpg",
-      badge: ""
-    },
-    {
-      id: "16",
-      name: "Esmalte 2",
-      category: "esmaltes",
-      price: 7000,
-      description: "Color y brillo intenso",
-      image: "images/esmaltes/img2.jpg",
-      badge: ""
-    },
-    {
-      id: "17",
-      name: "Esmalte 3",
-      category: "esmaltes",
-      price: 7000,
-      description: "Color y brillo intenso",
-      image: "images/esmaltes/img3.jpg",
-      badge: ""
-    },
-    {
-      id: "18",
-      name: "Esmalte 4",
-      category: "esmaltes",
-      price: 7000,
-      description: "Color y brillo intenso",
-      image: "images/esmaltes/img4.jpg",
-      badge: ""
-    },
-    {
-      id: "19",
-      name: "Esmalte 5",
-      category: "esmaltes",
-      price: 7000,
-      description: "Color y brillo intenso",
-      image: "images/esmaltes/img5.jpg",
-      badge: ""
-    },
-    {
-      id: "20",
-      name: "Esmalte 6",
-      category: "esmaltes",
-      price: 7000,
-      description: "Color y brillo intenso",
-      image: "images/esmaltes/img6.jpg",
-      badge: ""
-    },
-    {
-      id: "21",
-      name: "Esmalte 7",
-      category: "esmaltes",
-      price: 7000,
-      description: "Color y brillo intenso",
-      image: "images/esmaltes/img7.jpg",
-      badge: ""
-    },
-    {
-      id: "22",
-      name: "Esmalte 8",
-      category: "esmaltes",
-      price: 7000,
-      description: "Color y brillo intenso",
-      image: "images/esmaltes/img8.jpg",
-      badge: ""
-    },
-    {
-      id: "23",
-      name: "Esmalte 9",
-      category: "esmaltes",
-      price: 7000,
-      description: "Color y brillo intenso",
-      image: "images/esmaltes/img9.jpg",
-      badge: ""
-    },
-    {
-      id: "24",
-      name: "Esmalte 10",
-      category: "esmaltes",
-      price: 7000,
-      description: "Color y brillo intenso",
-      image: "images/esmaltes/img10.jpg",
-      badge: ""
-    },
-    {
-      id: "25",
-      name: "Esmalte 11",
-      category: "esmaltes",
-      price: 7000,
-      description: "Color y brillo intenso",
-      image: "images/esmaltes/img11.jpg",
-      badge: ""
-    },
-    {
-      id: "26",
-      name: "Esmalte 12",
-      category: "esmaltes",
-      price: 7000,
-      description: "Color y brillo intenso",
-      image: "images/esmaltes/img12.jpg",
-      badge: ""
-    },
-    {
-      id: "27",
-      name: "Esmalte 13",
-      category: "esmaltes",
-      price: 7000,
-      description: "Color y brillo intenso",
-      image: "images/esmaltes/img13.jpg",
-      badge: ""
-    },
-    {
-      id: "28",
-      name: "Esmalte 14",
-      category: "esmaltes",
-      price: 7000,
-      description: "Color y brillo intenso",
-      image: "images/esmaltes/img14.jpg",
-      badge: ""
-    },
-    {
-      id: "29",
-      name: "Esmalte 15",
-      category: "esmaltes",
-      price: 7000,
-      description: "Color y brillo intenso",
-      image: "images/esmaltes/img15.jpg",
-      badge: ""
-    },
-    {
-      id: "30",
-      name: "Esmalte 16",
-      category: "esmaltes",
-      price: 7000,
-      description: "Color y brillo intenso",
-      image: "images/esmaltes/img16.jpg",
-      badge: ""
-    },
-    {
-      id: "31",
-      name: "Esmalte 17",
-      category: "esmaltes",
-      price: 7000,
-      description: "Color y brillo intenso",
-      image: "images/esmaltes/img17.jpg",
-      badge: ""
-    },
-    {
-      id: "32",
-      name: "Esmalte 18",
-      category: "esmaltes",
-      price: 7000,
-      description: "Color y brillo intenso",
-      image: "images/esmaltes/img18.jpg",
-      badge: ""
-    },
-    {
-      id: "33",
-      name: "Esmalte 19",
-      category: "esmaltes",
-      price: 7000,
-      description: "Color y brillo intenso",
-      image: "images/esmaltes/img19.jpg",
-      badge: ""
-    },
-    {
-      id: "34",
-      name: "Esmalte 20",
-      category: "esmaltes",
-      price: 7000,
-      description: "Color y brillo intenso",
-      image: "images/esmaltes/img20.jpg",
-      badge: ""
-    },
-    {
-      id: "35",
-      name: "Esmalte 21",
-      category: "esmaltes",
-      price: 7000,
-      description: "Color y brillo intenso",
-      image: "images/esmaltes/img21.jpg",
-      badge: ""
-    },
-    {
-      id: "36",
-      name: "Esmalte 22",
-      category: "esmaltes",
-      price: 7000,
-      description: "Color y brillo intenso",
-      image: "images/esmaltes/img22.jpg",
-      badge: ""
-    },
-    {
-      id: "37",
-      name: "Esmalte 23",
-      category: "esmaltes",
-      price: 7000,
-      description: "Color y brillo intenso",
-      image: "images/esmaltes/img23.jpg",
-      badge: ""
-    },
-    {
-      id: "38",
-      name: "Esmalte 24",
-      category: "esmaltes",
-      price: 7000,
-      description: "Color y brillo intenso",
-      image: "images/esmaltes/img24.jpg",
-      badge: ""
-    },
-    {
-      id: "39",
-      name: "Gel de Baño",
-      category: "higiene",
-      price: 29400,
-      description: "Gel suave para piel sensible",
-      image: "images/higiene/gel-de-bao.jpg",
-      badge: ""
-    },
-    {
-      id: "41",
-      name: "Maquillaje 1",
-      category: "maquillaje",
-      price: 35000,
-      description: "Producto de maquillaje",
-      image: "images/maquillaje/img70.jpg",
-      badge: ""
-    },
-    {
-      id: "42",
-      name: "Maquillaje 2",
-      category: "maquillaje",
-      price: 35000,
-      description: "Producto de maquillaje",
-      image: "images/maquillaje/img71.jpg",
-      badge: ""
-    },
-    {
-      id: "43",
-      name: "Agua Micelar",
-      category: "skincare",
-      price: 39200,
-      description: "Limpieza sin enjuague",
-      image: "images/skincare/agua-micelar.jpg",
-      badge: ""
-    },
-    {
-      id: "44",
-      name: "Ampollas Reafirmantes",
-      category: "skincare",
-      price: 75000,
-      description: "Tratamiento intensivo para piel madura",
-      image: "images/skincare/ampollas-reafirmantes.jpg",
-      badge: ""
-    },
-    {
-      id: "45",
-      name: "Contorno de Ojos",
-      category: "skincare",
-      price: 48000,
-      description: "Reduce ojeras y líneas de expresión",
-      image: "images/skincare/contorno-de-ojos.jpg",
-      badge: ""
-    },
-    {
-      id: "46",
-      name: "Crema Antiarrugas",
-      category: "skincare",
-      price: 68000,
-      description: "Combate los signos de la edad",
-      image: "images/skincare/crema-antiarrugas.jpg",
-      badge: ""
-    },
-    {
-      id: "47",
-      name: "Crema de Día",
-      category: "skincare",
-      price: 45000,
-      description: "Hidratación diaria para todo tipo de piel",
-      image: "images/skincare/crema-de-da.jpg",
-      badge: ""
-    },
-    {
-      id: "48",
-      name: "Crema de Noche",
-      category: "skincare",
-      price: 52000,
-      description: "Regeneración nocturna intensiva",
-      image: "images/skincare/crema-de-noche.jpg",
-      badge: ""
-    },
-    {
-      id: "50",
-      name: "Exfoliante Facial",
-      category: "skincare",
-      price: 42000,
-      description: "Elimina células muertas",
-      image: "images/skincare/exfoliante-facial.jpg",
-      badge: ""
-    },
-    {
-      id: "51",
-      name: "Mascarilla Purificante",
-      category: "skincare",
-      price: 38000,
-      description: "Limpieza profunda de poros",
-      image: "images/skincare/mascarilla-purificante.jpg",
-      badge: ""
-    },
-    {
-      id: "52",
-      name: "Protector Solar",
-      category: "skincare",
-      price: 55000,
-      description: "SPF 50+ para uso diario",
-      image: "images/skincare/protector-solar.jpg",
-      badge: "Popular"
-    },
-    {
-      id: "53",
-      name: "Serum Antioxidante",
-      category: "skincare",
-      price: 65000,
-      description: "Con vitamina C para luminosidad",
-      image: "images/skincare/serum-antioxidante.jpg",
-      badge: ""
-    },
-    {
-      id: "54",
-      name: "Serum Hidratante",
-      category: "skincare",
-      price: 58000,
-      description: "Con ácido hialurónico",
-      image: "images/skincare/serum-hidratante.jpg",
-      badge: ""
-    },
-    {
-      id: "55",
-      name: "Tónico Facial",
-      category: "skincare",
-      price: 32000,
-      description: "Equilibra el pH de la piel",
-      image: "images/skincare/tnico-facial.jpg",
-      badge: ""
-    },
-    {
-      id: "56",
-      name: "Kit de Uñas 1",
-      category: "uñas",
-      price: 28000,
-      description: "Kit completo para manicura",
-      image: "images/uñas/img194.jpg",
-      badge: ""
-    },
-    {
-      id: "57",
-      name: "Kit de Uñas 2",
-      category: "uñas",
-      price: 32000,
-      description: "Kit profesional para uñas",
-      image: "images/uñas/img195.jpg",
-      badge: ""
-    },
-    {
-      id: "58",
-      name: "Kit de Uñas 3",
-      category: "uñas",
-      price: 35000,
-      description: "Kit completo para uñas acrílicas",
-      image: "images/uñas/img196.jpg",
-      badge: ""
-    },
-    {
-      id: "59",
-      name: "Kit de Uñas 4",
-      category: "uñas",
-      price: 42000,
-      description: "Kit profesional para uñas de gel",
-      image: "images/uñas/img197.jpg",
-      badge: "Nuevo"
-    },
-    {
-      id: "60",
-      name: "Kit de Uñas 5",
-      category: "uñas",
-      price: 38000,
-      description: "Kit completo para nail art",
-      image: "images/uñas/img203.jpg",
-      badge: ""
-    },
-    {
-      id: "61",
-      name: "Kit de Uñas 6",
-      category: "uñas",
-      price: 45000,
-      description: "Kit profesional para decoración de uñas",
-      image: "images/uñas/img204.jpg",
-      badge: ""
-    }
-  ];
-  
-  appState.productos = productosCompletos;
-  console.log('✅ Productos completos cargados:', appState.productos.length);
-  renderizarProductos(productosCompletos);
-  setupFilters();
 }
 
-// Productos de respaldo
-function cargarProductosRespaldo() {
-  console.log('🚨 Cargando productos de respaldo...');
-  
-  // Datos de productos de respaldo
-  const productosRespaldo = [
-    {
-      id: "15",
-      name: "Esmalte 1",
-      category: "esmaltes",
-      price: 7000,
-      description: "Color y brillo intenso",
-      image: "images/esmaltes/img1.jpg",
-      badge: ""
-    },
-    {
-      id: "39",
-      name: "Gel de Baño",
-      category: "higiene",
-      price: 29400,
-      description: "Gel suave para piel sensible",
-      image: "images/higiene/gel-de-bao.jpg",
-      badge: ""
-    },
-    {
-      id: "41",
-      name: "Maquillaje 1",
-      category: "maquillaje",
-      price: 35000,
-      description: "Producto de maquillaje",
-      image: "images/maquillaje/img70.jpg",
-      badge: ""
-    },
-    {
-      id: "43",
-      name: "Agua Micelar",
-      category: "skincare",
-      price: 39200,
-      description: "Limpieza sin enjuague",
-      image: "images/skincare/agua-micelar.jpg",
-      badge: ""
+// Fetch desde Supabase
+async function fetchProductosDesdeSupabase() {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/products?select=*`, {
+    headers: {
+      apikey: SUPABASE_KEY,
+      Authorization: `Bearer ${SUPABASE_KEY}`
     }
-  ];
-  
-  appState.productos = productosRespaldo;
-  console.log('✅ Productos de respaldo cargados:', appState.productos.length);
-  renderizarProductos(productosRespaldo);
-  setupFilters();
-}
-
-// Configurar filtros
-function setupFilters() {
-  const filterButtons = document.querySelectorAll('.filter-btn');
-  filterButtons.forEach(btn => {
-    btn.addEventListener('click', () => {
-      appState.currentFilter = btn.dataset.filter;
-      renderizarProductos(appState.productos);
-      filterButtons.forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-    });
   });
+  if (!res.ok) throw new Error('Supabase API error');
+  return await res.json();
 }
 
-// Configurar carrito
-function configurarCarrito() {
-  const cartButton = document.getElementById('cartButton');
-  const finalizarCompraBtn = document.getElementById('finalizarCompra');
-  const limpiarCarritoBtn = document.getElementById('limpiarCarrito');
-  const closeCartBtn = document.querySelector('.close-cart');
-
-  if (cartButton) {
-    cartButton.addEventListener('click', () => {
-      mostrarCarrito();
-    });
-  }
-
-  if (closeCartBtn) {
-    closeCartBtn.addEventListener('click', cerrarCarrito);
-  }
-
-  if (limpiarCarritoBtn) {
-    limpiarCarritoBtn.addEventListener('click', () => {
-      appState.cart.clear();
-      actualizarContadorCarrito();
-      mostrarCarrito();
-    });
-  }
-
-  if (finalizarCompraBtn) {
-    finalizarCompraBtn.addEventListener('click', mostrarFormularioPedido);
-  }
-}
-
-// Mostrar formulario de pedido
-function mostrarFormularioPedido() {
-  console.log('🧾 Mostrando formulario de pedido');
-  const checkoutForm = document.getElementById('checkoutForm');
-  const summaryItems = checkoutForm.querySelector('.summary-items');
-  const subtotalElement = checkoutForm.querySelector('.subtotal-amount');
-  const shippingElement = checkoutForm.querySelector('.shipping-amount');
-  const totalElement = checkoutForm.querySelector('.total-amount');
-  
-  // Cerrar el modal del carrito
-  cerrarCarrito();
-  
-  // Llenar el resumen del pedido
-  summaryItems.innerHTML = '';
-  appState.cart.items.forEach(item => {
-    const itemDiv = document.createElement('div');
-    itemDiv.className = 'summary-item';
-    itemDiv.innerHTML = `
-      <span class="item-name">${item.name} x${item.quantity}</span>
-      <span class="item-price">$${(item.price * item.quantity).toLocaleString()}</span>
+// Renderizar productos
+function renderizarProductos(productos) {
+  const container = document.getElementById('product-list');
+  if (!container) return;
+  container.innerHTML = '';
+  productos.forEach(prod => {
+    const card = document.createElement('div');
+    card.className = 'product-card';
+    card.innerHTML = `
+      <img src="${prod.image}" alt="${prod.name}" />
+      <h3>${prod.name}</h3>
+      <p>${prod.description}</p>
+      <span>$${prod.price}</span>
+      <button class="add-to-cart" data-id="${prod.id}">Agregar</button>
     `;
-    summaryItems.appendChild(itemDiv);
+    container.appendChild(card);
   });
-  
-  // Calcular totales
-  const subtotal = appState.cart.getTotal();
-  const shipping = subtotal > 200000 ? 0 : 12000; // Envío gratis para compras mayores a $200,000
-  const total = subtotal + shipping;
-  
-  // Actualizar montos en el formulario
-  subtotalElement.textContent = `$${subtotal.toLocaleString()}`;
-  shippingElement.textContent = shipping === 0 ? 'Gratis' : `$${shipping.toLocaleString()}`;
-  totalElement.textContent = `$${total.toLocaleString()}`;
-  
-  // Mostrar el formulario
-  checkoutForm.classList.remove('hidden');
-  checkoutForm.classList.add('active');
-  checkoutForm.setAttribute('aria-modal', 'true');
-  
-  // Configurar eventos del formulario
-  configurarFormularioPedido();
+
+  document.querySelectorAll('.add-to-cart').forEach(btn => {
+    btn.addEventListener('click', agregarAlCarrito);
+  });
 }
 
-// Configurar eventos del formulario de pedido
-function configurarFormularioPedido() {
-  const checkoutForm = document.getElementById('checkoutForm');
-  const closeFormBtn = checkoutForm.querySelector('.close-form');
-  const backToCartBtn = checkoutForm.querySelector('.btn-back-to-cart');
-  const formulario = document.getElementById('formularioCompra');
-  
-  // Cerrar formulario
-  if (closeFormBtn) {
-    closeFormBtn.addEventListener('click', () => {
-      checkoutForm.classList.remove('active');
-      checkoutForm.classList.add('hidden');
-      checkoutForm.setAttribute('aria-modal', 'false');
-    });
-  }
-  
-  // Volver al carrito
-  if (backToCartBtn) {
-    backToCartBtn.addEventListener('click', () => {
-      checkoutForm.classList.remove('active');
-      checkoutForm.classList.add('hidden');
-      mostrarCarrito();
-    });
-  }
-  
-  // Enviar formulario
-  if (formulario) {
-    formulario.addEventListener('submit', procesarPedido);
-  }
-}
-
-// Procesar pedido
-function procesarPedido(event) {
-  event.preventDefault();
-  console.log('🛒 Procesando pedido...');
-
-  try {
-    const formulario = document.getElementById('formularioCompra');
-    const nombre = formulario.querySelector('#nombre').value.trim();
-    const email = formulario.querySelector('#email').value.trim();
-    const telefono = formulario.querySelector('#telefono').value.trim();
-    const direccion = formulario.querySelector('#direccion').value.trim();
-    const ciudad = formulario.querySelector('#ciudad').value.trim();
-    const referidor = formulario.querySelector('#referidor').value.trim();
-
-    if (!nombre || !email || !telefono || !direccion || !ciudad || !referidor) {
-      alert('Por favor completa todos los campos, incluyendo quién te refirió.');
-      formulario.querySelector('#referidor').focus();
-      return;
-    }
-
-    const subtotal = appState.cart.getTotal();
-    const shipping = subtotal > 200000 ? 0 : 12000;
-    const total = subtotal + shipping;
-    const orderNumber = `BL-${Date.now().toString().slice(-6)}`;
-
-    let carritoTexto = appState.cart.items
-      .map(item => `${item.quantity}x ${item.name} ($${item.price.toLocaleString()})`)
-      .join(", ");
-
-    if (typeof emailjs !== 'undefined') {
-      emailjs.send("service_owxur5f", "template_sck7rdl", {
-        nombre,
-        email,
-        telefono,
-        direccion: `${direccion}, ${ciudad}`,
-        referidor,
-        metodo_pago: 'Wompi',
-        total: total.toLocaleString(),
-        carrito: carritoTexto,
-        referencia: orderNumber
-      }).then(() => {
-        console.log("📧 Pedido registrado, redirigiendo a Wompi...");
-
-        mostrarModalWompi(total, orderNumber);
-      }).catch(error => {
-        console.error("❌ Error al enviar correo:", error);
-        alert("Error al procesar el pedido. Por favor intenta nuevamente.");
-      });
-    } else {
-      alert("El servicio de correo no está disponible. Intenta nuevamente más tarde.");
-    }
-  } catch (error) {
-    console.error('❌ Error en procesarPedido:', error);
-    alert("Ocurrió un error inesperado. Por favor intenta nuevamente.");
-  }
-}
-
-function mostrarModalWompi(total, orderNumber) {
-  const wompiModal = document.getElementById('wompiModal');
-  if (!wompiModal) return;
-
-  document.getElementById('wompi-total').textContent = `$${total.toLocaleString()}`;
-  document.getElementById('wompi-order-number').textContent = orderNumber;
-
-  wompiModal.classList.remove('hidden');
-  wompiModal.classList.add('active');
-
-  // Limpiar carrito después de ir a Wompi
-  document.getElementById('btnIrAWompi').addEventListener('click', () => {
-    wompiModal.classList.remove('active');
-    wompiModal.classList.add('hidden');
-    mostrarConfirmacionPedido(orderNumber);
-    appState.cart.clear();
+// Agregar al carrito
+function agregarAlCarrito(e) {
+  const id = e.target.dataset.id;
+  const producto = appState.productos.find(p => p.id == id);
+  if (producto) {
+    appState.cart.items.push(producto);
+    localStorage.setItem('cart', JSON.stringify(appState.cart.items));
     actualizarContadorCarrito();
-  });
-
-  wompiModal.querySelector('.close-modal').addEventListener('click', () => {
-    wompiModal.classList.remove('active');
-    wompiModal.classList.add('hidden');
-    mostrarConfirmacionPedido(orderNumber);
-    appState.cart.clear();
-    actualizarContadorCarrito();
-  });
-}
-
-// Mostrar confirmación de pedido
-function mostrarConfirmacionPedido(orderNumber) {
-  const confirmationModal = document.getElementById('confirmationModal');
-  const orderNumberElement = document.getElementById('order-number');
-  const continuarComprandoBtn = document.getElementById('btn-continue-shopping');
-  
-  // Actualizar número de pedido
-  if (orderNumberElement) {
-    orderNumberElement.textContent = orderNumber;
-  }
-  
-  // Mostrar modal
-  confirmationModal.classList.remove('hidden');
-  confirmationModal.classList.add('active');
-  
-  // Configurar botón para continuar comprando
-  if (continuarComprandoBtn) {
-    continuarComprandoBtn.addEventListener('click', () => {
-      confirmationModal.classList.remove('active');
-      confirmationModal.classList.add('hidden');
-    });
   }
 }
 
-// Inicialización
-document.addEventListener('DOMContentLoaded', () => {
-  console.log('🚀 Inicializando aplicación...');
-  
-  // Agregar botón para limpiar caché (solo visible en desarrollo)
-  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-    const limpiarBtn = document.createElement('button');
-    limpiarBtn.textContent = 'Limpiar Caché';
-    limpiarBtn.style.position = 'fixed';
-    limpiarBtn.style.bottom = '10px';
-    limpiarBtn.style.right = '10px';
-    limpiarBtn.style.zIndex = '9999';
-    limpiarBtn.style.padding = '5px 10px';
-    limpiarBtn.style.backgroundColor = '#d63384';
-    limpiarBtn.style.color = 'white';
-    limpiarBtn.style.border = 'none';
-    limpiarBtn.style.borderRadius = '4px';
-    limpiarBtn.style.cursor = 'pointer';
-    limpiarBtn.style.fontSize = '12px';
-    
-    limpiarBtn.addEventListener('click', () => {
-      localStorage.removeItem('productos');
-      localStorage.removeItem('productosCache');
-      localStorage.removeItem('lastUpdate');
-      window.location.reload(true);
-    });
-    
-    document.body.appendChild(limpiarBtn);
-  }
-  
-  // Cargar productos desde la API primero
-  configurarCarrito();
-  actualizarContadorCarrito();
-  cargarProductosDesdeSupabase();
-  
-  // Actualizar año en el footer
-  document.getElementById('current-year').textContent = new Date().getFullYear();
+function actualizarContadorCarrito() {
+  const count = document.getElementById('cart-count');
+  count.textContent = appState.cart.items.length;
+}
+
+// Checkout
+document.getElementById('formularioCompra')?.addEventListener('submit', e => {
+  e.preventDefault();
+  procesarPedido();
 });
+
+function procesarPedido() {
+  const form = document.getElementById('formularioCompra');
+  const total = calcularTotalPedido();
+  const orderNumber = `BL-${Date.now()}`;
+  const email = form.email.value;
+  const nombre = form.nombre.value;
+  const referidor = form.referidor?.value || '';
+
+  // Enviar correo con EmailJS
+  emailjs.send("default_service", "pedido_template", {
+    nombre,
+    email,
+    total,
+    referidor,
+    pedido: JSON.stringify(appState.cart.items, null, 2)
+  }).then(() => {
+    console.log('📧 Pedido enviado');
+    redirigirAWompi(total, orderNumber, email, nombre);
+  }).catch(err => {
+    alert('❌ Error al enviar pedido: ' + err.message);
+  });
+}
+
+function calcularTotalPedido() {
+  return appState.cart.items.reduce((total, item) => total + item.price, 0);
+}
+
+function redirigirAWompi(total, orderNumber, email, nombre) {
+  const form = document.createElement('form');
+  form.action = 'https://checkout.wompi.co/p/';
+  form.method = 'GET';
+
+  form.innerHTML = `
+    <input type="hidden" name="public-key" value="LLAVE_PUBLICA_WOMPI">
+    <input type="hidden" name="currency" value="COP">
+    <input type="hidden" name="amount-in-cents" value="${total * 100}">
+    <input type="hidden" name="reference" value="${orderNumber}">
+    <input type="hidden" name="customer-data:email" value="${email}">
+    <input type="hidden" name="customer-data:full-name" value="${nombre}">
+    <input type="hidden" name="redirect-url" value="https://beauty-mocha-ten.vercel.app/confirmacion.html">
+  `;
+  document.body.appendChild(form);
+  form.submit();
+}
+
+// Eventos
+function configurarEventosGenerales() {
+  document.querySelector('.btn-back-to-cart')?.addEventListener('click', () => {
+    document.getElementById('checkoutForm').classList.add('hidden');
+    document.getElementById('carrito-modal').classList.remove('hidden');
+  });
+
+  document.getElementById('finalizarCompra')?.addEventListener('click', () => {
+    mostrarFormularioCheckout();
+  });
+}
+
+function mostrarFormularioCheckout() {
+  const modal = document.getElementById('checkoutForm');
+  if (modal) modal.classList.remove('hidden');
+}
