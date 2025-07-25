@@ -1,221 +1,526 @@
-// script.js - versión completa con Supabase, carrito y checkout
+// Estado global de la aplicación (expuesto globalmente para el filtro)
+window.appState = {
+  cart: {
+    items: [],
 
-import { supabase } from './supabaseClient.js';
-import {
-  cargarCarrito,
-  agregarProductoAlCarrito,
-  eliminarProductoDelCarrito,
-  limpiarCarrito
-} from './carrito-supabase.js';
+    addItem(item) {
+      const index = this.items.findIndex(p => p.id === item.id);
+      if (index >= 0) {
+        this.items[index].quantity += 1;
+      } else {
+        this.items.push({ ...item, quantity: 1 });
+      }
+      this.showFeedback(item.name);
+    },
 
-// Obtener user_id anónimo
-let userId = localStorage.getItem('user_id');
-if (!userId) {
-  userId = crypto.randomUUID();
-  localStorage.setItem('user_id', userId);
-}
+    removeItem(id) {
+      this.items = this.items.filter(item => item.id !== id);
+    },
 
-// Estado global
-const appState = {
+    clear() {
+      this.items = [];
+    },
+
+    getTotal() {
+      return this.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    },
+
+    showFeedback(productName) {
+      const feedback = document.createElement('div');
+      feedback.className = 'cart-feedback';
+      feedback.textContent = "✓ " + productName + " agregado";
+      document.body.appendChild(feedback);
+      setTimeout(() => feedback.remove(), 2000);
+    }
+  },
   productos: [],
-  carrito: []
+  currentFilter: 'all'
 };
 
-// Cargar productos desde Supabase
-async function cargarProductos() {
-  console.log("🔄 Cargando productos desde Supabase...");
-  const { cargarProductosSupabase } = window.supabaseClient;
+// Renderizar productos (expuesto globalmente para el filtro)
+window.renderizarProductos = function renderizarProductos(productos) {
+  console.log('📊 Renderizando productos:', productos?.length || 0);
+  const contenedor = document.getElementById('product-list');
+  if (!contenedor) {
+    console.error('❌ Contenedor de productos no encontrado');
+    return;
+  }
+
+  if (!productos || productos.length === 0) {
+    console.warn('⚠️ No hay productos para mostrar');
+    contenedor.innerHTML = "<p class='info-message'>No hay productos disponibles en este momento.</p>";
+    return;
+  }
+
+  const productosFiltrados = appState.currentFilter === 'all' 
+    ? productos 
+    : productos.filter(p => p.category === appState.currentFilter);
+  
+  console.log('🔍 Productos filtrados:', productosFiltrados.length, 'Filtro actual:', appState.currentFilter);
 
   try {
-    const productos = await cargarProductosSupabase();
+    contenedor.innerHTML = productosFiltrados.map(producto => (
+      `<div class='product-card'>
+        <div class='product-image-container'>
+          <img src='${producto.image}' alt='${producto.name}' class='product-image' loading='lazy' onerror="this.onerror=null; this.src='/images/default-product.html';">
+          ${producto.badge ? `<span class="product-badge">${producto.badge}</span>` : ''}
+        </div>
+        <div class='product-info'>
+          <h3 class='product-title'>${producto.name}</h3>
+          ${producto.description ? `<p class='product-description'>${producto.description}</p>` : ''}
+          <div class='product-price'>$${producto.price.toLocaleString()}</div>
+          <button class='add-to-cart' data-id='${producto.id}' data-name='${producto.name}' data-price='${producto.price}'>
+            Agregar al carrito
+          </button>
+        </div>
+      </div>`
+    )).join('');
 
-    if (!productos || productos.length === 0) {
-      console.warn("⚠️ No hay productos en la base de datos.");
-      return;
-    }
-
-    appState.productos = productos;
-    renderizarProductos(productos);
-    console.log('✅ Productos cargados desde Supabase:', productos.length);
+    document.querySelectorAll('.add-to-cart').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const productData = {
+          id: btn.dataset.id,
+          name: btn.dataset.name,
+          price: Number(btn.dataset.price)
+        };
+        appState.cart.addItem(productData);
+        actualizarContadorCarrito();
+      });
+    });
+    
+    console.log('✅ Eventos de botones configurados');
   } catch (error) {
-    console.error("❌ Error al cargar productos de Supabase:", error);
+    console.error('❌ Error al renderizar productos:', error);
+    contenedor.innerHTML = `<p class='error-message'>Error al mostrar los productos: ${error.message}</p>`;
   }
 }
 
-// Renderizar productos
-function renderizarProductos(productos) {
-  const contenedor = document.getElementById('product-list');
-  if (!contenedor) return;
-  contenedor.innerHTML = '';
-  productos.forEach((producto) => {
-    if (!producto || !producto.id) return;
-    const card = document.createElement('div');
-    card.className = 'product-card';
-    card.innerHTML = `
-      <div class="product-image">
-        <img src="${producto.image}" alt="${producto.name}" loading="lazy">
-      </div>
-      <div class="product-info">
-        <h3 class="product-title">${producto.name}</h3>
-        <p class="product-description">${producto.description || ''}</p>
-        <div class="product-price">$${producto.price.toLocaleString()}</div>
-        <button class="add-to-cart" data-id="${producto.id}" data-name="${producto.name}" data-price="${producto.price}">Agregar</button>
-      </div>
-    `;
-    const btn = card.querySelector('.add-to-cart');
-    btn.addEventListener('click', async () => {
-      await agregarProductoAlCarrito({ id: producto.id, name: producto.name, price: Number(producto.price) });
-      await actualizarCarrito();
-      mostrarNotificacion(`✅ ${producto.name} agregado al carrito`);
-    });
-    contenedor.appendChild(card);
-  });
-}
-
-function mostrarNotificacion(mensaje) {
-  const notif = document.createElement('div');
-  notif.className = 'carrito-notificacion';
-  notif.textContent = mensaje;
-  document.body.appendChild(notif);
-  setTimeout(() => notif.remove(), 2000);
-}
-
-function actualizarContadorCarrito() {
-  const countSpan = document.getElementById('cart-count');
-  if (!countSpan) return;
-  const totalItems = appState.carrito.reduce((sum, item) => sum + item.quantity, 0);
-  countSpan.textContent = totalItems;
-}
-
+// Mostrar carrito
 function mostrarCarrito() {
   const modal = document.getElementById('carrito-modal');
-  if (!modal) return;
   const lista = modal.querySelector('.cart-items');
   const total = modal.querySelector('.total-amount');
+
+  if (!modal || !lista || !total) return;
+
   lista.innerHTML = '';
-  if (appState.carrito.length === 0) {
-    lista.innerHTML = '<div class="empty-cart">Tu carrito está vacío</div>';
+
+  if (appState.cart.items.length === 0) {
+    lista.innerHTML = '<p class="empty-cart">Tu carrito está vacío</p>';
     total.textContent = '$0';
   } else {
-    appState.carrito.forEach(item => {
+    appState.cart.items.forEach(item => {
       const itemDiv = document.createElement('div');
       itemDiv.className = 'cart-item';
       itemDiv.innerHTML = `
-        <div class="item-info">
-          <span class="item-name">${item.name}</span>
-          <span class="item-quantity">Cantidad: ${item.quantity}</span>
-        </div>
-        <div class="item-price">$${(item.price * item.quantity).toLocaleString()}</div>
-        <button class="remove-item" data-id="${item.product_id}"><i class="fas fa-trash"></i></button>
+        <span class="item-name">${item.name}</span>
+        <span class="item-quantity">x${item.quantity}</span>
+        <span class="item-price">$${(item.price * item.quantity).toLocaleString()}</span>
       `;
-      itemDiv.querySelector('.remove-item').addEventListener('click', async () => {
-        await eliminarProductoDelCarrito(item.product_id);
-        await actualizarCarrito();
-        mostrarCarrito();
-      });
       lista.appendChild(itemDiv);
     });
-    const totalValor = appState.carrito.reduce((s, i) => s + i.price * i.quantity, 0);
-    total.textContent = `$${totalValor.toLocaleString()}`;
+    total.textContent = `$${appState.cart.getTotal().toLocaleString()}`;
   }
+
   modal.classList.remove('hidden');
   modal.classList.add('active');
+  modal.setAttribute('aria-modal', 'true');
 }
 
-async function actualizarCarrito() {
-  appState.carrito = await cargarCarrito();
-  actualizarContadorCarrito();
+// Cerrar carrito
+function cerrarCarrito() {
+  const modal = document.getElementById('carrito-modal');
+  if (modal) {
+    modal.classList.remove('active');
+    modal.classList.add('hidden');
+    modal.setAttribute('aria-modal', 'false');
+  }
 }
 
+// Actualizar contador del carrito
+function actualizarContadorCarrito() {
+  const count = appState.cart.items.reduce((sum, item) => sum + item.quantity, 0);
+  const countElement = document.getElementById('cart-count');
+  if (countElement) {
+    countElement.textContent = count;
+    countElement.style.display = count ? 'inline-block' : 'none';
+  }
+}
+
+// Cargar productos
+function cargarProductos() {
+  console.log('🔄 Cargando productos...');
+  
+  // Cargar directamente desde el JSON local para evitar problemas CORS
+  try {
+    cargarProductosCompletos();
+  } catch (e) {
+    console.error('Error al cargar productos:', e);
+    // Mostrar mensaje de error
+    const contenedor = document.getElementById('product-list');
+    if (contenedor) {
+      contenedor.innerHTML = "<p class='error-message'>Error al cargar productos. Por favor, intenta recargar la página.</p>";
+    }
+  }
+}
+
+// Cargar productos completos directamente (expuesto globalmente para el filtro)
+window.cargarProductosCompletos = async function cargarProductosCompletos() {
+  console.log('🔄 Cargando productos completos...');
+  
+  try {
+    // Forzar recarga del JSON para evitar caché
+    const timestamp = new Date().getTime();
+    const response = await fetch(`/productos.json?t=${timestamp}`);
+    if (response.ok) {
+      const productos = await response.json();
+      if (productos && productos.length > 0) {
+        appState.productos = productos;
+        console.log('✅ Productos cargados desde JSON:', productos.length);
+        renderizarProductos(productos);
+        setupFilters();
+        return;
+      }
+    }
+  } catch (error) {
+    console.error('Error al cargar productos desde JSON:', error);
+  }
+  
+  // Si no se pudo cargar desde JSON, mostrar mensaje de error
+  console.error('❌ No se pudieron cargar los productos desde el JSON');
+  
+  // Usar un array vacío para evitar errores
+  const productosCompletos = [];
+  
+  appState.productos = productosCompletos;
+  console.log('✅ No hay productos de respaldo disponibles');
+  renderizarProductos(productosCompletos);
+  setupFilters();
+}
+
+// Configurar filtros
+function setupFilters() {
+  const filterButtons = document.querySelectorAll('.filter-btn');
+  filterButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      appState.currentFilter = btn.dataset.filter;
+      renderizarProductos(appState.productos);
+      filterButtons.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    });
+  });
+}
+
+// Configurar carrito
 function configurarCarrito() {
   const cartButton = document.getElementById('cartButton');
-  const closeCart = document.querySelector('.close-cart');
-  const limpiarBtn = document.getElementById('limpiarCarrito');
-  const finalizarBtn = document.getElementById('finalizarCompra');
-  if (cartButton) cartButton.addEventListener('click', mostrarCarrito);
-  if (closeCart) closeCart.addEventListener('click', () => document.getElementById('carrito-modal').classList.add('hidden'));
-  if (limpiarBtn) limpiarBtn.addEventListener('click', async () => {
-    await limpiarCarrito();
-    await actualizarCarrito();
-    mostrarCarrito();
-  });
-  if (finalizarBtn) finalizarBtn.addEventListener('click', () => {
-    document.getElementById('carrito-modal').classList.add('hidden');
-    mostrarFormularioCheckout();
-  });
+  const finalizarCompraBtn = document.getElementById('finalizarCompra');
+  const limpiarCarritoBtn = document.getElementById('limpiarCarrito');
+  const closeCartBtn = document.querySelector('.close-cart');
+
+  if (cartButton) {
+    cartButton.addEventListener('click', () => {
+      mostrarCarrito();
+    });
+  }
+
+  if (closeCartBtn) {
+    closeCartBtn.addEventListener('click', cerrarCarrito);
+  }
+
+  if (limpiarCarritoBtn) {
+    limpiarCarritoBtn.addEventListener('click', () => {
+      appState.cart.clear();
+      actualizarContadorCarrito();
+      mostrarCarrito();
+    });
+  }
+
+  if (finalizarCompraBtn) {
+    finalizarCompraBtn.addEventListener('click', mostrarFormularioPedido);
+  }
 }
 
-function mostrarFormularioCheckout() {
+// Mostrar formulario de pedido
+function mostrarFormularioPedido() {
+  console.log('🧾 Mostrando formulario de pedido');
   const checkoutForm = document.getElementById('checkoutForm');
-  if (!checkoutForm) return;
   const summaryItems = checkoutForm.querySelector('.summary-items');
   const subtotalElement = checkoutForm.querySelector('.subtotal-amount');
+  const shippingElement = checkoutForm.querySelector('.shipping-amount');
   const totalElement = checkoutForm.querySelector('.total-amount');
+  
+  // Cerrar el modal del carrito
+  cerrarCarrito();
+  
+  // Llenar el resumen del pedido
   summaryItems.innerHTML = '';
-  appState.carrito.forEach(item => {
+  appState.cart.items.forEach(item => {
     const itemDiv = document.createElement('div');
     itemDiv.className = 'summary-item';
     itemDiv.innerHTML = `
-      <span>${item.name} x${item.quantity}</span>
-      <span>$${(item.price * item.quantity).toLocaleString()}</span>
+      <span class="item-name">${item.name} x${item.quantity}</span>
+      <span class="item-price">$${(item.price * item.quantity).toLocaleString()}</span>
     `;
     summaryItems.appendChild(itemDiv);
   });
-  const total = appState.carrito.reduce((s, i) => s + i.price * i.quantity, 0);
-  subtotalElement.textContent = `$${total.toLocaleString()}`;
+  
+  // Calcular totales
+  const subtotal = appState.cart.getTotal();
+  const shipping = subtotal > 200000 ? 0 : 12000; // Envío gratis para compras mayores a $200,000
+  const total = subtotal + shipping;
+  
+  // Actualizar montos en el formulario
+  subtotalElement.textContent = `$${subtotal.toLocaleString()}`;
+  shippingElement.textContent = shipping === 0 ? 'Gratis' : `$${shipping.toLocaleString()}`;
   totalElement.textContent = `$${total.toLocaleString()}`;
+  
+  // Mostrar el formulario
   checkoutForm.classList.remove('hidden');
+  checkoutForm.classList.add('active');
+  checkoutForm.setAttribute('aria-modal', 'true');
+  
+  // Configurar eventos del formulario
+  configurarFormularioPedido();
 }
 
-function configurarCheckoutForm() {
-  const form = document.getElementById('formularioCompra');
-  if (!form) return;
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const formData = new FormData(form);
-    const cliente = {
-      nombre: formData.get('nombre') || '',
-      email: formData.get('email') || '',
-      telefono: formData.get('telefono') || '',
-      direccion: formData.get('direccion') || '',
-      ciudad: formData.get('ciudad') || '',
-      referidor: formData.get('referidor')
-    };
-    const total = appState.carrito.reduce((s, i) => s + i.price * i.quantity, 0);
-    const pedido = {
-      cliente_nombre: cliente.nombre,
-      cliente_email: cliente.email,
-      cliente_telefono: cliente.telefono,
-      direccion: cliente.direccion,
-      ciudad: cliente.ciudad,
-      referidor: cliente.referidor,
-      productos: appState.carrito,
-      total,
-      estado: 'pendiente',
-      numero_orden: `BL-${Date.now().toString().slice(-6)}`
-    };
-    const { error } = await supabase.from('pedidos').insert([pedido]);
-    if (error) {
-      alert('❌ Error al guardar el pedido');
+// Configurar eventos del formulario de pedido
+function configurarFormularioPedido() {
+  const checkoutForm = document.getElementById('checkoutForm');
+  const closeFormBtn = checkoutForm.querySelector('.close-form');
+  const backToCartBtn = checkoutForm.querySelector('.btn-back-to-cart');
+  const formulario = document.getElementById('formularioCompra');
+  
+  // Cerrar formulario
+  if (closeFormBtn) {
+    closeFormBtn.addEventListener('click', () => {
+      checkoutForm.classList.remove('active');
+      checkoutForm.classList.add('hidden');
+      checkoutForm.setAttribute('aria-modal', 'false');
+    });
+  }
+  
+  // Volver al carrito
+  if (backToCartBtn) {
+    backToCartBtn.addEventListener('click', () => {
+      checkoutForm.classList.remove('active');
+      checkoutForm.classList.add('hidden');
+      mostrarCarrito();
+    });
+  }
+  
+  // Enviar formulario
+  if (formulario) {
+    formulario.addEventListener('submit', procesarPedido);
+  }
+}
+
+// Procesar pedido
+function procesarPedido(event) {
+  event.preventDefault();
+  console.log('🛒 Procesando pedido...');
+  
+  try {
+    // Obtener datos del formulario
+    const formulario = document.getElementById('formularioCompra');
+    const nombre = formulario.querySelector('#nombre').value;
+    const email = formulario.querySelector('#email').value;
+    const telefono = formulario.querySelector('#telefono').value;
+    const direccion = formulario.querySelector('#direccion').value;
+    const ciudad = formulario.querySelector('#ciudad').value;
+    const referidor = formulario.querySelector('#referidor')?.value || '';
+    
+    // Validar datos básicos incluyendo el referidor
+    if (!nombre || !email || !telefono || !direccion || !ciudad || !referidor) {
+      // Resaltar campos vacíos
+      if (!nombre) document.getElementById('nombre').style.border = '2px solid red';
+      if (!email) document.getElementById('email').style.border = '2px solid red';
+      if (!telefono) document.getElementById('telefono').style.border = '2px solid red';
+      if (!direccion) document.getElementById('direccion').style.border = '2px solid red';
+      if (!ciudad) document.getElementById('ciudad').style.border = '2px solid red';
+      if (!referidor) {
+        document.getElementById('referidor').style.border = '2px solid red';
+        alert('Por favor indica quién te refirió. Este campo es obligatorio.');
+        document.getElementById('referidor').focus();
+      } else {
+        alert('Por favor completa todos los campos obligatorios.');
+      }
       return;
     }
-    const referencia = encodeURIComponent(`${cliente.referidor}-${pedido.numero_orden}`);
-    const url = `https://checkout.wompi.co/l/VPOS_nJo3xk?amount=${Math.round(total * 100)}&currency=COP&reference=${referencia}`;
+    
+    // Calcular totales
+    const subtotal = appState.cart.getTotal();
+    const shipping = subtotal > 200000 ? 0 : 12000;
+    const total = subtotal + shipping;
+    
+    // Generar número de pedido
+    const orderNumber = `BL-${Date.now().toString().slice(-6)}`;
+    
+    // Preparar datos del carrito para el correo
+    const carrito = appState.cart.items.map(item => `${item.quantity}x ${item.name} ($${item.price.toLocaleString()})`).join(", ");
+    
+    // Enviar correo con los datos del pedido usando EmailJS
+    if (typeof emailjs !== 'undefined') {
+      emailjs.send("service_owxur5f", "template_sck7rdl", {
+        nombre,
+        email,
+        telefono,
+        direccion: `${direccion}, ${ciudad}`,
+        referidor,
+        metodo_pago: 'Wompi',
+        total: total.toLocaleString(),
+        carrito,
+        referencia: orderNumber
+      }, "Cqwg1EyqFLvPg7ULx")
+      .then(function(response) {
+        console.log("📧 Pedido enviado correctamente");
+        
+        // Cerrar formulario de checkout
+        const checkoutForm = document.getElementById('checkoutForm');
+        checkoutForm.classList.remove('active');
+        checkoutForm.classList.add('hidden');
+        
+        // Limpiar carrito
+        appState.cart.clear();
+        actualizarContadorCarrito();
+        
+        // Mostrar confirmación
+        mostrarConfirmacionPedido(orderNumber);
+        
+        // Redirigir a la página de Wompi con parámetros
+        const totalCents = Math.round(total * 100);
+        window.location.href = `/wompi-redirect.html?total=${totalCents}&reference=${orderNumber}&email=${encodeURIComponent(email)}&name=${encodeURIComponent(nombre)}`;
+      })
+      .catch(function(error) {
+        console.error("❌ Error al enviar correo:", error);
+        alert("Hubo un error al procesar el pedido. Por favor, intenta nuevamente.");
+      });
+    } else {
+      console.error('❌ EmailJS no está disponible');
+      alert("Error al procesar el pedido: El servicio de correo no está disponible. Por favor, intenta nuevamente.");
+    }
+  } catch (error) {
+    console.error('❌ Error en procesarPedido:', error);
+    alert("Ocurrió un error inesperado. Por favor, intenta nuevamente.");
+  }
+}
+
+// Mostrar modal de Wompi
+function mostrarModalWompi(total, orderNumber) {
+  console.log('💳 Preparando pago con Wompi...');
+  
+  // URL directa de Wompi
+  const urlWompi = "https://checkout.wompi.co/l/VPOS_nJo3xk";
+  
+  // Crear un modal con instrucciones para Wompi
+  const wompiModal = document.createElement('div');
+  wompiModal.className = 'modal active';
+  wompiModal.id = 'wompiModal';
+  wompiModal.innerHTML = `
+    <div class="modal-content payment-modal">
+      <button class="close-modal" aria-label="Cerrar">&times;</button>
+      <h2>Pago con Wompi</h2>
+      <div class="payment-info">
+        <p>A continuación serás redirigido a Wompi para completar tu pago.</p>
+        <div class="payment-details">
+          <p><strong>Monto a pagar:</strong> $${total.toLocaleString()}</p>
+          <p><strong>Número de pedido:</strong> ${orderNumber}</p>
+          <p class="important-note">IMPORTANTE: Por favor ingresa exactamente el monto indicado arriba. Cualquier inconsistencia impedirá que el pedido sea despachado.</p>
+        </div>
+        <div class="form-actions">
+          <a href="${urlWompi}" target="_blank" id="btnIrAWompi" class="btn-submit-order">Ir a Wompi</a>
+        </div>
+      </div>
+    </div>
+  `;
+  
+  document.body.appendChild(wompiModal);
+  
+  // Configurar el botón para ir a Wompi
+  document.getElementById('btnIrAWompi').addEventListener('click', () => {
+    // Cerrar el modal y mostrar confirmación
     setTimeout(() => {
-      window.open(url, '_blank');
-      limpiarCarrito();
-      actualizarCarrito();
-      form.reset();
-      document.getElementById('checkoutForm')?.classList.add('hidden');
-    }, 3000);
+      document.getElementById('wompiModal').remove();
+      mostrarConfirmacionPedido(orderNumber);
+      
+      // Limpiar carrito
+      appState.cart.clear();
+      actualizarContadorCarrito();
+    }, 500);
+  });
+  
+  // Configurar el botón de cerrar
+  wompiModal.querySelector('.close-modal').addEventListener('click', () => {
+    document.getElementById('wompiModal').remove(
+    
+    );
+    mostrarConfirmacionPedido(orderNumber);
+    
+    // Limpiar carrito
+    appState.cart.clear();
+    actualizarContadorCarrito();
   });
 }
 
+// Mostrar confirmación de pedido
+function mostrarConfirmacionPedido(orderNumber) {
+  const confirmationModal = document.getElementById('confirmationModal');
+  const orderNumberElement = document.getElementById('order-number');
+  const continuarComprandoBtn = document.getElementById('btn-continue-shopping');
+  
+  // Actualizar número de pedido
+  if (orderNumberElement) {
+    orderNumberElement.textContent = orderNumber;
+  }
+  
+  // Mostrar modal
+  confirmationModal.classList.remove('hidden');
+  confirmationModal.classList.add('active');
+  
+  // Configurar botón para continuar comprando
+  if (continuarComprandoBtn) {
+    continuarComprandoBtn.addEventListener('click', () => {
+      confirmationModal.classList.remove('active');
+      confirmationModal.classList.add('hidden');
+    });
+  }
+}
+
 // Inicialización
-window.addEventListener('DOMContentLoaded', async () => {
+document.addEventListener('DOMContentLoaded', () => {
   console.log('🚀 Inicializando aplicación...');
-  await cargarProductos();
-  await actualizarCarrito();
+  
+  // Agregar botón para limpiar caché (solo visible en desarrollo)
+  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+    const limpiarBtn = document.createElement('button');
+    limpiarBtn.textContent = 'Limpiar Caché';
+    limpiarBtn.style.position = 'fixed';
+    limpiarBtn.style.bottom = '10px';
+    limpiarBtn.style.right = '10px';
+    limpiarBtn.style.zIndex = '9999';
+    limpiarBtn.style.padding = '5px 10px';
+    limpiarBtn.style.backgroundColor = '#d63384';
+    limpiarBtn.style.color = 'white';
+    limpiarBtn.style.border = 'none';
+    limpiarBtn.style.borderRadius = '4px';
+    limpiarBtn.style.cursor = 'pointer';
+    limpiarBtn.style.fontSize = '12px';
+    
+    limpiarBtn.addEventListener('click', () => {
+      localStorage.removeItem('productos');
+      localStorage.removeItem('productosCache');
+      localStorage.removeItem('lastUpdate');
+      window.location.reload(true);
+    });
+    
+    document.body.appendChild(limpiarBtn);
+  }
+  
+  // Cargar productos desde la API primero
+  cargarProductos();
   configurarCarrito();
-  configurarCheckoutForm();
+  actualizarContadorCarrito();
+  
+  // Actualizar año en el footer
+  document.getElementById('current-year').textContent = new Date().getFullYear();
 });
