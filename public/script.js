@@ -12,27 +12,28 @@ if (!userId) {
 
 // Estado global
 const appState = {
-  productos: [],
-  carrito: []
+  products: [],
+  carrito: [],
+  pedidos: [],
 };
 
 // Cargar productos desde Supabase
 async function cargarProductos() {
   try {
-    const { data: productos, error } = await client
-      .from('productos')
+    const { data: products, error } = await client
+      .from('products')
       .select('*')
       .order('name', { ascending: true });
 
     if (error) throw error;
 
-    if (!productos || productos.length === 0) {
+    if (!products || products.length === 0) {
       document.getElementById('product-list').innerHTML = '<div class="empty-message">No hay productos disponibles.</div>';
       return;
     }
 
-    appState.productos = productos;
-    renderizarProductos(productos);
+    appState.products = products;
+    renderizarProductos(products);
   } catch (error) {
     console.error("Error al cargar productos:", error);
     document.getElementById('product-list').innerHTML = '<div class="error-message">Error cargando productos.</div>';
