@@ -184,6 +184,22 @@ function actualizarContadorCarrito() {
 // Mostrar modal del carrito
 function mostrarCarrito() {
   const modal = document.getElementById('carrito-modal');
+  
+  // Debug: Verificar si el modal existe
+  if (!modal) {
+    console.error('Elemento #carrito-modal no encontrado en el DOM');
+    return;
+  }
+
+  // Debug: Mostrar estado antes de cambios
+  console.log('Estado inicial del modal:', {
+    classes: modal.classList,
+    display: window.getComputedStyle(modal).display,
+    visibility: window.getComputedStyle(modal).visibility,
+    opacity: window.getComputedStyle(modal).opacity
+  });
+
+  // Actualizar contenido del carrito
   const lista = modal.querySelector('.cart-items');
   const total = modal.querySelector('.total-amount');
   lista.innerHTML = '';
@@ -215,8 +231,20 @@ function mostrarCarrito() {
     total.textContent = `$${totalValor.toLocaleString()}`;
   }
 
+  // Mostrar el modal con múltiples métodos
   modal.classList.remove('hidden');
+  modal.style.display = 'flex';
+  modal.style.visibility = 'visible';
+  modal.style.opacity = '1';
   modal.setAttribute('aria-modal', 'true');
+  
+  // Debug: Mostrar estado después de cambios
+  console.log('Estado después de mostrar:', {
+    classes: modal.classList,
+    display: window.getComputedStyle(modal).display,
+    visibility: window.getComputedStyle(modal).visibility,
+    opacity: window.getComputedStyle(modal).opacity
+  });
 }
 
 // Configurar botones del carrito
