@@ -221,19 +221,57 @@ function mostrarCarrito() {
 
 // Configurar botones del carrito
 function configurarCarrito() {
-  document.getElementById('cartButton')?.addEventListener('click', async () => {
-  await actualizarCarrito();
-  mostrarCarrito();
-});
+  const cartButton = document.getElementById('cartButton');
+  const closeButton = document.querySelector('.close-cart');
+  const clearButton = document.getElementById('limpiarCarrito');
+  const modal = document.getElementById('carrito-modal');
 
-  document.querySelector('.close-cart')?.addEventListener('click', () => {
-    document.getElementById('carrito-modal')?.classList.add('hidden');
-  });
-  document.getElementById('limpiarCarrito')?.addEventListener('click', async () => {
-    await limpiarCarrito();
-    await actualizarCarrito();
-    mostrarCarrito();
-    mostrarNotificacion("🧹 Carrito vaciado");
+  if (cartButton) {
+    cartButton.addEventListener('click', async () => {
+      try {
+        await actualizarCarrito();
+        modal.classList.remove('hidden');
+        modal.setAttribute('aria-modal', 'true');
+        // Enfocar el primer elemento del modal
+        modal.querySelector('button')?.focus();
+      } catch (error) {
+        console.error("Error al abrir carrito:", error);
+        mostrarNotificacion("❌ Error al cargar el carrito");
+      }
+    });
+  }
+
+  if (closeButton) {
+    closeButton.addEventListener('click', () => {
+      modal.classList.add('hidden');
+      modal.setAttribute('aria-modal', 'false');
+      // Devolver foco al botón del carrito
+      cartButton?.focus();
+    });
+  }
+
+  if (clearButton) {
+    clearButton.addEventListener('click', async () => {
+      clearButton.disabled = true;
+      try {
+        await limpiarCarrito();
+        await actualizarCarrito();
+        mostrarCarrito();
+        mostrarNotificacion("🧹 Carrito vaciado");
+      } catch (error) {
+        mostrarNotificacion("❌ Error al vaciar carrito");
+      } finally {
+        clearButton.disabled = false;
+      }
+    });
+  }
+
+  // Cerrar al hacer clic fuera del contenido
+  modal?.addEventListener('click', (e) => {
+    if (e.target === modal) {
+      modal.classList.add('hidden');
+      modal.setAttribute('aria-modal', 'false');
+    }
   });
 }
 
