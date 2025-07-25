@@ -22,7 +22,7 @@ async function cargarProductos() {
   
   try {
     const { data: productos, error } = await client
-      .from('productos')
+      .from('products')  // Cambiado de 'productos' a 'products'
       .select('*')
       .order('name', { ascending: true });
 
@@ -44,7 +44,11 @@ async function cargarProductos() {
     console.error("❌ Error al cargar productos de Supabase:", error);
     const contenedor = document.getElementById('product-list');
     if (contenedor) {
-      contenedor.innerHTML = '<div class="error-message">Error cargando productos. Intenta nuevamente.</div>';
+      contenedor.innerHTML = `
+        <div class="error-message">
+          Error cargando productos: ${error.message}
+        </div>
+      `;
     }
   }
 }
