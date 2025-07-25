@@ -217,7 +217,11 @@ function mostrarCarrito() {
 
 // Configurar botones del carrito
 function configurarCarrito() {
-  document.getElementById('cartButton')?.addEventListener('click', mostrarCarrito);
+  document.getElementById('cartButton')?.addEventListener('click', async () => {
+  await actualizarCarrito();
+  mostrarCarrito();
+});
+
   document.querySelector('.close-cart')?.addEventListener('click', () => {
     document.getElementById('carrito-modal')?.classList.add('hidden');
   });
@@ -241,9 +245,9 @@ window.addEventListener('DOMContentLoaded', async () => {
       e.preventDefault();
       const filtro = button.dataset.filter;
       const filtrados = filtro
-        ? appState.productos.filter(p => p.categoria === filtro)
-        : appState.productos;
-      renderizarProductos(filtrados);
+        ? appState.products.filter(p => p.categoria === filtro)
+        : appState.products;
+      renderizarProductos(products);
     });
   });
 });
