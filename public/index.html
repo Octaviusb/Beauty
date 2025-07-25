@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Tienda de productos de belleza y cuidado personal - Beauty Club. Productos naturales de alta calidad para el cuidado de la piel y maquillaje.">
-  <title>Beauty Club - Tienda de Belleza y Cuidado Personal | Productos Naturales</title>
+  <meta name="description" content="Tienda de productos de belleza y cuidado personal - Beauty Line. Productos naturales de alta calidad para el cuidado de la piel y maquillaje.">
+  <title>Beauty Line - Tienda de Belleza y Cuidado Personal | Productos Naturales</title>
   
   <!-- Preload de recursos críticos -->
   <link rel="preload" href="styles.css" as="style">
@@ -22,7 +22,6 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
   
   <!-- Scripts -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="script.js"></script>
   <script>
     if(window.location.hostname === "localhost") {
@@ -37,7 +36,6 @@
     <div class="header-container">
       <h1 class="logo">
         <img src="assets/logo.png" alt="Beauty Club Logo" width="150" height="50" loading="lazy">
-        <a href="/" aria-label="Beauty Club - Inicio">Beauty<span>Line</span></a>
       </h1>
 
       <button class="cart-icon" id="cartButton" aria-label="Carrito de compras" aria-expanded="false">
@@ -133,13 +131,13 @@
     <div class="container">
       <div class="footer-content">
         <div class="footer-col">
-          <h3>Beauty Club</h3>
+          <h3>Beauty Line</h3>
           <p>Tu tienda de confianza para productos de belleza de alta calidad.</p>
         </div>
         <!-- Otras columnas del footer -->
       </div>
       <div class="footer-bottom">
-        <p class="footer-legal">&copy; <span id="current-year"></span> Beauty Club. Todos los derechos reservados.</p>
+        <p class="footer-legal">&copy; <span id="current-year"></span> Beauty Line. Todos los derechos reservados.</p>
       </div>
     </div>
   </footer>
@@ -197,10 +195,10 @@
               <label for="ciudad">Ciudad*</label>
               <input type="text" id="ciudad" name="ciudad" required autocomplete="address-level2">
             </div>
-
+            
             <div class="form-group">
-              <label for="referidor">¿Quién te refirió a nosotros?*</label>
-              <input type="text" id="referidor" name="referidor" required autocomplete="off" placeholder="Nombre de quien te refirió">
+              <label for="referidor">¿Quién te refirió?*</label>
+              <input type="text" id="referidor" name="referidor" required placeholder="Nombre de quien te refirió">
             </div>
           </div>
           
@@ -272,7 +270,9 @@
   </div>
 
   <!-- Scripts -->
+  <script src="vercel-fix.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+  <script src="filtrar-productos.js"></script>
   <script>
     emailjs.init("Cqwg1EyqFLvPg7ULx");
     document.getElementById('current-year').textContent = new Date().getFullYear();
