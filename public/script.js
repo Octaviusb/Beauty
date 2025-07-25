@@ -1,7 +1,7 @@
 // Configuración de Supabase
 const supabaseUrl = 'https://lsxojnbkbqhuwaydiqqb.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxzeG9qbmJrYnFodXdheWRpcXFiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI1MDYzMzAsImV4cCI6MjA2ODA4MjMzMH0.uHQJ_F3NmeM2U4EsIq_UFSPMKd35MlMZnrboKOIy45g';
-const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+const client = supabase.createClient(supabaseUrl, supabaseKey);
 
 // Obtener user_id anónimo
 let userId = localStorage.getItem('user_id');
@@ -21,7 +21,7 @@ async function cargarProductos() {
   console.log("🔄 Cargando productos desde Supabase...");
   
   try {
-    const { data: productos, error } = await supabase
+    const { data: productos, error } = await client
       .from('productos')
       .select('*')
       .order('name', { ascending: true });
@@ -118,7 +118,7 @@ function renderizarProductos(productos) {
 async function agregarProductoAlCarrito(producto) {
   try {
     // Verificar si el producto ya está en el carrito
-    const { data: existingItem, error: queryError } = await supabase
+    const { data: existingItem, error: queryError } = await client
       .from('carrito')
       .select('*')
       .eq('product_id', producto.id)
@@ -129,7 +129,7 @@ async function agregarProductoAlCarrito(producto) {
 
     if (existingItem) {
       // Actualizar cantidad si ya existe
-      const { error: updateError } = await supabase
+      const { error: updateError } = await client
         .from('carrito')
         .update({ quantity: existingItem.quantity + 1 })
         .eq('id', existingItem.id);
@@ -137,7 +137,7 @@ async function agregarProductoAlCarrito(producto) {
       if (updateError) throw updateError;
     } else {
       // Insertar nuevo item
-      const { error: insertError } = await supabase
+      const { error: insertError } = await client
         .from('carrito')
         .insert([{
           product_id: producto.id,
@@ -157,7 +157,7 @@ async function agregarProductoAlCarrito(producto) {
 
 async function cargarCarrito() {
   try {
-    const { data: items, error } = await supabase
+    const { data: items, error } = await client
       .from('carrito')
       .select('*')
       .eq('user_id', userId);
@@ -172,7 +172,7 @@ async function cargarCarrito() {
 
 async function eliminarProductoDelCarrito(productId) {
   try {
-    const { error } = await supabase
+    const { error } = await client
       .from('carrito')
       .delete()
       .eq('product_id', productId)
@@ -187,7 +187,7 @@ async function eliminarProductoDelCarrito(productId) {
 
 async function limpiarCarrito() {
   try {
-    const { error } = await supabase
+    const { error } = await client
       .from('carrito')
       .delete()
       .eq('user_id', userId);
@@ -399,7 +399,7 @@ function configurarCheckoutForm() {
         user_id: userId
       };
       
-      const { error } = await supabase.from('pedidos').insert([pedido]);
+      const { error } = await client.from('pedidos').insert([pedido]);
       if (error) throw error;
       
       const referencia = encodeURIComponent(`${cliente.referidor}-${pedido.numero_orden}`);
