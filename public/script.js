@@ -93,23 +93,24 @@ function renderizarProductos(productos) {
 }
 
 // Agregar producto al carrito
-const { data: existingItems, error: queryError } = await client
-  .from('carrito')
-  .select('*')
-  .eq('product_id', producto.id)
-  .eq('user_id', userId);
+async function agregarProductoAlCarrito(producto) {
+  // Buscar si ya existe ese producto en el carrito del usuario
+  const { data: existingItems, error: queryError } = await client
+    .from('carrito')
+    .select('*')
+    .eq('product_id', producto.id)
+    .eq('user_id', userId);
 
-if (queryError) throw queryError;
+  if (queryError) throw queryError;
 
-const existingItem = existingItems?.[0]; // Obtén el primero, si existe
-
-  if (queryError && queryError.code !== 'PGRST116') throw queryError;
+  const existingItem = existingItems?.[0];
 
   if (existingItem) {
     const { error: updateError } = await client
       .from('carrito')
       .update({ quantity: existingItem.quantity + 1 })
       .eq('id', existingItem.id);
+
     if (updateError) throw updateError;
   } else {
     const { error: insertError } = await client
@@ -121,6 +122,7 @@ const existingItem = existingItems?.[0]; // Obtén el primero, si existe
         quantity: 1,
         user_id: userId
       }]);
+
     if (insertError) throw insertError;
   }
 }
