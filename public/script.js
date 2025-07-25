@@ -222,55 +222,71 @@ function mostrarCarrito() {
 // Configurar botones del carrito
 function configurarCarrito() {
   const cartButton = document.getElementById('cartButton');
-  const closeButton = document.querySelector('.close-cart');
-  const clearButton = document.getElementById('limpiarCarrito');
   const modal = document.getElementById('carrito-modal');
 
-  if (cartButton) {
-    cartButton.addEventListener('click', async () => {
-      try {
-        await actualizarCarrito();
-        modal.classList.remove('hidden');
-        modal.setAttribute('aria-modal', 'true');
-        // Enfocar el primer elemento del modal
-        modal.querySelector('button')?.focus();
-      } catch (error) {
-        console.error("Error al abrir carrito:", error);
-        mostrarNotificacion("❌ Error al cargar el carrito");
-      }
-    });
+  if (!cartButton || !modal) {
+    console.error('Elementos del carrito no encontrados');
+    return;
   }
 
-  if (closeButton) {
-    closeButton.addEventListener('click', () => {
-      modal.classList.add('hidden');
-      modal.setAttribute('aria-modal', 'false');
-      // Devolver foco al botón del carrito
-      cartButton?.focus();
-    });
-  }
+  // Abrir carrito
+  cartButton.addEventListener('click', async function() {
+    console.log('Botón de carrito clickeado'); // Debug
+    
+    try {
+      cartButton.disabled = true;
+      cartButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+      
+      await actualizarCarrito();
+      
+      console.log('Mostrando carrito...'); // Debug
+      modal.classList.remove('hidden');
+      modal.setAttribute('aria-hidden', 'false');
+      
+      // Enfocar el modal para accesibilidad
+      modal.focus();
+      
+    } catch (error) {
+      console.error('Error al abrir carrito:', error);
+      mostrarNotificacion('❌ Error al abrir el carrito');
+    } finally {
+      cartButton.disabled = false;
+      cartButton.innerHTML = `<span id="cart-count">0</span>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/>
+        </svg>`;
+    }
+  });
 
-  if (clearButton) {
-    clearButton.addEventListener('click', async () => {
-      clearButton.disabled = true;
-      try {
-        await limpiarCarrito();
-        await actualizarCarrito();
-        mostrarCarrito();
-        mostrarNotificacion("🧹 Carrito vaciado");
-      } catch (error) {
-        mostrarNotificacion("❌ Error al vaciar carrito");
-      } finally {
-        clearButton.disabled = false;
-      }
-    });
-  }
+  // Cerrar carrito
+  document.querySelector('.close-cart')?.addEventListener('click', () => {
+    modal.classList.add('hidden');
+    modal.setAttribute('aria-hidden', 'true');
+    cartButton.focus(); // Devuelve el foco al botón
+  });
 
-  // Cerrar al hacer clic fuera del contenido
-  modal?.addEventListener('click', (e) => {
+  // Limpiar carrito
+  document.getElementById('limpiarCarrito')?.addEventListener('click', async () => {
+    const button = document.getElementById('limpiarCarrito');
+    try {
+      button.disabled = true;
+      await limpiarCarrito();
+      await actualizarCarrito();
+      mostrarCarrito();
+      mostrarNotificacion("🧹 Carrito vaciado");
+    } catch (error) {
+      console.error('Error al limpiar carrito:', error);
+      mostrarNotificacion("❌ Error al vaciar carrito");
+    } finally {
+      button.disabled = false;
+    }
+  });
+
+  // Cerrar al hacer clic fuera del modal
+  modal.addEventListener('click', (e) => {
     if (e.target === modal) {
       modal.classList.add('hidden');
-      modal.setAttribute('aria-modal', 'false');
+      modal.setAttribute('aria-hidden', 'true');
     }
   });
 }
