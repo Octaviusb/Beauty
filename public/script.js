@@ -93,13 +93,15 @@ function renderizarProductos(productos) {
 }
 
 // Agregar producto al carrito
-async function agregarProductoAlCarrito(producto) {
-  const { data: existingItem, error: queryError } = await client
-    .from('carrito')
-    .select('*')
-    .eq('product_id', producto.id)
-    .eq('user_id', userId)
-    .single();
+const { data: existingItems, error: queryError } = await client
+  .from('carrito')
+  .select('*')
+  .eq('product_id', producto.id)
+  .eq('user_id', userId);
+
+if (queryError) throw queryError;
+
+const existingItem = existingItems?.[0]; // Obtén el primero, si existe
 
   if (queryError && queryError.code !== 'PGRST116') throw queryError;
 
