@@ -1,6 +1,6 @@
 // Configuración de Supabase
 const supabaseUrl = 'https://lsxojnbkbqhuwaydiqqb.supabase.co';
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'; // truncado por seguridad
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxzeG9qbmJrYnFodXdheWRpcXFiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI1MDYzMzAsImV4cCI6MjA2ODA4MjMzMH0.uHQJ_F3NmeM2U4EsIq_UFSPMKd35MlMZnrboKOIy45g'; // truncado por seguridad
 const client = supabase.createClient(supabaseUrl, supabaseKey);
 
 // Obtener user_id anónimo
