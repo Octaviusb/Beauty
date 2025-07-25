@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test API de Productos</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+    pre { background: #f5f5f5; padding: 10px; border-radius: 5px; overflow: auto; }
+    button { padding: 10px 15px; background: #4CAF50; color: white; border: none; cursor: pointer; margin-bottom: 20px; }
+    .error { color: red; }
+    .success { color: green; }
+  </style>
+</head>
+<body>
+  <h1>Test de API de Productos</h1>
+  
+  <button id="testProductsBtn">Probar API de Productos</button>
+  <button id="testWompiBtn">Probar API de Wompi</button>
+  
+  <div id="results">
+    <h2>Resultados:</h2>
+    <div id="output"></div>
+  </div>
+  
+  <script>
+    // Función para mostrar resultados
+    function showResult(data, isError = false) {
+      const output = document.getElementById('output');
+      const pre = document.createElement('pre');
+      pre.className = isError ? 'error' : 'success';
+      
+      if (typeof data === 'object') {
+        pre.textContent = JSON.stringify(data, null, 2);
+      } else {
+        pre.textContent = data;
+      }
+      
+      output.appendChild(pre);
+    }
+    
+    // Test de API de productos
+    document.getElementById('testProductsBtn').addEventListener('click', async () => {
+      document.getElementById('output').innerHTML = '';
+      showResult('Probando API de productos...');
+      
+      try {
+        const response = await fetch('/api/products');
+        showResult(`Estado de respuesta: ${response.status} ${response.statusText}`);
+        
+        if (!response.ok) {
+          throw new Error(`Error en la respuesta: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        showResult(`Productos recibidos: ${Array.isArray(data) ? data.length : 'No es un array'}`);
+        showResult(data);
+      } catch (error) {
+        showResult(`Error: ${error.message}`, true);
+      }
+    });
+    
+    // Test de API de Wompi
+    document.getElementById('testWompiBtn').addEventListener('click', async () => {
+      document.getElementById('output').innerHTML = '';
+      showResult('Probando API de Wompi...');
+      
+      try {
+        const publicKey = "pub_prod_XApVcADEVCLGJnnghUT1V8G3oEwrF7ZW";
+        const montoEnCentavos = 1000000; // $10.000 COP
+        const referencia = `test_${Date.now()}`;
+        
+        const response = await fetch('/api/wompi-link', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            amountInCents: montoEnCentavos,
+            currency: "COP",
+            reference: referencia,
+            publicKey: publicKey
+          })
+        });
+        
+        showResult(`Estado de respuesta: ${response.status} ${response.statusText}`);
+        
+        if (!response.ok) {
+          throw new Error(`Error en la respuesta: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        showResult('Respuesta recibida:');
+        showResult(data);
+        
+        if (data.checkoutUrl) {
+          showResult(`URL de checkout generada: ${data.checkoutUrl}`);
+          
+          // Crear botón para ir a la URL
+          const btn = document.createElement('button');
+          btn.textContent = 'Ir a Wompi';
+          btn.onclick = () => window.open(data.checkoutUrl, '_blank');
+          document.getElementById('output').appendChild(btn);
+        }
+      } catch (error) {
+        showResult(`Error: ${error.message}`, true);
+      }
+    });
+  </script>
+</body>
+</html>

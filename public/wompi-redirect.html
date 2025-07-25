@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pago con Wompi - Beauty Line</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles-form.css">
+  <link rel="stylesheet" href="styles-wompi.css">
+  <style>
+    .payment-container {
+      max-width: 600px;
+      margin: 50px auto;
+      padding: 30px;
+      background-color: #fff;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+    .payment-header {
+      margin-bottom: 30px;
+    }
+    .payment-header h1 {
+      color: #d63384;
+      margin-bottom: 10px;
+    }
+    .payment-details {
+      margin: 20px 0;
+      padding: 15px;
+      background-color: #f8f9fa;
+      border-radius: 6px;
+    }
+    .payment-button {
+      margin: 30px 0;
+    }
+    .back-button {
+      margin-top: 20px;
+      display: inline-block;
+      padding: 10px 20px;
+      background-color: #6c757d;
+      color: white;
+      text-decoration: none;
+      border-radius: 4px;
+    }
+    .back-button:hover {
+      background-color: #5a6268;
+    }
+    .wompi-button {
+      display: inline-block;
+      margin: 0 auto;
+    }
+  </style>
+</head>
+<body>
+  <div class="payment-container">
+    <div class="payment-header">
+      <h1>Pago con Wompi</h1>
+      <p>Completa tu pago de manera segura con Wompi</p>
+    </div>
+    
+    <div class="payment-details">
+      <p>Hemos recibido tu pedido correctamente. Para completar tu compra, haz clic en el botón de pago a continuación.</p>
+      <p><strong>Nota importante:</strong> Una vez realizado el pago, tu pedido será procesado y despachado en un plazo máximo de 3 días hábiles.</p>
+    </div>
+    
+    <div class="payment-button">
+      <!-- Botón de pago de Wompi -->
+      <div class="wompi-button">
+        <form>
+          <script
+            src="https://checkout.wompi.co/widget.js"
+            data-render="button"
+            data-public-key="pub_test_X0zDA9xoKdePzhd8a0x9HAez7HgGO2fH"
+            data-currency="COP"
+            data-amount-in-cents="4950000"
+            data-reference="BL-WOMPI-TEST"
+            data-redirect-url="https://beauty-mocha-ten.vercel.app/confirmacion.html"
+          ></script>
+        </form>
+      </div>
+    </div>
+    
+    <a href="/" class="back-button">Volver a la tienda</a>
+  </div>
+
+  <script>
+    // Obtener parámetros de la URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const total = urlParams.get('total') || 49500;
+    const reference = urlParams.get('reference') || 'BL-WOMPI-TEST';
+    const email = urlParams.get('email') || '';
+    const name = urlParams.get('name') || '';
+    
+    // Actualizar el botón de Wompi con los parámetros
+    document.addEventListener('DOMContentLoaded', () => {
+      const script = document.querySelector('script[data-render="button"]');
+      if (script) {
+        script.setAttribute('data-amount-in-cents', Math.round(total * 100).toString());
+        script.setAttribute('data-reference', reference);
+        
+        if (email) {
+          script.setAttribute('data-customer-data:email', email);
+        }
+        
+        if (name) {
+          script.setAttribute('data-customer-data:full-name', name);
+        }
+      }
+    });
+  </script>
+</body>
+</html>

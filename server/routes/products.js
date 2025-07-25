@@ -3,9 +3,6 @@ console.log('¡El archivo products.js está siendo requerido!'); // Este log est
 const express = require('express');
 const router = express.Router();
 
-// **** ATENCIÓN: ASEGÚRATE DE QUE ESTA LÍNEA NO EXISTA ****
-// const db = require('../db/db'); // SI ESTÁ AQUÍ, ¡ELIMÍNALA O COMENTALA!
-// **********************************************************
 
 // Middleware de autenticación específico para este router
 const API_SECRET = 'super-secret-key'; // ¡Debe coincidir con el de admin.js!

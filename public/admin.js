@@ -7,12 +7,46 @@ const supabase = window.supabase.createClient(
 const tableBody = document.getElementById("productsTable");
 const form = document.getElementById("addForm");
 
-async function cargarProductos() {
-  const { data, error } = await supabase.from("products").select("*");
-  if (error) return alert("Error al cargar productos");
+// Autenticación básica para el panel de administración
+function checkAuth() {
+  const isAuthenticated = sessionStorage.getItem('adminAuth');
+  if (!isAuthenticated) {
+    const password = prompt('Ingrese la contraseña de administrador:');
+    if (password === 'admin') { // Contraseña simple para demo
+      sessionStorage.setItem('adminAuth', 'true');
+    } else {
+      alert('Contraseña incorrecta');
+      window.location.href = '/';
+    }
+  }
+}
 
+// Cargar productos desde Supabase o API
+async function cargarProductos() {
+  try {
+    // Intentar cargar desde Supabase
+    const { data, error } = await supabase.from("products").select("*");
+    
+    if (error || !data || data.length === 0) {
+      // Si hay error o no hay datos, intentar cargar desde la API
+      const response = await fetch('/api/products');
+      if (!response.ok) throw new Error('Error al cargar productos desde API');
+      const apiData = await response.json();
+      renderizarProductos(apiData);
+    } else {
+      // Si hay datos en Supabase, usarlos
+      renderizarProductos(data);
+    }
+  } catch (err) {
+    console.error('Error al cargar productos:', err);
+    alert('Error al cargar productos. Intente nuevamente.');
+  }
+}
+
+// Renderizar productos en la tabla
+function renderizarProductos(productos) {
   tableBody.innerHTML = "";
-  data.forEach(p => {
+  productos.forEach(p => {
     const tr = document.createElement("tr");
     tr.innerHTML = `
       <td><input value="${p.name}" data-id="${p.id}" data-field="name"></td>
@@ -29,32 +63,89 @@ async function cargarProductos() {
   });
 }
 
+// Guardar cambios en un producto
 async function guardar(id) {
   const inputs = document.querySelectorAll(`[data-id="${id}"]`);
   const datos = {};
   inputs.forEach(i => datos[i.dataset.field] = i.value);
+  datos.price = Number(datos.price);
 
-  const { error } = await supabase.from("products").update(datos).eq("id", id);
-  if (error) return alert("Error al actualizar");
-  alert("✅ Producto actualizado");
+  try {
+    // Intentar actualizar en Supabase
+    const { error } = await supabase.from("products").update(datos).eq("id", id);
+    
+    if (error) {
+      // Si hay error, intentar actualizar a través de la API
+      const response = await fetch(`/api/products/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(datos)
+      });
+      
+      if (!response.ok) throw new Error('Error al actualizar producto');
+    }
+    
+    alert("✅ Producto actualizado");
+    cargarProductos(); // Recargar para ver cambios
+  } catch (err) {
+    console.error('Error al guardar:', err);
+    alert('Error al actualizar el producto');
+  }
 }
 
+// Eliminar un producto
 async function eliminar(id) {
   if (!confirm("¿Eliminar este producto?")) return;
-  const { error } = await supabase.from("products").delete().eq("id", id);
-  if (error) return alert("Error al eliminar");
-  cargarProductos();
+  
+  try {
+    // Intentar eliminar en Supabase
+    const { error } = await supabase.from("products").delete().eq("id", id);
+    
+    if (error) {
+      // Si hay error, intentar eliminar a través de la API
+      const response = await fetch(`/api/products/${id}`, {
+        method: 'DELETE'
+      });
+      
+      if (!response.ok) throw new Error('Error al eliminar producto');
+    }
+    
+    cargarProductos(); // Recargar la lista
+  } catch (err) {
+    console.error('Error al eliminar:', err);
+    alert('Error al eliminar el producto');
+  }
 }
 
+// Agregar un nuevo producto
 form.addEventListener("submit", async e => {
   e.preventDefault();
   const datos = Object.fromEntries(new FormData(form));
   datos.price = Number(datos.price);
-
-  const { error } = await supabase.from("products").insert(datos);
-  if (error) return alert("Error al agregar");
-  form.reset();
-  cargarProductos();
+  
+  try {
+    // Intentar insertar en Supabase
+    const { error } = await supabase.from("products").insert(datos);
+    
+    if (error) {
+      // Si hay error, intentar insertar a través de la API
+      const response = await fetch('/api/products', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(datos)
+      });
+      
+      if (!response.ok) throw new Error('Error al agregar producto');
+    }
+    
+    form.reset();
+    cargarProductos(); // Recargar la lista
+  } catch (err) {
+    console.error('Error al agregar:', err);
+    alert('Error al agregar el producto');
+  }
 });
 
+// Inicializar
+checkAuth();
 cargarProductos();

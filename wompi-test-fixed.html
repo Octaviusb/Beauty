@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Test Wompi Integration</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+    button { padding: 10px 20px; background: #4CAF50; color: white; border: none; cursor: pointer; font-size: 16px; }
+    .log { margin-top: 20px; border: 1px solid #ddd; padding: 10px; background: #f9f9f9; }
+    .success { color: green; }
+    .error { color: red; }
+  </style>
+  <!-- Cargar el widget de Wompi -->
+  <script src="https://checkout.wompi.co/widget.js"></script>
+</head>
+<body>
+  <h1>Test de Integración con Wompi</h1>
+  <p>Esta página prueba la integración con el widget de Wompi.</p>
+  
+  <button id="testButton">Probar Wompi ($10.000 COP)</button>
+  
+  <div class="log" id="logArea">
+    <h3>Logs:</h3>
+  </div>
+  
+  <script>
+    // Función para agregar logs
+    function log(message, type = 'info') {
+      const logArea = document.getElementById('logArea');
+      const logEntry = document.createElement('p');
+      logEntry.textContent = message;
+      if (type === 'success') logEntry.className = 'success';
+      if (type === 'error') logEntry.className = 'error';
+      logArea.appendChild(logEntry);
+      console.log(message);
+    }
+    
+    // Verificar si el widget está cargado
+    document.addEventListener('DOMContentLoaded', () => {
+      log(`Widget de Wompi cargado: ${typeof window.WompiCheckout === 'function' ? 'SÍ' : 'NO'}`);
+    });
+    
+    // Configurar el botón de prueba
+    document.getElementById('testButton').addEventListener('click', () => {
+      log('Iniciando prueba de Wompi...');
+      
+      try {
+        if (typeof window.WompiCheckout !== 'function') {
+          throw new Error('El widget de Wompi no está disponible');
+        }
+        
+        log('Creando instancia de WompiCheckout...', 'info');
+        
+        const checkout = new window.WompiCheckout({
+          currency: 'COP',
+          amountInCents: 1000000, // $10.000 COP
+          reference: `test_${Date.now()}`,
+          publicKey: 'pub_prod_XApVcADEVCLGJnnghUT1V8G3oEwrF7ZW',
+          redirectUrl: window.location.href
+        });
+        
+        log('Instancia creada correctamente', 'success');
+        log('Abriendo widget de pago...', 'info');
+        
+        checkout.open();
+      } catch (error) {
+        log(`Error: ${error.message}`, 'error');
+      }
+    });
+  </script>
+</body>
+</html>

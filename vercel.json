@@ -1,24 +1,11 @@
 {
   "version": 2,
   "builds": [
-<<<<<<< HEAD
-    {
-      "src": "server.js",
-      "use": "@vercel/node"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "/server.js"
-    }
-=======
     { "src": "server/server.js", "use": "@vercel/node" },
     { "src": "public/**", "use": "@vercel/static" }
   ],
   "routes": [
     { "src": "/api/(.*)", "dest": "server/server.js" },
     { "src": "/(.*)", "dest": "public/$1" }
->>>>>>> da2e45b (Guardando cambios antes de pull)
   ]
 }

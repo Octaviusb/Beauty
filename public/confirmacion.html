@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Confirmación de Pago - Beauty Line</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles-form.css">
+  <style>
+    .confirmation-container {
+      max-width: 600px;
+      margin: 50px auto;
+      padding: 30px;
+      background-color: #fff;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+    .confirmation-icon {
+      font-size: 60px;
+      color: #28a745;
+      margin-bottom: 20px;
+    }
+    .confirmation-header {
+      margin-bottom: 30px;
+    }
+    .confirmation-header h1 {
+      color: #d63384;
+      margin-bottom: 10px;
+    }
+    .confirmation-details {
+      margin: 20px 0;
+      padding: 15px;
+      background-color: #f8f9fa;
+      border-radius: 6px;
+      text-align: left;
+    }
+    .confirmation-number {
+      font-weight: bold;
+      font-size: 18px;
+      margin: 20px 0;
+    }
+    .back-button {
+      margin-top: 20px;
+      display: inline-block;
+      padding: 10px 20px;
+      background-color: #d63384;
+      color: white;
+      text-decoration: none;
+      border-radius: 4px;
+    }
+    .back-button:hover {
+      background-color: #c62b76;
+    }
+  </style>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+</head>
+<body>
+  <div class="confirmation-container">
+    <div class="confirmation-icon">
+      <i class="fas fa-check-circle"></i>
+    </div>
+    
+    <div class="confirmation-header">
+      <h1>¡Pago Confirmado!</h1>
+      <p>Gracias por tu compra en Beauty Line</p>
+    </div>
+    
+    <div class="confirmation-details">
+      <p>Hemos recibido tu pago correctamente. En breve recibirás un correo electrónico con los detalles de tu pedido.</p>
+      <p>Tu pedido será procesado y despachado en un plazo máximo de 3 días hábiles.</p>
+    </div>
+    
+    <div class="confirmation-number">
+      Número de pedido: <span id="order-number">BL-000000</span>
+    </div>
+    
+    <a href="/" class="back-button">Volver a la tienda</a>
+  </div>
+
+  <script>
+    // Obtener parámetros de la URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const reference = urlParams.get('reference') || '';
+    
+    // Mostrar número de pedido
+    document.addEventListener('DOMContentLoaded', () => {
+      const orderNumberElement = document.getElementById('order-number');
+      if (orderNumberElement && reference) {
+        orderNumberElement.textContent = reference;
+      }
+    });
+  </script>
+</body>
+</html>

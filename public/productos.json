@@ -1,5 +1,122 @@
 [
   {
+    "id": 1,
+    "name": "Brocha Kabuki",
+    "category": "accesorios",
+    "price": 23800,
+    "description": "Ideal para polvos sueltos",
+    "image": "images/accesorios/brocha-kabuki.jpg",
+    "badge": ""
+  },
+  {
+    "id": 2,
+    "name": "Caja de Almacenamiento",
+    "category": "accesorios",
+    "price": 44800,
+    "description": "Para cosméticos y accesorios",
+    "image": "images/accesorios/caja-de-almacenamiento.jpg",
+    "badge": ""
+  },
+  {
+    "id": 3,
+    "name": "Cepillo Facial Eléctrico",
+    "category": "accesorios",
+    "price": 64400,
+    "description": "Limpieza profunda",
+    "image": "images/accesorios/cepillo-facial-elctrico.jpg",
+    "badge": ""
+  },
+  {
+    "id": 4,
+    "name": "Cinta para Peinar",
+    "category": "accesorios",
+    "price": 12600,
+    "description": "Para rutina facial",
+    "image": "images/accesorios/cinta-para-peinar.jpg",
+    "badge": ""
+  },
+  {
+    "id": 5,
+    "name": "Cortaúñas Profesional",
+    "category": "accesorios",
+    "price": 16800,
+    "description": "Acero inoxidable",
+    "image": "images/accesorios/cortaas-profesional.jpg",
+    "badge": ""
+  },
+  {
+    "id": 6,
+    "name": "Espejo con Luz LED",
+    "category": "accesorios",
+    "price": 58800,
+    "description": "Ideal para maquillaje",
+    "image": "images/accesorios/espejo-con-luz-led.jpg",
+    "badge": "Popular"
+  },
+  {
+    "id": 7,
+    "name": "Esponjas de Maquillaje x3",
+    "category": "accesorios",
+    "price": 28000,
+    "description": "Aplicación uniforme",
+    "image": "images/accesorios/esponjas-de-maquillaje-x3.jpg",
+    "badge": ""
+  },
+  {
+    "id": 8,
+    "name": "Guantes de Spa",
+    "category": "accesorios",
+    "price": 14000,
+    "description": "Para manos y pies",
+    "image": "images/accesorios/guantes-de-spa.jpg",
+    "badge": ""
+  },
+  {
+    "id": 9,
+    "name": "Lámpara LED/UV",
+    "category": "accesorios",
+    "price": 84000,
+    "description": "Lámpara para secado de uñas",
+    "image": "images/accesorios/img226.jpg",
+    "badge": ""
+  },
+  {
+    "id": 11,
+    "name": "Organizador de Maquillaje",
+    "category": "accesorios",
+    "price": 49000,
+    "description": "Acrílico transparente",
+    "image": "images/accesorios/organizador-de-maquillaje.jpg",
+    "badge": ""
+  },
+  {
+    "id": 12,
+    "name": "Pinzas de Precisión",
+    "category": "accesorios",
+    "price": 21000,
+    "description": "Para cejas y pestañas",
+    "image": "images/accesorios/pinzas-de-precisin.jpg",
+    "badge": ""
+  },
+  {
+    "id": 13,
+    "name": "Set de Brochas 10 piezas",
+    "category": "accesorios",
+    "price": 75600,
+    "description": "Brochas suaves y profesionales",
+    "image": "images/accesorios/set-de-brochas-10-piezas.jpg",
+    "badge": "Nuevo"
+  },
+  {
+    "id": 14,
+    "name": "Toalla Desmaquillante",
+    "category": "accesorios",
+    "price": 19600,
+    "description": "Reutilizable y suave",
+    "image": "images/accesorios/toalla-desmaquillante.jpg",
+    "badge": ""
+  },
+  {
     "id": 15,
     "name": "Esmalte 1",
     "category": "esmaltes",

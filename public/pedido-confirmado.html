@@ -3,12 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Confirmación de Pago - Beauty Line</title>
+  <meta name="description" content="Confirmación de pedido - Beauty Line">
+  <title>Pedido Confirmado - Beauty Line</title>
   <link rel="stylesheet" href="styles.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="icon" href="./assets/favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
   <style>
     .confirmation-page {
       max-width: 800px;
@@ -41,6 +43,13 @@
       padding: 20px;
       margin-bottom: 30px;
       text-align: left;
+    }
+    
+    .confirmation-details h3 {
+      margin-top: 0;
+      border-bottom: 1px solid #ddd;
+      padding-bottom: 10px;
+      margin-bottom: 15px;
     }
     
     .detail-row {
@@ -98,7 +107,9 @@
   </header>
 
   <main class="confirmation-page">
-    <div class="confirmation-icon">✅</div>
+    <div class="confirmation-icon">
+      <i class="fas fa-check-circle"></i>
+    </div>
     
     <h1 class="confirmation-title">¡Gracias por tu compra!</h1>
     
@@ -122,7 +133,7 @@
       
       <div class="detail-row">
         <span class="detail-label">Fecha:</span>
-        <span id="order-date"><script>document.write(new Date().toLocaleDateString())</script></span>
+        <span id="order-date"><script>document.write(new Date().toLocaleDateString('es-CO'))</script></span>
       </div>
     </div>
     
@@ -150,19 +161,5 @@
       </div>
     </div>
   </footer>
-  
-  <script>
-    // Limpiar el carrito al completar la compra
-    localStorage.removeItem('cart');
-    localStorage.removeItem('carrito');
-    
-    // Obtener parámetros de la URL si existen
-    const urlParams = new URLSearchParams(window.location.search);
-    const transactionId = urlParams.get('id');
-    
-    if (transactionId) {
-      document.getElementById('order-reference').textContent = transactionId;
-    }
-  </script>
 </body>
 </html>
