@@ -5,14 +5,14 @@ window.supabaseClient = window.supabaseClient || supabase.createClient(
 );
 
 // Obtener user_id anónimo
-let userId = localStorage.getItem('user_id');
-if (!userId) {
-  userId = crypto.randomUUID();
-  localStorage.setItem('user_id', userId);
-}
+window.userId = window.userId || localStorage.getItem('user_id') || (() => {
+  const id = crypto.randomUUID();
+  localStorage.setItem('user_id', id);
+  return id;
+})();
 
 // Estado global
-const appState = {
+window.appState = window.appState || {
   products: [],
   carrito: [],
   pedidos: [],
@@ -33,7 +33,7 @@ async function cargarProductos() {
       return;
     }
 
-    appState.products = products;
+    window.appState.products = products;
     renderizarProductos(products);
   } catch (error) {
     console.error("Error al cargar productos:", error);
@@ -99,7 +99,7 @@ async function agregarProductoAlCarrito(producto) {
     .from('carrito')
     .select('*')
     .eq('product_id', producto.id)
-    .eq('user_id', userId);
+    .eq('user_id', window.userId);
 
   if (queryError) throw queryError;
 
@@ -120,7 +120,7 @@ async function agregarProductoAlCarrito(producto) {
         name: producto.name,
         price: producto.price,
         quantity: 1,
-        user_id: userId
+        user_id: window.userId
       }]);
 
     if (insertError) throw insertError;
@@ -133,7 +133,7 @@ async function cargarCarrito() {
     const { data, error } = await window.supabaseClient
       .from('carrito')
       .select('*')
-      .eq('user_id', userId);
+      .eq('user_id', window.userId);
     
     if (error) throw error;
     
@@ -150,7 +150,7 @@ async function eliminarProductoDelCarrito(productId) {
       .from('carrito')
       .delete()
       .eq('product_id', productId)
-      .eq('user_id', userId);
+      .eq('user_id', window.userId);
     
     if (error) throw error;
   } catch (error) {
@@ -164,7 +164,7 @@ async function limpiarCarrito() {
   const { error } = await window.supabaseClient
     .from('carrito')
     .delete()
-    .eq('user_id', userId);
+    .eq('user_id', window.userId);
   if (error) throw error;
 }
 
@@ -181,7 +181,7 @@ function mostrarNotificacion(mensaje) {
 async function actualizarCarrito() {
   try {
     const carritoActual = await cargarCarrito();
-    appState.carrito = carritoActual;
+    window.appState.carrito = carritoActual;
     actualizarContadorCarrito();
   } catch (error) {
     console.error("Error al actualizar carrito:", error);
@@ -190,7 +190,7 @@ async function actualizarCarrito() {
 
 // Actualizar contador numérico
 function actualizarContadorCarrito() {
-  const total = appState.carrito.reduce((sum, item) => sum + item.quantity, 0);
+  const total = window.appState.carrito.reduce((sum, item) => sum + item.quantity, 0);
   const span = document.getElementById('cart-count');
   if (span) span.textContent = total;
 }
@@ -209,11 +209,11 @@ function mostrarCarrito() {
   
   lista.innerHTML = '';
 
-  if (appState.carrito.length === 0) {
+  if (window.appState.carrito.length === 0) {
     lista.innerHTML = '<div class="empty-cart">Tu carrito está vacío</div>';
     total.textContent = '$0';
   } else {
-    appState.carrito.forEach(item => {
+    window.appState.carrito.forEach(item => {
       const itemDiv = document.createElement('div');
       itemDiv.className = 'cart-item';
       itemDiv.innerHTML = `
@@ -236,7 +236,7 @@ function mostrarCarrito() {
       lista.appendChild(itemDiv);
     });
 
-    const totalValor = appState.carrito.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    const totalValor = window.appState.carrito.reduce((sum, item) => sum + (item.price * item.quantity), 0);
     total.textContent = `$${totalValor.toLocaleString()}`;
   }
 
@@ -266,7 +266,7 @@ function mostrarFormularioPedido() {
   cerrarCarrito();
   
   summaryItems.innerHTML = '';
-  appState.carrito.forEach(item => {
+  window.appState.carrito.forEach(item => {
     const itemDiv = document.createElement('div');
     itemDiv.className = 'summary-item';
     itemDiv.innerHTML = `
@@ -276,7 +276,7 @@ function mostrarFormularioPedido() {
     summaryItems.appendChild(itemDiv);
   });
   
-  const subtotal = appState.carrito.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  const subtotal = window.appState.carrito.reduce((sum, item) => sum + (item.price * item.quantity), 0);
   const shipping = subtotal > 200000 ? 0 : 12000;
   const total = subtotal + shipping;
   
@@ -323,7 +323,7 @@ async function procesarPedido(event) {
     return;
   }
   
-  const subtotal = appState.carrito.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  const subtotal = window.appState.carrito.reduce((sum, item) => sum + (item.price * item.quantity), 0);
   const shipping = subtotal > 200000 ? 0 : 12000;
   const total = subtotal + shipping;
   const orderNumber = `BL-${Date.now().toString().slice(-6)}`;
@@ -335,19 +335,19 @@ async function procesarPedido(event) {
     telefono_cliente: telefono,
     direccion_cliente: `${direccion}, ${ciudad}`,
     referidor: referidor,
-    productos: appState.carrito,
+    productos: window.appState.carrito,
     subtotal: subtotal,
     envio: shipping,
     total: total,
     estado: 'pendiente_pago',
     metodo_pago: 'wompi',
-    user_id: userId
+    user_id: window.userId
   };
   
   try {
     await guardarPedidoEnSupabase(pedidoData);
     
-    const carrito = appState.carrito.map(item => `${item.quantity}x ${item.name} ($${item.price.toLocaleString()})`).join(", ");
+    const carrito = window.appState.carrito.map(item => `${item.quantity}x ${item.name} ($${item.price.toLocaleString()})`).join(", ");
     
     if (typeof emailjs !== 'undefined') {
       await emailjs.send("service_owxur5f", "template_sck7rdl", {
@@ -428,20 +428,24 @@ function configurarCarrito() {
 }
 
 // Inicializar
-window.addEventListener('DOMContentLoaded', async () => {
-  await cargarProductos();
-  await actualizarCarrito();
-  configurarCarrito();
+if (!window.beautyLineInitialized) {
+  window.beautyLineInitialized = true;
+  
+  window.addEventListener('DOMContentLoaded', async () => {
+    await cargarProductos();
+    await actualizarCarrito();
+    configurarCarrito();
 
-  // Filtros
-  document.querySelectorAll('.filter-btn').forEach(button => {
-    button.addEventListener('click', (e) => {
-      e.preventDefault();
-      const filtro = button.dataset.filter;
-      const filtrados = filtro
-        ? appState.products.filter(p => p.categoria === filtro)
-        : appState.products;
-      renderizarProductos(filtrados);
+    // Filtros
+    document.querySelectorAll('.filter-btn').forEach(button => {
+      button.addEventListener('click', (e) => {
+        e.preventDefault();
+        const filtro = button.dataset.filter;
+        const filtrados = filtro
+          ? window.appState.products.filter(p => p.categoria === filtro)
+          : window.appState.products;
+        renderizarProductos(filtrados);
+      });
     });
   });
-});
+}
