@@ -1,74 +1,186 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Redirigiendo a Wompi</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      margin: 0;
-      background-color: #f8f9fa;
-      text-align: center;
-    }
-    .loader {
-      border: 5px solid #f3f3f3;
-      border-top: 5px solid #3498db;
-      border-radius: 50%;
-      width: 50px;
-      height: 50px;
-      animation: spin 1s linear infinite;
-      margin-bottom: 20px;
-    }
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-    h1 {
-      color: #333;
-      margin-bottom: 20px;
-    }
-    p {
-      color: #666;
-      margin-bottom: 30px;
-    }
-    .btn {
-      background-color: #00aef7;
-      color: white;
-      padding: 10px 20px;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 16px;
-      text-decoration: none;
-    }
-    .btn:hover {
-      background-color: #0095d9;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport"0 content="width=device-width, initial-scale=1.0">
+    <title>Procesando Pago - Beauty Line</title>
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #fdfcfb 0%, #e2d1c3 100%);
+            color: #333;
+        }
+        .container {
+            text-align: center;
+            background: white;
+            padding: 2.5rem;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            max-width: 90%;
+            width: 450px;
+        }
+        .logo {
+            margin-bottom: 1.5rem;
+        }
+        .logo img {
+            max-width: 120px;
+        }
+        h1 {
+            color: #d4a373;
+            margin-bottom: 1rem;
+            font-family: 'Playfair Display', serif;
+        }
+        .loading {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #d4a373;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 20px 0;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .order-details {
+            background-color: #f8f4f0;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1.5rem 0;
+            text-align: left;
+            font-size: 0.9rem;
+        }
+        .order-details p {
+            margin: 0.5rem 0;
+        }
+        .secure-note {
+            font-size: 0.8rem;
+            color: #666;
+            margin-top: 1.5rem;
+        }
+        .error-message {
+            color: #e63946;
+            background-color: #ffccd5;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+            display: none;
+        }
+    </style>
 </head>
 <body>
-  <div class="loader"></div>
-  <h1>Redirigiendo a Wompi</h1>
-  <p>Serás redirigido automáticamente a la página de pago de Wompi en unos segundos...</p>
-  <a href="https://checkout.wompi.co/l/VPOS_nJo3xk" class="btn" id="redirect-btn">Ir a Wompi ahora</a>
+    <div class="container">
+        <div class="logo">
+            <img src="assets/logo.png" alt="Beauty Line Logo">
+        </div>
+        <h1>Procesando tu pago</h1>
+        <div class="loading" id="loading-spinner"></div>
+        <p>Estamos redirigiéndote a la pasarela de pago segura de Wompi.</p>
+        
+        <div class="order-details">
+            <p><strong>Referencia:</strong> <span id="order-reference">-</span></p>
+            <p><strong>Total:</strong> <span id="order-total">-</span></p>
+            <p><strong>Cliente:</strong> <span id="customer-email">-</span></p>
+        </div>
+        
+        <p class="secure-note">
+            <i class="fas fa-lock"></i> Tu pago será procesado de forma segura. 
+            No almacenamos información de tus tarjetas.
+        </p>
+        
+        <div class="error-message" id="error-message">
+            <p><strong>Error:</strong> Ocurrió un problema al procesar tu pago. Por favor, regresa e inténtalo nuevamente.</p>
+            <button onclick="goBack()" class="btn-secondary">Volver al Carrito</button>
+        </div>
+    </div>
 
-  <script>
-    // Redirigir automáticamente después de 2 segundos
-    setTimeout(function() {
-      window.location.href = "https://checkout.wompi.co/l/VPOS_nJo3xk";
-    }, 2000);
-    
-    // También permitir clic manual
-    document.getElementById('redirect-btn').addEventListener('click', function(e) {
-      e.preventDefault();
-      window.location.href = "https://checkout.wompi.co/l/VPOS_nJo3xk";
-    });
-  </script>
+    <!-- Wompi Checkout Script -->
+    <script src="https://checkout.wompi.co/widget.js"></script>
+    <script>
+        function goBack() {
+            window.location.href = '/index.html';
+        }
+
+        window.addEventListener('load', function() {
+            console.log('🚀 Iniciando proceso de redirección a Wompi...');
+            
+            // Obtener parámetros de la URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const totalCents = urlParams.get('total');
+            const reference = urlParams.get('reference');
+            const email = urlParams.get('email');
+            const name = urlParams.get('name');
+            
+            // Mostrar información del pedido
+            document.getElementById('order-reference').textContent = reference || 'N/A';
+            document.getElementById('order-total').textContent = totalCents ? `$${(parseInt(totalCents) / 100).toLocaleString('es-CO')}` : 'N/A';
+            document.getElementById('customer-email').textContent = email || 'N/A';
+            
+            console.log('📦 Datos del pedido:', { totalCents, reference, email, name });
+            
+            // Validar parámetros requeridos
+            if (!totalCents || !reference || !email) {
+                console.error('❌ Parámetros incompletos:', { totalCents, reference, email });
+                document.getElementById('error-message').style.display = 'block';
+                document.getElementById('loading-spinner').style.display = 'none';
+                return;
+            }
+            
+            // TU PUBLIC KEY DE WOMPI (la que proporcionaste)
+            const publicKey = 'pub_prod_XApVcADEVCLGJnnghUT1V8G3oEwrF7ZW';
+            
+            // Inicializar Wompi Checkout
+            try {
+                console.log('🔐 Inicializando Wompi con publicKey:', publicKey);
+                
+                window.$wompi = new WompiCheckout({
+                    publicKey: publicKey,
+                    currency: 'COP',
+                    amountInCents: parseInt(totalCents),
+                    reference: reference,
+                    customerData: {
+                        email: email,
+                        fullName: name || email.split('@')[0]
+                    },
+                    paymentMethods: {
+                        bancolombia: true,
+                        nequi: true,
+                        daviplata: true,
+                        pse: true,
+                        card: true
+                    },
+                    onSuccess: function(transaction) {
+                        console.log('✅ Pago exitoso:', transaction);
+                        // Redirigir a página de éxito (puedes crear esta página)
+                        window.location.href = `/pago-exitoso.html?reference=${reference}`;
+                    },
+                    onCancel: function() {
+                        console.log('ℹ️ Pago cancelado');
+                        alert('El pago fue cancelado. Serás redirigido al carrito de compras.');
+                        window.location.href = '/index.html';
+                    },
+                    onError: function(error) {
+                        console.error('❌ Error en pago:', error);
+                        document.getElementById('error-message').style.display = 'block';
+                        document.getElementById('loading-spinner').style.display = 'none';
+                    }
+                });
+                
+                console.log('✅ Wompi inicializado correctamente');
+                
+            } catch (error) {
+                console.error('💥 Error inicializando Wompi:', error);
+                document.getElementById('error-message').style.display = 'block';
+                document.getElementById('loading-spinner').style.display = 'none';
+            }
+        });
+    </script>
 </body>
 </html>
