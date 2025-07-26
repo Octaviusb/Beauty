@@ -441,11 +441,25 @@ if (!window.beautyLineInitialized) {
       element.addEventListener('click', (e) => {
         e.preventDefault();
         const filtro = element.dataset.filter;
+        console.log(`🔍 Aplicando filtro: "${filtro}"`); // Para depuración
+        console.log(`📦 Productos totales en appState:`, window.appState.products.length); // Para depuración
+
+        // Verificar si los productos tienen la propiedad 'categoria'
+        if (window.appState.products.length > 0) {
+          console.log(`ℹ️  Ejemplo de producto:`, window.appState.products[0]); // Para depuración
+        }
+
         const filtrados = filtro
-          ? window.appState.products.filter(p => p.categoria === filtro)
+          ? window.appState.products.filter(p => {
+              // Para depuración, mostrar qué productos se están evaluando
+              console.log(`Evaluando producto: ${p.name}, categoria: ${p.categoria}, coincide: ${p.categoria === filtro}`);
+              return p.categoria === filtro;
+            })
           : window.appState.products;
+
+        console.log(`✅ Productos filtrados:`, filtrados.length); // Para depuración
         renderizarProductos(filtrados);
-        
+
         // Opcional: Desplazar hacia la sección de productos
         const productosSection = document.getElementById('seccion-productos');
         if (productosSection) {
@@ -453,5 +467,5 @@ if (!window.beautyLineInitialized) {
         }
       });
     });
-  });
-}
+  }); // Cierra DOMContentLoaded
+} // Cierra if (!window.beautyLineInitialized)
