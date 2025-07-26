@@ -307,9 +307,9 @@ async function guardarPedidoEnSupabase(pedidoData) {
 }
 
 // Procesar pedido
+// Procesar pedido
 async function procesarPedido(event) {
   event.preventDefault();
-  
   const formulario = document.getElementById('formularioCompra');
   const nombre = formulario.querySelector('#nombre').value;
   const email = formulario.querySelector('#email').value;
@@ -317,36 +317,36 @@ async function procesarPedido(event) {
   const direccion = formulario.querySelector('#direccion').value;
   const ciudad = formulario.querySelector('#ciudad').value;
   const referidor = formulario.querySelector('#referidor').value;
-  
   if (!nombre || !email || !telefono || !direccion || !ciudad || !referidor) {
     alert('Por favor completa todos los campos obligatorios.');
     return;
   }
-  
   const subtotal = window.appState.carrito.reduce((sum, item) => sum + (item.price * item.quantity), 0);
   const shipping = subtotal > 200000 ? 0 : 12000;
   const total = subtotal + shipping;
   const orderNumber = `BL-${Date.now().toString().slice(-6)}`;
   
+  // Formatear correctamente los datos para Supabase
   const pedidoData = {
     numero_pedido: orderNumber,
-    cliente_info: JSON.stringify({
+    cliente_info: { // Enviar como objeto, no como string
       nombre: nombre,
       email: email,
       telefono: telefono,
       direccion: `${direccion}, ${ciudad}`,
       referidor: referidor
-    }),
-    productos: window.appState.carrito,
+    },
+    productos: JSON.stringify(window.appState.carrito), // Convertir a string si la columna es JSON/TEXT
     total: total,
     estado: 'pendiente_pago'
   };
   
   try {
-    await guardarPedidoEnSupabase(pedidoData);
+    console.log('📦 Datos del pedido a enviar:', pedidoData); // Para debugging
+    const pedidoGuardado = await guardarPedidoEnSupabase(pedidoData);
     
+    // Resto del código...
     const carrito = window.appState.carrito.map(item => `${item.quantity}x ${item.name} ($${item.price.toLocaleString()})`).join(", ");
-    
     if (typeof emailjs !== 'undefined') {
       await emailjs.send("service_owxur5f", "template_sck7rdl", {
         nombre,
@@ -360,16 +360,18 @@ async function procesarPedido(event) {
         referencia: orderNumber
       }, "Cqwg1EyqFLvPg7ULx");
     }
-    
     document.getElementById('checkoutForm').classList.add('hidden');
     await limpiarCarrito();
     await actualizarCarrito();
-    
     const totalCents = Math.round(total * 100);
     window.location.href = `/wompi-redirect.html?total=${totalCents}&reference=${orderNumber}&email=${encodeURIComponent(email)}&name=${encodeURIComponent(nombre)}`;
-    
   } catch (error) {
-    console.error('Error procesando pedido:', error);
+    console.error('❌ Error procesando pedido:', error);
+    console.error('📝 Detalles del error:', {
+      message: error.message,
+      details: error.details,
+      hint: error.hint
+    });
     alert('Error al procesar el pedido. Intenta nuevamente.');
   }
 }
