@@ -1,7 +1,10 @@
 // Configuración de Supabase
-const SUPABASE_URL = 'https://lsxojnbkbqhuwaydiqqb.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxzeG9qbmJrYnFodXdheWRpcXFiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI1MDYzMzAsImV4cCI6MjA2ODA4MjMzMH0.uHQJ_F3NmeM2U4EsIq_UFSPMKd35MlMZnrboKOIy45g';
-const client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+if (!window.SUPABASE_CLIENT) {
+  const SUPABASE_URL = 'https://lsxojnbkbqhuwaydiqqb.supabase.co';
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxzeG9qbmJrYnFodXdheWRpcXFiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI1MDYzMzAsImV4cCI6MjA2ODA4MjMzMH0.uHQJ_F3NmeM2U4EsIq_UFSPMKd35MlMZnrboKOIy45g';
+  window.SUPABASE_CLIENT = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+}
+const client = window.SUPABASE_CLIENT;
 
 // Obtener user_id anónimo
 let userId = localStorage.getItem('user_id');
