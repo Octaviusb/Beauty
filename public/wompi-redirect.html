@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport"0 content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Procesando Pago - Beauty Line</title>
     <style>
         body {
@@ -73,6 +73,19 @@
             margin-top: 1rem;
             display: none;
         }
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            margin-top: 10px;
+        }
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
     </style>
 </head>
 <body>
@@ -101,8 +114,8 @@
         </div>
     </div>
 
-    <!-- Wompi Checkout Script -->
-    <script src="https://checkout.wompi.co/widget.js"></script>
+    <!-- Wompi Checkout Script CORREGIDO -->
+    <script src="https://cdn.wompi.dev/v1.js"></script>
     <script>
         function goBack() {
             window.location.href = '/index.html';
