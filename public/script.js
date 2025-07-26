@@ -330,18 +330,16 @@ async function procesarPedido(event) {
   
   const pedidoData = {
     numero_pedido: orderNumber,
-    nombre_cliente: nombre,
-    email_cliente: email,
-    telefono_cliente: telefono,
-    direccion_cliente: `${direccion}, ${ciudad}`,
-    referidor: referidor,
+    cliente_info: JSON.stringify({
+      nombre: nombre,
+      email: email,
+      telefono: telefono,
+      direccion: `${direccion}, ${ciudad}`,
+      referidor: referidor
+    }),
     productos: window.appState.carrito,
-    subtotal: subtotal,
-    envio: shipping,
     total: total,
-    estado: 'pendiente_pago',
-    metodo_pago: 'wompi',
-    user_id: window.userId
+    estado: 'pendiente_pago'
   };
   
   try {
@@ -448,4 +446,5 @@ if (!window.beautyLineInitialized) {
       });
     });
   });
+}
 }
