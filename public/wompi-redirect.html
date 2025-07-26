@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Procesando Pago - Beauty Line</title>
+    <title>Redirigiendo a Wompi - Beauty Line</title>
     <style>
         body {
             font-family: 'Montserrat', sans-serif;
@@ -86,6 +86,11 @@
         .btn-secondary:hover {
             background-color: #5a6268;
         }
+        .countdown {
+            font-size: 0.9rem;
+            color: #888;
+            margin-top: 1rem;
+        }
     </style>
 </head>
 <body>
@@ -95,7 +100,7 @@
         </div>
         <h1>Procesando tu pago</h1>
         <div class="loading" id="loading-spinner"></div>
-        <p>Estamos redirigiéndote a la pasarela de pago segura de Wompi.</p>
+        <p>Serás redirigido automáticamente a la pasarela de pago segura de Wompi.</p>
         
         <div class="order-details">
             <p><strong>Referencia:</strong> <span id="order-reference">-</span></p>
@@ -108,22 +113,36 @@
             No almacenamos información de tus tarjetas.
         </p>
         
+        <div class="countdown">
+            Redirigiendo en <span id="countdown">5</span> segundos...
+        </div>
+        
         <div class="error-message" id="error-message">
-            <p><strong>Error:</strong> Ocurrió un problema al procesar tu pago. Por favor, regresa e inténtalo nuevamente.</p>
-            <button onclick="goBack()" class="btn-secondary">Volver al Carrito</button>
+            <p><strong>Error:</strong> No se pudo redirigir automáticamente. Por favor, haz clic en el botón de abajo.</p>
+            <button id="manual-redirect-btn" class="btn-secondary">Ir a la Pasarela de Pago</button>
         </div>
     </div>
 
-    <!-- Wompi Checkout Script CORREGIDO -->
-    <script src="https://widget.wompi.co/v1.js"></script>
     <script>
+        let countdownValue = 5;
+        let countdownInterval;
+        let redirectUrl = "";
+
         function goBack() {
             window.location.href = '/index.html';
         }
 
-        // Esperar a que el script se cargue completamente
+        function performRedirect() {
+            if (redirectUrl) {
+                window.location.href = redirectUrl;
+            } else {
+                document.getElementById('error-message').style.display = 'block';
+                document.getElementById('loading-spinner').style.display = 'none';
+            }
+        }
+
         window.addEventListener('load', function() {
-            console.log('🚀 Iniciando proceso de redirección a Wompi...');
+            console.log('🚀 Iniciando redirección a Wompi con link genérico...');
             
             // Obtener parámetros de la URL
             const urlParams = new URLSearchParams(window.location.search);
@@ -147,61 +166,40 @@
                 return;
             }
             
-            // TU PUBLIC KEY DE WOMPI (la que proporcionaste)
-            const publicKey = 'pub_prod_XApVcADEVCLGJnnghUT1V8G3oEwrF7ZW';
+            // Construir la URL de redirección con parámetros
+            // TU LINK DE PAGO GENÉRICO DE WOMPI
+            const genericLink = 'https://checkout.wompi.co/l/VPOS_nJo3xk';
             
-            // Verificar que WompiCheckout esté disponible
-            if (typeof WompiCheckout === 'undefined') {
-                console.error('❌ WompiCheckout no está definido. El script no se cargó correctamente.');
-                document.getElementById('error-message').style.display = 'block';
-                document.getElementById('loading-spinner').style.display = 'none';
-                return;
-            }
+            // Construir los parámetros para el link genérico
+            const paymentParams = new URLSearchParams({
+                'reference': reference,
+                'amount-in-cents': parseInt(totalCents),
+                'currency': 'COP',
+                'customer-email': email,
+                'customer-full-name': name || email.split('@')[0]
+                // Puedes agregar más parámetros si los necesitas, como:
+                // 'customer-phone-number': '3001234567',
+                // 'redirect-url': 'https://tu-dominio.com/pago-exitoso.html'
+            });
             
-            // Inicializar Wompi Checkout
-            try {
-                console.log('🔐 Inicializando Wompi con publicKey:', publicKey);
+            // URL final de redirección
+            redirectUrl = `${genericLink}?${paymentParams.toString()}`;
+            
+            console.log('🔗 URL de redirección a Wompi:', redirectUrl);
+            
+            // Iniciar cuenta regresiva
+            countdownInterval = setInterval(() => {
+                countdownValue--;
+                document.getElementById('countdown').textContent = countdownValue;
                 
-                window.$wompi = new WompiCheckout({
-                    publicKey: publicKey,
-                    currency: 'COP',
-                    amountInCents: parseInt(totalCents),
-                    reference: reference,
-                    customerData: {
-                        email: email,
-                        fullName: name || email.split('@')[0]
-                    },
-                    paymentMethods: {
-                        bancolombia: true,
-                        nequi: true,
-                        daviplata: true,
-                        pse: true,
-                        card: true
-                    },
-                    onSuccess: function(transaction) {
-                        console.log('✅ Pago exitoso:', transaction);
-                        // Redirigir a página de éxito (puedes crear esta página)
-                        window.location.href = `/pago-exitoso.html?reference=${reference}`;
-                    },
-                    onCancel: function() {
-                        console.log('ℹ️ Pago cancelado');
-                        alert('El pago fue cancelado. Serás redirigido al carrito de compras.');
-                        window.location.href = '/index.html';
-                    },
-                    onError: function(error) {
-                        console.error('❌ Error en pago:', error);
-                        document.getElementById('error-message').style.display = 'block';
-                        document.getElementById('loading-spinner').style.display = 'none';
-                    }
-                });
-                
-                console.log('✅ Wompi inicializado correctamente');
-                
-            } catch (error) {
-                console.error('💥 Error inicializando Wompi:', error);
-                document.getElementById('error-message').style.display = 'block';
-                document.getElementById('loading-spinner').style.display = 'none';
-            }
+                if (countdownValue <= 0) {
+                    clearInterval(countdownInterval);
+                    performRedirect();
+                }
+            }, 1000);
+            
+            // Configurar botón de redirección manual
+            document.getElementById('manual-redirect-btn').addEventListener('click', performRedirect);
         });
     </script>
 </body>
