@@ -1,7 +1,7 @@
 // Configuración de Supabase
-const supabaseUrl = 'https://lsxojnbkbqhuwaydiqqb.supabase.co';
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxzeG9qbmJrYnFodXdheWRpcXFiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI1MDYzMzAsImV4cCI6MjA2ODA4MjMzMH0.uHQJ_F3NmeM2U4EsIq_UFSPMKd35MlMZnrboKOIy45g';
-const client = supabase.createClient(supabaseUrl, supabaseKey);
+const SUPABASE_URL = 'https://lsxojnbkbqhuwaydiqqb.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxzeG9qbmJrYnFodXdheWRpcXFiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI1MDYzMzAsImV4cCI6MjA2ODA4MjMzMH0.uHQJ_F3NmeM2U4EsIq_UFSPMKd35MlMZnrboKOIy45g';
+const client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // Obtener user_id anónimo
 let userId = localStorage.getItem('user_id');
@@ -334,7 +334,7 @@ async function procesarPedido(event) {
     telefono_cliente: telefono,
     direccion_cliente: `${direccion}, ${ciudad}`,
     referidor: referidor,
-    productos: JSON.stringify(appState.carrito),
+    productos: appState.carrito,
     subtotal: subtotal,
     envio: shipping,
     total: total,
