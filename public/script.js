@@ -453,3 +453,4 @@ if (!window.beautyLineInitialized) {
         }
       });
     });
+  });
