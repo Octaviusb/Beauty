@@ -436,16 +436,21 @@ if (!window.beautyLineInitialized) {
     await actualizarCarrito();
     configurarCarrito();
 
-    // Filtros
-    document.querySelectorAll('.filter-btn').forEach(button => {
-      button.addEventListener('click', (e) => {
+        // Filtros (maneja tanto botones como enlaces con clase filter-btn)
+    document.querySelectorAll('.filter-btn').forEach(element => {
+      element.addEventListener('click', (e) => {
         e.preventDefault();
-        const filtro = button.dataset.filter;
+        const filtro = element.dataset.filter;
         const filtrados = filtro
           ? window.appState.products.filter(p => p.categoria === filtro)
           : window.appState.products;
         renderizarProductos(filtrados);
+        
+        // Opcional: Desplazar hacia la sección de productos
+        const productosSection = document.getElementById('seccion-productos');
+        if (productosSection) {
+          productosSection.scrollIntoView({ behavior: 'smooth' });
+        }
       });
     });
-  });
-}
+  }
