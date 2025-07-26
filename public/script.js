@@ -328,18 +328,18 @@ async function procesarPedido(event) {
   
   // Formatear correctamente los datos para Supabase
   const pedidoData = {
-    numero_pedido: orderNumber,
-    cliente_info: { // Enviar como objeto, no como string
-      nombre: nombre,
-      email: email,
-      telefono: telefono,
-      direccion: `${direccion}, ${ciudad}`,
-      referidor: referidor
-    },
-    productos: JSON.stringify(window.appState.carrito), // Convertir a string si la columna es JSON/TEXT
-    total: total,
-    estado: 'pendiente_pago'
-  };
+  numero_pedido: orderNumber,
+  cliente_info: JSON.stringify({ // NO stringify
+    nombre: nombre,
+    email: email,
+    telefono: telefono,
+    direccion: `${direccion}, ${ciudad}`,
+    referidor: referidor
+  }),
+  productos: window.appState.carrito, // Esto está bien como array
+  total: total,
+  estado: 'pendiente_pago'
+};
   
   try {
     console.log('📦 Datos del pedido a enviar:', pedidoData); // Para debugging
