@@ -129,25 +129,37 @@ async function agregarProductoAlCarrito(producto) {
 
 // Cargar carrito
 async function cargarCarrito() {
-  const { data, error } = await client
-    .from('carrito')
-    .select('*')
-    .eq('user_id', userId);
-  if (error) {
+  try {
+    const { data, error } = await client
+      .from('carrito')
+      .select('*')
+      .eq('user_id', userId);
+    
+    if (error) throw error;
+    
+    console.log("🛍️ Productos cargados desde Supabase:", data);
+    return data || [];
+  } catch (error) {
     console.error("Error cargando carrito:", error);
     return [];
   }
-  return data || [];
 }
 
-// Eliminar producto del carrito
 async function eliminarProductoDelCarrito(productId) {
-  const { error } = await client
-    .from('carrito')
-    .delete()
-    .eq('product_id', productId)
-    .eq('user_id', userId);
-  if (error) throw error;
+  try {
+    console.log("🔍 Eliminando producto ID:", productId);
+    const { error } = await client
+      .from('carrito')
+      .delete()
+      .eq('product_id', productId)
+      .eq('user_id', userId);
+    
+    if (error) throw error;
+    console.log("✅ Producto eliminado correctamente");
+  } catch (error) {
+    console.error("Error eliminando producto:", error);
+    throw error;
+  }
 }
 
 // Limpiar carrito
@@ -196,25 +208,20 @@ function actualizarContadorCarrito() {
 // Mostrar modal del carrito
 function mostrarCarrito() {
   const modal = document.getElementById('carrito-modal');
-  
-  // Debug: Verificar si el modal existe
   if (!modal) {
-    console.error('Elemento #carrito-modal no encontrado en el DOM');
+    console.error("Modal no encontrado");
     return;
   }
 
-  // Debug: Mostrar estado antes de cambios
-  console.log('Estado inicial del modal:', {
-    classes: modal.classList,
-    display: window.getComputedStyle(modal).display,
-    visibility: window.getComputedStyle(modal).visibility,
-    opacity: window.getComputedStyle(modal).opacity
-  });
-
-  // Actualizar contenido del carrito
+  console.log("📊 Mostrando carrito con estado:", appState.carrito);
+  
   const lista = modal.querySelector('.cart-items');
   const total = modal.querySelector('.total-amount');
-  lista.innerHTML = '';
+  
+  // Limpiar solo si hay productos
+  if (appState.carrito.length > 0) {
+    lista.innerHTML = '';
+  }
 
   if (appState.carrito.length === 0) {
     lista.innerHTML = '<div class="empty-cart">Tu carrito está vacío</div>';
@@ -229,19 +236,38 @@ function mostrarCarrito() {
           <span class="item-quantity">Cantidad: ${item.quantity}</span>
         </div>
         <div class="item-price">$${(item.price * item.quantity).toLocaleString()}</div>
-        <button class="remove-item" data-id="${item.product_id}"><i class="fas fa-trash"></i></button>
+        <button class="remove-item" data-id="${item.product_id}">
+          <i class="fas fa-trash"></i>
+        </button>
       `;
-      itemDiv.querySelector('.remove-item').addEventListener('click', async () => {
-        await eliminarProductoDelCarrito(item.product_id);
-        await actualizarCarrito();
-        mostrarCarrito();
+      
+      // Agregar event listener correctamente
+      const removeBtn = itemDiv.querySelector('.remove-item');
+      removeBtn.addEventListener('click', async (e) => {
+        e.target.disabled = true;
+        try {
+          await eliminarProductoDelCarrito(item.product_id);
+          await actualizarCarrito();
+          mostrarCarrito();
+        } catch (error) {
+          console.error("Error eliminando producto:", error);
+        } finally {
+          e.target.disabled = false;
+        }
       });
+      
       lista.appendChild(itemDiv);
     });
 
-    const totalValor = appState.carrito.reduce((s, i) => s + i.price * i.quantity, 0);
+    const totalValor = appState.carrito.reduce((total, item) => total + (item.price * item.quantity), 0);
     total.textContent = `$${totalValor.toLocaleString()}`;
   }
+
+  // Mostrar modal
+  modal.classList.remove('hidden');
+  modal.setAttribute('aria-modal', 'true');
+  console.log("✅ Modal mostrado correctamente");
+}
 
   // Mostrar el modal con múltiples métodos
   modal.classList.remove('hidden');
@@ -262,71 +288,49 @@ function mostrarCarrito() {
 // Configurar botones del carrito
 function configurarCarrito() {
   const cartButton = document.getElementById('cartButton');
-  const modal = document.getElementById('carrito-modal');
+  const closeButton = document.querySelector('.close-cart');
+  const clearButton = document.getElementById('limpiarCarrito');
 
-  if (!cartButton || !modal) {
-    console.error('Elementos del carrito no encontrados');
-    return;
-  }
-
-  // Abrir carrito
-  cartButton.addEventListener('click', async function() {
-    console.log('Botón de carrito clickeado'); // Debug
-    
-    try {
-      cartButton.disabled = true;
-      cartButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-      
-      await actualizarCarrito();
-      
-      console.log('Mostrando carrito...'); // Debug
-      modal.classList.remove('hidden');
-      modal.setAttribute('aria-hidden', 'false');
-      
-      // Enfocar el modal para accesibilidad
-      modal.focus();
-      
-    } catch (error) {
-      console.error('Error al abrir carrito:', error);
-      mostrarNotificacion('❌ Error al abrir el carrito');
-    } finally {
-      cartButton.disabled = false;
-      cartButton.innerHTML = `<span id="cart-count">0</span>
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/>
-        </svg>`;
-    }
-  });
-
-  // Cerrar carrito
-  document.querySelector('.close-cart')?.addEventListener('click', () => {
-    modal.classList.add('hidden');
-    modal.setAttribute('aria-hidden', 'true');
-    cartButton.focus(); // Devuelve el foco al botón
-  });
-
-  // Limpiar carrito
-  document.getElementById('limpiarCarrito')?.addEventListener('click', async () => {
-    const button = document.getElementById('limpiarCarrito');
-    try {
-      button.disabled = true;
-      await limpiarCarrito();
+  if (cartButton) {
+    cartButton.addEventListener('click', async () => {
+      console.log("🛒 Botón de carrito clickeado");
       await actualizarCarrito();
       mostrarCarrito();
-      mostrarNotificacion("🧹 Carrito vaciado");
-    } catch (error) {
-      console.error('Error al limpiar carrito:', error);
-      mostrarNotificacion("❌ Error al vaciar carrito");
-    } finally {
-      button.disabled = false;
-    }
-  });
+    });
+  }
 
-  // Cerrar al hacer clic fuera del modal
-  modal.addEventListener('click', (e) => {
-    if (e.target === modal) {
-      modal.classList.add('hidden');
-      modal.setAttribute('aria-hidden', 'true');
+  if (closeButton) {
+    closeButton.addEventListener('click', () => {
+      document.getElementById('carrito-modal').classList.add('hidden');
+    });
+  }
+
+  if (clearButton) {
+    clearButton.addEventListener('click', async () => {
+      console.log("🧹 Intentando vaciar carrito...");
+      clearButton.disabled = true;
+      try {
+        await limpiarCarrito();
+        await actualizarCarrito();
+        mostrarCarrito();
+        mostrarNotificacion("Carrito vaciado");
+      } catch (error) {
+        console.error("Error vaciando carrito:", error);
+        mostrarNotificacion("Error al vaciar carrito");
+      } finally {
+        clearButton.disabled = false;
+      }
+    });
+  }
+
+  // Delegación de eventos para elementos dinámicos
+  document.getElementById('carrito-modal')?.addEventListener('click', async (e) => {
+    if (e.target.closest('.remove-item')) {
+      const productId = e.target.closest('.remove-item').dataset.id;
+      console.log("🗑️ Eliminando producto:", productId);
+      await eliminarProductoDelCarrito(productId);
+      await actualizarCarrito();
+      mostrarCarrito();
     }
   });
 }
