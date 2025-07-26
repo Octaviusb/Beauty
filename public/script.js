@@ -447,4 +447,3 @@ if (!window.beautyLineInitialized) {
     });
   });
 }
-}
