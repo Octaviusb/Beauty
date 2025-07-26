@@ -1,10 +1,8 @@
 // Configuración de Supabase
-if (!window.SUPABASE_CLIENT) {
-  const SUPABASE_URL = 'https://lsxojnbkbqhuwaydiqqb.supabase.co';
-  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxzeG9qbmJrYnFodXdheWRpcXFiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI1MDYzMzAsImV4cCI6MjA2ODA4MjMzMH0.uHQJ_F3NmeM2U4EsIq_UFSPMKd35MlMZnrboKOIy45g';
-  window.SUPABASE_CLIENT = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-}
-const client = window.SUPABASE_CLIENT;
+window.supabaseClient = window.supabaseClient || supabase.createClient(
+  'https://lsxojnbkbqhuwaydiqqb.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxzeG9qbmJrYnFodXdheWRpcXFiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI1MDYzMzAsImV4cCI6MjA2ODA4MjMzMH0.uHQJ_F3NmeM2U4EsIq_UFSPMKd35MlMZnrboKOIy45g'
+);
 
 // Obtener user_id anónimo
 let userId = localStorage.getItem('user_id');
@@ -23,7 +21,7 @@ const appState = {
 // Cargar productos desde Supabase
 async function cargarProductos() {
   try {
-    const { data: products, error } = await client
+    const { data: products, error } = await window.supabaseClient
       .from('products')
       .select('*')
       .order('name', { ascending: true });
@@ -97,7 +95,7 @@ function renderizarProductos(productos) {
 
 // Agregar producto al carrito
 async function agregarProductoAlCarrito(producto) {
-  const { data: existingItems, error: queryError } = await client
+  const { data: existingItems, error: queryError } = await window.supabaseClient
     .from('carrito')
     .select('*')
     .eq('product_id', producto.id)
@@ -108,14 +106,14 @@ async function agregarProductoAlCarrito(producto) {
   const existingItem = existingItems?.[0];
 
   if (existingItem) {
-    const { error: updateError } = await client
+    const { error: updateError } = await window.supabaseClient
       .from('carrito')
       .update({ quantity: existingItem.quantity + 1 })
       .eq('id', existingItem.id);
 
     if (updateError) throw updateError;
   } else {
-    const { error: insertError } = await client
+    const { error: insertError } = await window.supabaseClient
       .from('carrito')
       .insert([{
         product_id: producto.id,
@@ -132,7 +130,7 @@ async function agregarProductoAlCarrito(producto) {
 // Cargar carrito
 async function cargarCarrito() {
   try {
-    const { data, error } = await client
+    const { data, error } = await window.supabaseClient
       .from('carrito')
       .select('*')
       .eq('user_id', userId);
@@ -148,7 +146,7 @@ async function cargarCarrito() {
 
 async function eliminarProductoDelCarrito(productId) {
   try {
-    const { error } = await client
+    const { error } = await window.supabaseClient
       .from('carrito')
       .delete()
       .eq('product_id', productId)
@@ -163,7 +161,7 @@ async function eliminarProductoDelCarrito(productId) {
 
 // Limpiar carrito
 async function limpiarCarrito() {
-  const { error } = await client
+  const { error } = await window.supabaseClient
     .from('carrito')
     .delete()
     .eq('user_id', userId);
@@ -294,7 +292,7 @@ function mostrarFormularioPedido() {
 // Guardar pedido en Supabase
 async function guardarPedidoEnSupabase(pedidoData) {
   try {
-    const { data, error } = await client
+    const { data, error } = await window.supabaseClient
       .from('pedidos')
       .insert([pedidoData])
       .select();
