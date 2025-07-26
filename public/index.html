@@ -1,283 +1,186 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Tienda de productos de belleza y cuidado personal - Beauty Line. Productos naturales de alta calidad para el cuidado de la piel y maquillaje.">
-  <title>Beauty Line - Tienda de Belleza y Cuidado Personal | Productos Naturales</title>
-  
-  <!-- Preload de recursos críticos -->
-  <link rel="preload" href="styles.css" as="style">
-  <link rel="preload" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600&display=swap" as="style">
-  <link rel="preload" href="script.js" as="script">
-  
-  <!-- Hojas de estilo -->
-  <link rel="stylesheet" href="styles.css" />
-  <link rel="stylesheet" href="styles-form.css" />
-  <link rel="stylesheet" href="styles-wompi.css" />
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="icon" href="./assets/favicon.ico" type="image/x-icon">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-  
-  <!-- Scripts -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
-  <script src="script.js"></script>
-  <script>
-    if(window.location.hostname === "localhost") {
-      window.OtAutoBlock = false; // Desactiva el bloqueo en desarrollo local
-    }
-  </script>
-  <!-- Script de Wompi -->
-  <script src="https://checkout.wompi.co/widget.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport"0 content="width=device-width, initial-scale=1.0">
+    <title>Procesando Pago - Beauty Line</title>
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #fdfcfb 0%, #e2d1c3 100%);
+            color: #333;
+        }
+        .container {
+            text-align: center;
+            background: white;
+            padding: 2.5rem;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            max-width: 90%;
+            width: 450px;
+        }
+        .logo {
+            margin-bottom: 1.5rem;
+        }
+        .logo img {
+            max-width: 120px;
+        }
+        h1 {
+            color: #d4a373;
+            margin-bottom: 1rem;
+            font-family: 'Playfair Display', serif;
+        }
+        .loading {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #d4a373;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 20px 0;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .order-details {
+            background-color: #f8f4f0;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1.5rem 0;
+            text-align: left;
+            font-size: 0.9rem;
+        }
+        .order-details p {
+            margin: 0.5rem 0;
+        }
+        .secure-note {
+            font-size: 0.8rem;
+            color: #666;
+            margin-top: 1.5rem;
+        }
+        .error-message {
+            color: #e63946;
+            background-color: #ffccd5;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+            display: none;
+        }
+    </style>
 </head>
 <body>
-  <header class="main-header" role="banner">
-    <div class="header-container">
-      <h1 class="logo">
-        <img src="assets/logo.png" alt="Beauty Club Logo" width="150" height="50" loading="lazy">
-      </h1>
-
-      <button class="cart-icon" id="cartButton" aria-label="Carrito de compras" aria-expanded="false">
-        <span id="cart-count" aria-live="polite">0</span>
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-          <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/>
-        </svg>
-      </button>
-    </div>
-  </header>
-
-  <main id="main-content">
-    <!-- Hero Section -->
-    <section id="inicio" class="hero" aria-labelledby="hero-heading">
-      <div class="hero-container">
-        <div class="hero-content">
-          <h1 id="hero-heading">Descubre tu Belleza Natural</h1>
-          <p>Los mejores cosméticos naturales para realzar tu belleza. Productos de alta calidad que cuidan tu piel.</p>
-        </div>
-        <div class="hero-image">
-          <img src="https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" 
-               alt="Variedad de cosméticos naturales en exhibición" 
-               loading="eager"
-               width="600"
-               height="400">
-        </div>
-      </div>
-    </section>
-
-    <!-- Categorías -->
-    <section id="categorias" class="categories" aria-labelledby="categories-heading">
-      <div class="container">
-        <div class="categories-grid" role="list">
-          
-          <div class="category-card" role="listitem">
-            <div class="category-icon">
-              <i class="fas fa-palette" aria-hidden="true"></i>
-            </div>
-            <h3>Maquillaje</h3>
-            <p>Productos para realzar tu belleza natural</p>
-            <a href="#productos?filter=maquillaje" class="category-link filter-btn" data-filter="maquillaje">Ver productos</a>
-          </div>
-
-          <div class="category-card" role="listitem">
-            <div class="category-icon">
-              <i class="fas fa-spa" aria-hidden="true"></i>
-            </div>
-            <h3>Skincare</h3>
-            <p>Cuidado facial y corporal</p>
-            <a href="#productos?filter=skincare" class="category-link filter-btn" data-filter="skincare">Ver productos</a>
-          </div>
-
-          <div class="category-card" role="listitem">
-            <div class="category-icon">
-              <i class="fas fa-pump-soap" aria-hidden="true"></i>
-            </div>
-            <h3>Higiene</h3>
-            <p>Productos de limpieza y cuidado</p>
-            <a href="#productos?filter=higiene" class="category-link filter-btn" data-filter="higiene">Ver productos</a>
-          </div>
-
-          <div class="category-card" role="listitem">
-            <div class="category-icon">
-              <i class="fas fa-gem" aria-hidden="true"></i>
-            </div>
-            <h3>Accesorios</h3>
-            <p>Herramientas y accesorios de belleza</p>
-            <a href="#productos?filter=accesorios" class="category-link filter-btn" data-filter="accesorios">Ver productos</a>
-          </div>
-
-          <div class="category-card" role="listitem">
-            <div class="category-icon">
-              <i class="fas fa-hand-sparkles" aria-hidden="true"></i>
-            </div>
-            <h3>Uñas</h3>
-            <p>Esmaltes y cuidado de uñas</p>
-            <a href="#productos?filter=uñas" class="category-link filter-btn" data-filter="esmaltes">Ver productos</a>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section id="seccion-productos" class="productos-seccion">
-      <h2>Nuestros Productos</h2>
-
-      <!-- Aquí se insertan los productos -->
-      <div id="product-list" class="productos-grid"></div>
-    </section>
-  </main>
-
-  <!-- Footer -->
-  <footer class="footer" aria-label="Pie de página">
     <div class="container">
-      <div class="footer-content">
-        <div class="footer-col">
-          <h3>Beauty Line</h3>
-          <p>Tu tienda de confianza para productos de belleza de alta calidad.</p>
+        <div class="logo">
+            <img src="assets/logo.png" alt="Beauty Line Logo">
         </div>
-        <!-- Otras columnas del footer -->
-      </div>
-      <div class="footer-bottom">
-        <p class="footer-legal">&copy; <span id="current-year"></span> Beauty Line. Todos los derechos reservados.</p>
-      </div>
-    </div>
-  </footer>
-
-  <!-- Modales -->
-  <!-- Modal del Carrito -->
-  <div id="carrito-modal" class="modal hidden" role="dialog" aria-modal="false" aria-labelledby="cart-title">
-    <div class="modal-content">
-      <button class="close-cart" aria-label="Cerrar carrito">&times;</button>
-      <h2 id="cart-title">Tu Carrito</h2>
-      <div class="cart-items" role="list"></div>
-      <div class="cart-total">
-        <strong>Total:</strong> <span class="total-amount">$0.00</span>
-      </div>
-      <div class="cart-actions">
-        <button id="limpiarCarrito" class="clear-cart-btn">Vaciar Carrito</button>
-        <button id="finalizarCompra" class="checkout-btn">Finalizar Compra</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Modal de Checkout - FORMULARIO COMPLETO -->
-  <div id="checkoutForm" class="modal hidden" role="dialog" aria-modal="false" aria-labelledby="checkout-title">
-    <div class="modal-content checkout-content">
-      <button class="close-form" aria-label="Cerrar formulario">&times;</button>
-      <h2 id="checkout-title">Finalizar Compra</h2>
-      
-      <form id="formularioCompra" class="checkout-form">
-        <div class="form-grid">
-          <!-- Columna de información del cliente -->
-          <div class="form-column">
-            <h3>Información Personal</h3>
-            
-            <div class="form-group">
-              <label for="nombre">Nombre completo*</label>
-              <input type="text" id="nombre" name="nombre" required autocomplete="name">
-            </div>
-            
-            <div class="form-group">
-              <label for="email">Correo electrónico*</label>
-              <input type="email" id="email" name="email" required autocomplete="email">
-            </div>
-            
-            <div class="form-group">
-              <label for="telefono">Teléfono*</label>
-              <input type="tel" id="telefono" name="telefono" required autocomplete="tel">
-            </div>
-            
-            <div class="form-group">
-              <label for="direccion">Dirección completa*</label>
-              <textarea id="direccion" name="direccion" required autocomplete="street-address"></textarea>
-            </div>
-            
-            <div class="form-group">
-              <label for="ciudad">Ciudad*</label>
-              <input type="text" id="ciudad" name="ciudad" required autocomplete="address-level2">
-            </div>
-            
-            <div class="form-group">
-              <label for="referidor">¿Quién te refirió?*</label>
-              <input type="text" id="referidor" name="referidor" required placeholder="Nombre de quien te refirió">
-            </div>
-          </div>
-          
-          <!-- Columna de resumen del pedido -->
-          <div class="order-summary">
-            <h3>Tu Pedido</h3>
-            <div class="summary-items">
-              <!-- Los productos se agregarán dinámicamente aquí -->
-            </div>
-            <div class="summary-totals">
-              <div class="summary-row">
-                <span>Subtotal:</span>
-                <span class="subtotal-amount">$0.00</span>
-              </div>
-              <div class="summary-row">
-                <span>Envío:</span>
-                <span class="shipping-amount">$0.00</span>
-              </div>
-              <div class="summary-row total-row">
-                <strong>Total:</strong>
-                <strong class="total-amount">$0.00</strong>
-              </div>
-            </div>
-            
-            <div class="payment-methods">
-              <h4>Método de Pago</h4>
-              <div class="payment-options">
-                <label class="payment-option">
-                  <input type="radio" name="payment-method" value="wompi" checked>
-                  <span>Pago con Wompi (Tarjeta, Nequi, Daviplata)</span>
-                </label>
-                <label class="payment-option">
-                  <input type="radio" name="payment-method" value="pse">
-                  <span>PSE</span>
-                </label>
-              </div>
-            </div>
-            
-            <div class="form-notas">
-              <p><strong>Nota importante:</strong> El envío será despachado en un plazo máximo de 3 días hábiles después de confirmado el pago.</p>
-              <p>Envío gratuito para compras superiores a $200.000</p>
-              <p class="warning-note"><strong>Por favor, tome nota del valor exacto de su pedido, cualquier inconsistencia impedirá que el pedido sea despachado.</strong></p>
-            </div>
-          </div>
+        <h1>Procesando tu pago</h1>
+        <div class="loading" id="loading-spinner"></div>
+        <p>Estamos redirigiéndote a la pasarela de pago segura de Wompi.</p>
+        
+        <div class="order-details">
+            <p><strong>Referencia:</strong> <span id="order-reference">-</span></p>
+            <p><strong>Total:</strong> <span id="order-total">-</span></p>
+            <p><strong>Cliente:</strong> <span id="customer-email">-</span></p>
         </div>
         
-        <div class="form-actions">
-          <button type="button" class="btn-back-to-cart">Volver al Carrito</button>
-          <button type="submit" class="btn-submit-order">Realizar Pedido</button>
+        <p class="secure-note">
+            <i class="fas fa-lock"></i> Tu pago será procesado de forma segura. 
+            No almacenamos información de tus tarjetas.
+        </p>
+        
+        <div class="error-message" id="error-message">
+            <p><strong>Error:</strong> Ocurrió un problema al procesar tu pago. Por favor, regresa e inténtalo nuevamente.</p>
+            <button onclick="goBack()" class="btn-secondary">Volver al Carrito</button>
         </div>
-      </form>
     </div>
-  </div>
 
-  <!-- Modal de Confirmación -->
-  <div id="confirmationModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="confirmation-title">
-    <div class="modal-content confirmation-content">
-      <div class="confirmation-icon">
-        <i class="fas fa-check-circle"></i>
-      </div>
-      <h2 id="confirmation-title">¡Pedido Recibido!</h2>
-      <p class="confirmation-message">Hemos recibido tu pedido correctamente. En breve recibirás un correo electrónico con los detalles.</p>
-      <p class="confirmation-number">Número de pedido: <span id="order-number">BL-0000</span></p>
-      <div class="confirmation-actions">
-        <button id="btn-continue-shopping" class="btn-primary">Seguir Comprando</button>
-        <a href="/mis-pedidos" class="btn-secondary">Ver mis pedidos</a>
-      </div>
-    </div>
-  </div>
+    <!-- Wompi Checkout Script -->
+    <script src="https://checkout.wompi.co/widget.js"></script>
+    <script>
+        function goBack() {
+            window.location.href = '/index.html';
+        }
 
-  <!-- Scripts -->
-  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-  <script src="script.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
-  <script src="filtrar-productos.js"></script>
-  <script>
-    emailjs.init("Cqwg1EyqFLvPg7ULx");
-    document.getElementById('current-year').textContent = new Date().getFullYear();
-  </script>
+        window.addEventListener('load', function() {
+            console.log('🚀 Iniciando proceso de redirección a Wompi...');
+            
+            // Obtener parámetros de la URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const totalCents = urlParams.get('total');
+            const reference = urlParams.get('reference');
+            const email = urlParams.get('email');
+            const name = urlParams.get('name');
+            
+            // Mostrar información del pedido
+            document.getElementById('order-reference').textContent = reference || 'N/A';
+            document.getElementById('order-total').textContent = totalCents ? `$${(parseInt(totalCents) / 100).toLocaleString('es-CO')}` : 'N/A';
+            document.getElementById('customer-email').textContent = email || 'N/A';
+            
+            console.log('📦 Datos del pedido:', { totalCents, reference, email, name });
+            
+            // Validar parámetros requeridos
+            if (!totalCents || !reference || !email) {
+                console.error('❌ Parámetros incompletos:', { totalCents, reference, email });
+                document.getElementById('error-message').style.display = 'block';
+                document.getElementById('loading-spinner').style.display = 'none';
+                return;
+            }
+            
+            // TU PUBLIC KEY DE WOMPI (la que proporcionaste)
+            const publicKey = 'pub_prod_XApVcADEVCLGJnnghUT1V8G3oEwrF7ZW';
+            
+            // Inicializar Wompi Checkout
+            try {
+                console.log('🔐 Inicializando Wompi con publicKey:', publicKey);
+                
+                window.$wompi = new WompiCheckout({
+                    publicKey: publicKey,
+                    currency: 'COP',
+                    amountInCents: parseInt(totalCents),
+                    reference: reference,
+                    customerData: {
+                        email: email,
+                        fullName: name || email.split('@')[0]
+                    },
+                    paymentMethods: {
+                        bancolombia: true,
+                        nequi: true,
+                        daviplata: true,
+                        pse: true,
+                        card: true
+                    },
+                    onSuccess: function(transaction) {
+                        console.log('✅ Pago exitoso:', transaction);
+                        // Redirigir a página de éxito (puedes crear esta página)
+                        window.location.href = `/pago-exitoso.html?reference=${reference}`;
+                    },
+                    onCancel: function() {
+                        console.log('ℹ️ Pago cancelado');
+                        alert('El pago fue cancelado. Serás redirigido al carrito de compras.');
+                        window.location.href = '/index.html';
+                    },
+                    onError: function(error) {
+                        console.error('❌ Error en pago:', error);
+                        document.getElementById('error-message').style.display = 'block';
+                        document.getElementById('loading-spinner').style.display = 'none';
+                    }
+                });
+                
+                console.log('✅ Wompi inicializado correctamente');
+                
+            } catch (error) {
+                console.error('💥 Error inicializando Wompi:', error);
+                document.getElementById('error-message').style.display = 'block';
+                document.getElementById('loading-spinner').style.display = 'none';
+            }
+        });
+    </script>
 </body>
 </html>
