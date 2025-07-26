@@ -208,17 +208,18 @@ function actualizarContadorCarrito() {
 // Mostrar modal del carrito
 function mostrarCarrito() {
   const modal = document.getElementById('carrito-modal');
+  
+  // Verificación crítica del elemento modal
   if (!modal) {
-    console.error("Modal no encontrado");
+    console.error('Error: No se encontró el elemento #carrito-modal');
     return;
   }
 
-  console.log("📊 Mostrando carrito con estado:", appState.carrito);
-  
+  // Actualización del contenido del carrito
   const lista = modal.querySelector('.cart-items');
   const total = modal.querySelector('.total-amount');
   
-  // Limpiar solo si hay productos
+  // Limpiar lista solo si hay productos
   if (appState.carrito.length > 0) {
     lista.innerHTML = '';
   }
@@ -241,27 +242,46 @@ function mostrarCarrito() {
         </button>
       `;
       
-      // Agregar event listener correctamente
-      const removeBtn = itemDiv.querySelector('.remove-item');
-      removeBtn.addEventListener('click', async (e) => {
-        e.target.disabled = true;
+      // Evento para eliminar producto
+      itemDiv.querySelector('.remove-item').addEventListener('click', async () => {
+        const button = itemDiv.querySelector('.remove-item');
+        button.disabled = true;
         try {
           await eliminarProductoDelCarrito(item.product_id);
           await actualizarCarrito();
           mostrarCarrito();
         } catch (error) {
-          console.error("Error eliminando producto:", error);
+          console.error('Error eliminando producto:', error);
+          mostrarNotificacion('Error al eliminar producto');
         } finally {
-          e.target.disabled = false;
+          button.disabled = false;
         }
       });
       
       lista.appendChild(itemDiv);
     });
 
-    const totalValor = appState.carrito.reduce((total, item) => total + (item.price * item.quantity), 0);
+    // Calcular total
+    const totalValor = appState.carrito.reduce((sum, item) => sum + (item.price * item.quantity), 0);
     total.textContent = `$${totalValor.toLocaleString()}`;
   }
+
+  // Mostrar el modal (versión optimizada)
+  modal.style.display = 'flex';
+  modal.style.visibility = 'visible';
+  modal.style.opacity = '1';
+  modal.classList.remove('hidden');
+  modal.setAttribute('aria-modal', 'true');
+  
+  // Debug en consola
+  console.log('Modal activado. Estado actual:', {
+    display: window.getComputedStyle(modal).display,
+    visibility: window.getComputedStyle(modal).visibility,
+    opacity: window.getComputedStyle(modal).opacity,
+    classes: modal.classList.toString(),
+    carritoItems: appState.carrito.length
+  });
+}
 
   // Mostrar modal
   modal.classList.remove('hidden');
