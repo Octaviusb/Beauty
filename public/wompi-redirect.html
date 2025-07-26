@@ -115,12 +115,13 @@
     </div>
 
     <!-- Wompi Checkout Script CORREGIDO -->
-    <script src="https://cdn.wompi.dev/v1.js"></script>
+    <script src="https://widget.wompi.co/v1.js"></script>
     <script>
         function goBack() {
             window.location.href = '/index.html';
         }
 
+        // Esperar a que el script se cargue completamente
         window.addEventListener('load', function() {
             console.log('🚀 Iniciando proceso de redirección a Wompi...');
             
@@ -148,6 +149,14 @@
             
             // TU PUBLIC KEY DE WOMPI (la que proporcionaste)
             const publicKey = 'pub_prod_XApVcADEVCLGJnnghUT1V8G3oEwrF7ZW';
+            
+            // Verificar que WompiCheckout esté disponible
+            if (typeof WompiCheckout === 'undefined') {
+                console.error('❌ WompiCheckout no está definido. El script no se cargó correctamente.');
+                document.getElementById('error-message').style.display = 'block';
+                document.getElementById('loading-spinner').style.display = 'none';
+                return;
+            }
             
             // Inicializar Wompi Checkout
             try {
