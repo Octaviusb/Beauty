@@ -85,6 +85,48 @@
   position: relative;
 }
 
+/* ESTILOS PARA EL MODAL - DEBEN ESTAR EN TU CSS */
+#carrito-modal {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  background-color: rgba(0, 0, 0, 0.8) !important;
+  display: none !important; /* Inicialmente oculto */
+  justify-content: center !important;
+  align-items: center !important;
+  z-index: 9999 !important;
+  opacity: 0 !important;
+  transition: opacity 0.3s ease !important;
+}
+
+#carrito-modal:not(.hidden) {
+  display: flex !important;
+  opacity: 1 !important;
+}
+
+.modal-content {
+  background: white !important;
+  padding: 2rem !important;
+  border-radius: 8px !important;
+  width: 90% !important;
+  max-width: 600px !important;
+  max-height: 90vh !important;
+  overflow-y: auto !important;
+  position: relative !important;
+}
+
+.close-cart {
+  position: absolute !important;
+  top: 15px !important;
+  right: 15px !important;
+  background: none !important;
+  border: none !important;
+  font-size: 1.5rem !important;
+  cursor: pointer !important;
+}
+
 /* ==== BOTÓN CIERRE (X) ==== */
 .close-form, .close-modal {
   position: absolute;
