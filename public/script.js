@@ -307,7 +307,6 @@ async function guardarPedidoEnSupabase(pedidoData) {
 }
 
 // Procesar pedido
-// Procesar pedido
 async function procesarPedido(event) {
   event.preventDefault();
   const formulario = document.getElementById('formularioCompra');
@@ -327,16 +326,17 @@ async function procesarPedido(event) {
   const orderNumber = `BL-${Date.now().toString().slice(-6)}`;
   
   // Formatear correctamente los datos para Supabase
-  const pedidoData = {
+
+const pedidoData = {
   numero_pedido: orderNumber,
-  cliente_info: JSON.stringify({ // NO stringify
+  cliente_info: { // Envía como objeto, no como string
     nombre: nombre,
     email: email,
     telefono: telefono,
     direccion: `${direccion}, ${ciudad}`,
     referidor: referidor
-  }),
-  productos: window.appState.carrito, // Esto está bien como array
+  },
+  productos: window.appState.carrito, // Envía como array, no como string
   total: total,
   estado: 'pendiente_pago'
 };
