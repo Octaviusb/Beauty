@@ -441,29 +441,23 @@ if (!window.beautyLineInitialized) {
       element.addEventListener('click', (e) => {
         e.preventDefault();
         const filtro = element.dataset.filter;
-        console.log(`🔍 Aplicando filtro: "${filtro}"`); // Para depuración
-        console.log(`📦 Productos totales en appState:`, window.appState.products.length); // Para depuración
-
-        // Verificar si los productos tienen la propiedad 'categoria'
-        if (window.appState.products.length > 0) {
-          console.log(`ℹ️  Ejemplo de producto:`, window.appState.products[0]); // Para depuración
-        }
+        console.log(`🔍 Aplicando filtro: "${filtro}"`); // <-- Línea de depuración
+        console.log(`📦 Productos totales en appState:`, window.appState.products.length); // <-- Línea de depuración
 
         const filtrados = filtro
           ? window.appState.products.filter(p => {
-              // Para depuración, mostrar qué productos se están evaluando
-              console.log(`Evaluando producto: ${p.name}, categoria: ${p.categoria}, coincide: ${p.categoria === filtro}`);
+              console.log(`Evaluando producto: ${p.name}, categoria: ${p.categoria}, coincide: ${p.categoria === filtro}`); // <-- Línea de depuración
               return p.categoria === filtro;
             })
           : window.appState.products;
 
-        console.log(`✅ Productos filtrados:`, filtrados.length); // Para depuración
+        console.log(`✅ Productos filtrados:`, filtrados.length); // <-- Línea de depuración
         renderizarProductos(filtrados);
 
         // Opcional: Desplazar hacia la sección de productos
         const productosSection = document.getElementById('seccion-productos');
         if (productosSection) {
-          productosSection.scrollIntoView({ behavior: 'smooth' });
+          productosSection.scrollIntoView({ behavior: 'smooth' };
         }
       });
     });
