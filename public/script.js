@@ -457,7 +457,7 @@ if (!window.beautyLineInitialized) {
         // Opcional: Desplazar hacia la sección de productos
         const productosSection = document.getElementById('seccion-productos');
         if (productosSection) {
-          productosSection.scrollIntoView({ behavior: 'smooth' };
+          productosSection.scrollIntoView({ behavior: 'smooth' });
         }
       });
     });
