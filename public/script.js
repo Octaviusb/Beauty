@@ -170,8 +170,20 @@ function mostrarNotificacion(mensaje) {
 
 // Actualizar contador y vista de carrito
 async function actualizarCarrito() {
-  appState.carrito = await cargarCarrito();
-  actualizarContadorCarrito();
+  try {
+    console.log("🔄 Actualizando estado del carrito...");
+    const carritoActual = await cargarCarrito();
+    console.log("📦 Productos en carrito:", carritoActual);
+    
+    appState.carrito = carritoActual;
+    actualizarContadorCarrito();
+    
+    // Debug: Verificar estado actualizado
+    console.log("🛒 Estado después de actualizar:", appState.carrito);
+  } catch (error) {
+    console.error("❌ Error al actualizar carrito:", error);
+    mostrarNotificacion("Error al cargar el carrito");
+  }
 }
 
 // Actualizar contador numérico
